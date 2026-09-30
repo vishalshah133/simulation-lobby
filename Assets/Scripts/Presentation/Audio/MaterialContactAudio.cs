@@ -33,6 +33,9 @@ namespace SimulationLobby.Presentation
 
         [Range(2, 16)] public int voiceCount = 10;
 
+        [Tooltip("Softest setting that still clinks. Above it, contacts squelch only.")]
+        [Range(0f, 1f)] public float clinkMaxSoftness = 0.001f;
+
         [Header("Continuous voices")]
         [Range(0f, 1f)] public float creakVolume = 0.22f;
         [Range(60f, 400f)] public float creakLowHz = 170f;
@@ -131,8 +134,10 @@ namespace SimulationLobby.Presentation
         }
 
         /// <summary>
-        /// One contact. Clink and squelch are both played, weighted by softness — at 50% you hear
-        /// both, which is what makes a sweep audibly progress rather than switch.
+        /// One contact: a glass clink for a rigid body, a squelch for anything soft — never both. A
+        /// metallic ring from a jelly sounded wrong (first playtest), so the clink is reserved for
+        /// softness ≤ <see cref="clinkMaxSoftness"/>. The squelch itself firms up and shortens as
+        /// softness drops, which is how the sweep still audibly progresses.
         /// </summary>
         /// <param name="impactSpeed">Approach speed in m/s.</param>
         /// <param name="softness01">0 = glass, 1 = jelly.</param>
@@ -143,8 +148,9 @@ namespace SimulationLobby.Presentation
             softness01 = Mathf.Clamp01(softness01);
             _contactCount++;
 
-            float hard = Mathf.Pow(1f - softness01, 0.8f);
-            float soft = Mathf.Pow(softness01, 0.8f);
+            bool rigid = softness01 <= clinkMaxSoftness;
+            float hard = rigid ? 1f : 0f;
+            float soft = rigid ? 0f : Mathf.Lerp(0.6f, 1f, softness01);
 
             if (hard > 0.02f)
             {

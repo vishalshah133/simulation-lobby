@@ -104,6 +104,22 @@ volume and determinism. Every bug below was invisible in code review and obvious
   the capsule" finding was really stiff skin plus low friction. With a stretchy skin and friction
   1.0, a no-memory body splats evenly. Result (squash on impact → settled height):
   25% 73→90%, 50% 60→81%, 75% 45→65%, 100% 33→42% (a water-balloon splat 0.9m wide, on a 2m plinth).
+- **Second playtest: a hole narrower than the capsule makes the best gradient yet.** The glass
+  rests in a brass cup, and softer takes squeeze deeper (19 → 39 → 49 → 59cm). Two rigid-body bugs
+  surfaced and were fixed. (1) A thin lip slipped between the rigid body's collision points: the
+  rigid path now samples particles + edge midpoints + triangle centres, and the lip tube is kept
+  ≥ 0.06. (2) Per-contact restitution on a ring of tilted contacts was order-dependent and added
+  energy (a centred drop flew off sideways): bounce and sliding friction are now applied once, at
+  the λ-weighted average contact.
+- **Third playtest: "the soft body doesn't go in the hole."** It did, 39–59cm, but a camera 7°
+  above the plinth top can't see into a hole, and the opaque plinth hid everything below the rim.
+  The plinth is now smoked glass. Catch for any glass-inside-glass shot: the hero glass refracts the
+  *opaque* image, which never contains transparent objects. So the outer glass is plain
+  alpha-blended URP Lit, drawn after the hero glass (queue +10), not a second refraction shader.
+  Otherwise each would be invisible to the other.
+- **Lacquer is only as bright as what it reflects.** The plinth front read as a black hole until a
+  softbox card sat where that face's reflection lands (behind the camera, just above camera
+  height).
 - **A membrane can only get "water balloon", not liquid.** Its volume constraint and skin keep a
   dome. A true pour or puddle needs particle fluid (Obi Fluid, Zibra Liquids) or an offline bake.
 

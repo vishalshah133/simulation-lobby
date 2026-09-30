@@ -98,6 +98,77 @@ namespace SimulationLobby.Shared
         }
     }
 
+    /// <summary>Vertical capped cylinder between <see cref="yMin"/> and <see cref="yMax"/>.</summary>
+    public sealed class SdfCylinderY : SdfCollider
+    {
+        public readonly Vector3 axisPoint;
+        public readonly float radius;
+        public readonly float yMin;
+        public readonly float yMax;
+
+        public SdfCylinderY(Vector3 axisPoint, float radius, float yMin, float yMax)
+        {
+            this.axisPoint = axisPoint;
+            this.radius = radius;
+            this.yMin = yMin;
+            this.yMax = yMax;
+        }
+
+        public override float Distance(Vector3 p)
+        {
+            float dx = p.x - axisPoint.x;
+            float dz = p.z - axisPoint.z;
+            float radial = Mathf.Sqrt(dx * dx + dz * dz) - radius;
+            float vertical = Mathf.Max(yMin - p.y, p.y - yMax);
+            float outsideR = Mathf.Max(radial, 0f);
+            float outsideV = Mathf.Max(vertical, 0f);
+            return Mathf.Min(Mathf.Max(radial, vertical), 0f) + Mathf.Sqrt(outsideR * outsideR + outsideV * outsideV);
+        }
+    }
+
+    /// <summary>Horizontal torus (a ring lying flat) — a rounded lip around a hole.</summary>
+    public sealed class SdfTorusY : SdfCollider
+    {
+        public readonly Vector3 center;
+        public readonly float majorRadius;
+        public readonly float minorRadius;
+
+        public SdfTorusY(Vector3 center, float majorRadius, float minorRadius)
+        {
+            this.center = center;
+            this.majorRadius = majorRadius;
+            this.minorRadius = minorRadius;
+        }
+
+        public override float Distance(Vector3 p)
+        {
+            float dx = p.x - center.x;
+            float dz = p.z - center.z;
+            float qx = Mathf.Sqrt(dx * dx + dz * dz) - majorRadius;
+            float qy = p.y - center.y;
+            return Mathf.Sqrt(qx * qx + qy * qy) - minorRadius;
+        }
+    }
+
+    /// <summary>
+    /// <see cref="solid"/> with <see cref="cut"/> carved out of it (CSG subtraction) — a plinth with a
+    /// hole in it. Distance is the standard max(a, −b); not exact near the cut's rim, which is fine for
+    /// collision because the solver only needs the sign and a direction out.
+    /// </summary>
+    public sealed class SdfSubtract : SdfCollider
+    {
+        public readonly SdfCollider solid;
+        public readonly SdfCollider cut;
+
+        public SdfSubtract(SdfCollider solid, SdfCollider cut)
+        {
+            this.solid = solid;
+            this.cut = cut;
+        }
+
+        public override float Distance(Vector3 p) => Mathf.Max(solid.Distance(p), -cut.Distance(p));
+    }
+
     /// <summary>
     /// Vertical cone with rounded ends — a sphere of <see cref="baseRadius"/> at <see cref="basePoint"/>
     /// swept into a sphere of <see cref="tipRadius"/> <see cref="height"/> above it. A spike whose tip

@@ -23,7 +23,10 @@ MonoBehaviour:
   dropHeight: 1
   dropOffsetX: 0
   dropTiltDegrees: 0
-  plinthSize: {x: 2, y: 0.75, z: 2}
+  plinthSize: {x: 2, y: 1.2, z: 2}
+  holeRadius: 0.4
+  holeDepth: 1
+  lipRadius: 0.08
   substeps: 16
   gravity: 9.81
   collisionThickness: 0.014

@@ -29,6 +29,14 @@ namespace SimulationLobby.Presentation.EditorTools
         public struct Materials
         {
             public Material glass;
+
+            /// <summary>
+            /// Dark tinted glass for set pieces the subject goes <i>inside</i> (a plinth with a hole).
+            /// Plain alpha-blended URP Lit drawn after the hero glass, not the refraction shader:
+            /// refraction samples the opaque image, which never contains transparent objects, so two
+            /// refraction-glass objects can't see each other.
+            /// </summary>
+            public Material smokedGlass;
             public Material chrome;
             public Material lacquer;
             public Material brass;
@@ -72,6 +80,15 @@ namespace SimulationLobby.Presentation.EditorTools
             return new Materials
             {
                 glass = EnsureGlass(options.glassName, options.hue),
+                smokedGlass = EnsureMaterial("StudioSmokedGlass", "Universal Render Pipeline/Lit", m =>
+                {
+                    // Smoky, not clear: dark enough to read as a solid block, clear enough to see the
+                    // amber subject squeezing inside it. Mirror-smooth so the softbox cards show on it.
+                    m.SetColor("_BaseColor", new Color(0.07f, 0.07f, 0.08f, 0.45f));
+                    m.SetFloat("_Metallic", 0f);
+                    m.SetFloat("_Smoothness", 0.96f);
+                    MakeTransparent(m, 10);
+                }),
                 chrome = EnsureMaterial("StudioChrome", "Universal Render Pipeline/Lit", m =>
                 {
                     m.SetColor("_BaseColor", new Color(0.93f, 0.93f, 0.95f, 1f));
@@ -141,20 +158,26 @@ namespace SimulationLobby.Presentation.EditorTools
                 material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                 material.SetColor("_BaseColor", new Color(hue.r, hue.g, hue.b, 0.38f));
                 material.SetFloat("_Smoothness", 0.96f);
-                material.SetFloat("_Surface", 1f);
-                material.SetFloat("_Blend", 0f);
-                material.SetFloat("_BlendModePreserveSpecular", 1f);
-                material.SetFloat("_SrcBlend", (float)BlendMode.One);
-                material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
-                material.SetFloat("_ZWrite", 0f);
-                material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.SetOverrideTag("RenderType", "Transparent");
-                material.renderQueue = (int)RenderQueue.Transparent;
+                MakeTransparent(material, 0);
             }
 
             AssetDatabase.CreateAsset(material, path);
             return material;
+        }
+
+        /// <summary>
+        /// Turns a URP Lit material transparent (alpha blend, specular preserved) the way the material
+        /// Inspector would, via URP's own <see cref="BaseShaderGUI.SetupMaterialBlendMode"/>, so every
+        /// keyword and blend state matches what URP expects. <paramref name="queueOffset"/> orders it
+        /// after other transparents (e.g. +10 draws a glass plinth over the glass subject inside it).
+        /// </summary>
+        static void MakeTransparent(Material material, int queueOffset)
+        {
+            material.SetFloat("_Surface", 1f); // Transparent
+            material.SetFloat("_Blend", 0f); // Alpha
+            material.SetFloat("_BlendModePreserveSpecular", 1f);
+            material.SetFloat("_QueueOffset", queueOffset);
+            BaseShaderGUI.SetupMaterialBlendMode(material);
         }
 
         static Material EnsureMaterial(string name, string shaderName, System.Action<Material> setup)
@@ -364,6 +387,15 @@ namespace SimulationLobby.Presentation.EditorTools
             halo.spotAngle = 75f;
             halo.innerSpotAngle = 10f;
 
+            // Front fill: soft, low and from the camera side, so the front faces of whatever the subject
+            // stands on aren't left in the key light's shadow side. Warm-neutral, below the key's level.
+            Light fill = CreateLight(root, "Front Fill", LightType.Spot, new Color(1f, 0.96f, 0.9f), 14f);
+            fill.transform.position = new Vector3(subject.x, subject.y * 0.55f, subject.z + 5.5f);
+            fill.transform.LookAt(new Vector3(subject.x, subject.y * 0.3f, subject.z));
+            fill.range = 14f;
+            fill.spotAngle = 55f;
+            fill.innerSpotAngle = 15f;
+
             // Top: a soft pool on the plinth so its lacquer top reads, and the spike catches a crown.
             Light top = CreateLight(root, "Top", LightType.Spot, new Color(1f, 0.97f, 0.93f), 9f);
             top.transform.position = subject + Vector3.up * (size * 1.4f + 1.5f);
@@ -411,6 +443,11 @@ namespace SimulationLobby.Presentation.EditorTools
             // All behind the camera plane: invisible to it at any aspect, visible to every reflection.
             Vector3 behind = -cam.forward;
             Card("Softbox Overhead", cam.position + behind * 2.5f + Vector3.up * 3.2f, new Vector2(7f, 3f));
+
+            // The one the front faces see. A vertical face, viewed from a camera slightly above it,
+            // mirrors a band just above camera height behind the camera. Without a card there the
+            // lacquer front reflects darkness and reads as a black hole in the frame (first playtest).
+            Card("Softbox Front (low)", cam.position + behind * 2.5f + Vector3.up * 0.6f, new Vector2(8f, 1.8f));
             Card("Strip Left", cam.position + behind * 1.5f - cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(0.9f, 6f));
             Card("Strip Right", cam.position + behind * 1.5f + cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(0.9f, 6f));
         }

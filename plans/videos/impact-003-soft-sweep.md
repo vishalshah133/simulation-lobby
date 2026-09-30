@@ -38,7 +38,21 @@ first playtest of the full video.
 A headless harness compiled the real `Shared/SoftBody3D` code outside Unity and ran every take with
 the shipped defaults (1m drop, flat plinth):
 
-Re-tuned after the first playtest ("50/75% barely deform, 100% should be fluid"). Height as % of
+**Second playtest changes:** a brass-lipped hole (opening 0.8m, the capsule is 0.9m) in the plinth
+top, a front softbox card and fill light for the dark plinth front, and the clink only at 0%. With
+the hole (verified headless):
+
+| Take | Result |
+|---|---|
+| 0% | Lands in the brass cup, rocks ~1s, rests 19cm in with 83% of its height above the rim |
+| 25% | Squeezes 39cm in |
+| 50% | 50cm in |
+| 75% | 73cm in, 47% of its height above the rim |
+| 100% | 91cm in, 28% above the rim |
+
+(Plinth 1.2m tall with a 1.0m-deep hole since playtest 4; at 0.6m deep, 75% and 100% both bottomed out.)
+
+Without the hole (holeRadius 0), for reference — re-tuned after the first playtest ("50/75% barely deform, 100% should be fluid"). Height as % of
 the capsule's own:
 
 | Take | Squashes to | Settles at | Wobble | Spread (radius) |

@@ -5,9 +5,10 @@ using UnityEngine;
 namespace SimulationLobby.Simulations.Impact
 {
     /// <summary>
-    /// <c>impact</c>, soft-drop variant: an upright capsule released above a lacquer plinth, falling
-    /// onto it under gravity. How it lands — clinks and hops, dents, squashes, wobbles — depends only
-    /// on <see cref="SoftDropConfig.softness"/>. Meant to be driven by a <see cref="SweepRunner"/>,
+    /// <c>impact</c>, soft-drop variant: an upright capsule released above a lacquer plinth with a
+    /// brass-lipped hole in it, narrower than the capsule. How it lands — glass rests in the cup,
+    /// softer takes squeeze deeper in, 100% slumps into it — depends only on
+    /// <see cref="SoftDropConfig.softness"/>. Meant to be driven by a <see cref="SweepRunner"/>,
     /// which re-initialises it once per take.
     /// </summary>
     /// <remarks>
@@ -81,9 +82,21 @@ namespace SimulationLobby.Simulations.Impact
             Quaternion tilt = Quaternion.Euler(0f, 0f, _config.dropTiltDegrees);
             Solver = new SoftBodySolver(shape, _config.DropCenter, tilt, _config.BuildParameters());
 
-            var floor = new SdfPlane(Vector3.zero, Vector3.up);
-            var plinth = new SdfBox(new Vector3(0f, _config.plinthSize.y * 0.5f, 0f), _config.plinthSize * 0.5f);
-            foreach (SdfCollider collider in new SdfCollider[] { floor, plinth })
+            var colliders = new System.Collections.Generic.List<SdfCollider> { new SdfPlane(Vector3.zero, Vector3.up) };
+            SdfCollider plinth = new SdfBox(new Vector3(0f, _config.plinthSize.y * 0.5f, 0f), _config.plinthSize * 0.5f);
+            if (_config.holeRadius > 0f)
+            {
+                // The hole is carved out of the block; the brass lip is its own rounded collider so the
+                // skin rolls over a curve instead of catching on a sharp rim.
+                float top = _config.PlinthTopY;
+                plinth = new SdfSubtract(plinth,
+                    new SdfCylinderY(Vector3.zero, _config.holeRadius, top - _config.holeDepth, top + 10f));
+                colliders.Add(new SdfTorusY(new Vector3(0f, top, 0f), _config.holeRadius + _config.lipRadius,
+                    _config.lipRadius));
+            }
+
+            colliders.Add(plinth);
+            foreach (SdfCollider collider in colliders)
             {
                 collider.staticFriction = _config.staticFriction;
                 collider.dynamicFriction = _config.dynamicFriction;

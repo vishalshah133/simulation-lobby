@@ -44,8 +44,20 @@ namespace SimulationLobby.Simulations.Impact
         [Range(-45f, 45f)] public float dropTiltDegrees;
 
         [Header("Plinth (layout — shared with the scene builder)")]
-        [Tooltip("2m wide: the 100% take spreads to ~0.92m from centre and must stay on top.")]
-        public Vector3 plinthSize = new Vector3(2f, 0.75f, 2f);
+        [Tooltip("2m wide so any overflow stays on top; 1.2m tall to house a deep hole.")]
+        public Vector3 plinthSize = new Vector3(2f, 1.2f, 2f);
+
+        [Tooltip("Radius of the hole in the plinth top (the opening inside the brass lip). Smaller than the " +
+                 "capsule on purpose: the glass rests in it like an egg in a cup, softer takes squeeze in " +
+                 "deeper. 0 = no hole. Tested with depth 1.0: 0% rests 19cm in, 25/50/75/100% reach " +
+                 "39/50/73/91cm.")]
+        [Min(0f)] public float holeRadius = 0.4f;
+        [Tooltip("Depth of the hole. At 0.6 the 75% and 100% takes both hit the floor and looked alike; " +
+                 "1.0 lets every take find its own depth.")]
+        [Min(0.05f)] public float holeDepth = 1f;
+        [Tooltip("Tube radius of the rounded brass lip around the hole. Keep ≥ 0.06: a thinner lip slips " +
+                 "between the capsule's collision points.")]
+        [Min(0.01f)] public float lipRadius = 0.08f;
 
         [Header("Solver")]
         [Range(1, 48)] public int substeps = 16;
@@ -151,6 +163,18 @@ namespace SimulationLobby.Simulations.Impact
             if (Mathf.Abs(dropOffsetX) + capsuleRadius > plinthSize.x * 0.5f)
             {
                 error = "The capsule would land off the edge of the plinth.";
+                return false;
+            }
+
+            if (holeRadius > 0f && holeRadius + 2f * lipRadius >= Mathf.Min(plinthSize.x, plinthSize.z) * 0.5f)
+            {
+                error = "The hole and its lip don't fit on the plinth top.";
+                return false;
+            }
+
+            if (holeRadius > 0f && holeDepth >= plinthSize.y)
+            {
+                error = "holeDepth must be less than the plinth height.";
                 return false;
             }
 

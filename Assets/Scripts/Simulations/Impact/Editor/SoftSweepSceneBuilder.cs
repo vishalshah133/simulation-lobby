@@ -79,22 +79,25 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
                 subjectHeight = contentTop - layout.PlinthTopY
             });
 
-            // --- Plinth: piano-black lacquer block, the landing surface. ---
-            var plinth = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            plinth.name = "Plinth";
-            plinth.transform.position = new Vector3(0f, layout.plinthSize.y * 0.5f, 0f);
-            plinth.transform.localScale = layout.plinthSize;
-            plinth.GetComponent<MeshRenderer>().sharedMaterial = materials.lacquer;
-            Object.DestroyImmediate(plinth.GetComponent<Collider>());
+            // --- Plinth: a smoked-glass block with the hole cut into its top — the exact shape the
+            //     solver collides with (box minus cylinder). Glass, not lacquer, so the squeeze into the
+            //     hole is visible: from a product-shot camera only a few degrees above the top you can't
+            //     see down into a hole, and an opaque plinth hid everything that went in (playtest 3). ---
+            var plinth = new GameObject("Plinth");
+            plinth.AddComponent<MeshFilter>().sharedMesh = StudioSetBuilder.SaveMesh(
+                BuildPlinth(layout.plinthSize, layout.holeRadius, layout.holeDepth), "SoftSweepPlinth");
+            plinth.AddComponent<MeshRenderer>().sharedMaterial = materials.smokedGlass;
 
-            // --- Brass inlay: a thin ring set flush into the plinth top (1mm proud), marking the landing
-            //     spot — the one warm-metal accent. The 100% splat spreads over it, and seen refracted
-            //     through the amber puddle is the point; purely visual, the solver doesn't see it. ---
-            var ring = new GameObject("Brass Inlay");
-            ring.transform.position = new Vector3(0f, layout.PlinthTopY - 0.011f, 0f);
-            ring.AddComponent<MeshFilter>().sharedMesh = StudioSetBuilder.SaveMesh(
-                BuildTorus(Mathf.Min(layout.capsuleRadius * 1.45f, layout.plinthSize.x * 0.45f), 0.012f), "SoftSweepInlay");
-            ring.AddComponent<MeshRenderer>().sharedMaterial = materials.brass;
+            // --- Brass lip: the rounded ring around the hole, identical to the solver's torus. The glass
+            //     rests on it; the soft takes roll over it into the hole. ---
+            if (layout.holeRadius > 0f)
+            {
+                var lip = new GameObject("Brass Lip");
+                lip.transform.position = new Vector3(0f, layout.PlinthTopY, 0f);
+                lip.AddComponent<MeshFilter>().sharedMesh = StudioSetBuilder.SaveMesh(
+                    BuildTorus(layout.holeRadius + layout.lipRadius, layout.lipRadius, 128, 32), "SoftSweepLip");
+                lip.AddComponent<MeshRenderer>().sharedMaterial = materials.brass;
+            }
 
             // --- Brass edge trim around the plinth top: a hairline of warm metal on the black block. ---
             var trim = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -221,6 +224,99 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
             }
 
             camera.ResetAspect();
+        }
+
+        /// <summary>
+        /// A box standing on the floor with a round blind hole in the middle of its top. Hard-edged
+        /// faces (each face has its own vertices and normals), a smooth hole wall. No bottom face.
+        /// </summary>
+        static Mesh BuildPlinth(Vector3 size, float holeRadius, float holeDepth, int segments = 96)
+        {
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var triangles = new List<int>();
+            float hx = size.x * 0.5f;
+            float hz = size.z * 0.5f;
+            float top = size.y;
+
+            void Quad(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 na, Vector3 nb, Vector3 nc, Vector3 nd, Vector3 facing)
+            {
+                int start = vertices.Count;
+                vertices.Add(a); vertices.Add(b); vertices.Add(c); vertices.Add(d);
+                normals.Add(na); normals.Add(nb); normals.Add(nc); normals.Add(nd);
+                // Wind so the face points along `facing` (Unity: front face = (b-a)x(c-a)).
+                bool flip = Vector3.Dot(Vector3.Cross(b - a, c - a), facing) < 0f;
+                if (!flip)
+                {
+                    triangles.Add(start); triangles.Add(start + 1); triangles.Add(start + 2);
+                    triangles.Add(start); triangles.Add(start + 2); triangles.Add(start + 3);
+                }
+                else
+                {
+                    triangles.Add(start); triangles.Add(start + 2); triangles.Add(start + 1);
+                    triangles.Add(start); triangles.Add(start + 3); triangles.Add(start + 2);
+                }
+            }
+
+            void Flat(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 n) => Quad(a, b, c, d, n, n, n, n, n);
+
+            // Sides.
+            Flat(new Vector3(-hx, 0f, hz), new Vector3(hx, 0f, hz), new Vector3(hx, top, hz), new Vector3(-hx, top, hz), Vector3.forward);
+            Flat(new Vector3(hx, 0f, -hz), new Vector3(-hx, 0f, -hz), new Vector3(-hx, top, -hz), new Vector3(hx, top, -hz), Vector3.back);
+            Flat(new Vector3(hx, 0f, hz), new Vector3(hx, 0f, -hz), new Vector3(hx, top, -hz), new Vector3(hx, top, hz), Vector3.right);
+            Flat(new Vector3(-hx, 0f, -hz), new Vector3(-hx, 0f, hz), new Vector3(-hx, top, hz), new Vector3(-hx, top, -hz), Vector3.left);
+
+            if (holeRadius <= 0f)
+            {
+                Flat(new Vector3(-hx, top, -hz), new Vector3(hx, top, -hz), new Vector3(hx, top, hz), new Vector3(-hx, top, hz), Vector3.up);
+            }
+            else
+            {
+                // Top: an annulus from the hole's circle out to the square edge, along rays from the
+                // centre. Starting at 45° with a multiple-of-4 segment count puts a ray through every
+                // corner, so the outline is exactly square.
+                segments = Mathf.Max(8, segments / 4 * 4);
+                float bottom = top - holeDepth;
+                Vector3 Ray(int k, out Vector3 inner)
+                {
+                    float angle = Mathf.PI * 0.25f + k * Mathf.PI * 2f / segments;
+                    float c = Mathf.Cos(angle);
+                    float s = Mathf.Sin(angle);
+                    float reach = Mathf.Min(hx / Mathf.Max(Mathf.Abs(c), 1e-6f), hz / Mathf.Max(Mathf.Abs(s), 1e-6f));
+                    inner = new Vector3(c * holeRadius, top, s * holeRadius);
+                    return new Vector3(c * reach, top, s * reach);
+                }
+
+                for (int k = 0; k < segments; k++)
+                {
+                    Vector3 outerA = Ray(k, out Vector3 innerA);
+                    Vector3 outerB = Ray(k + 1, out Vector3 innerB);
+                    Flat(innerA, outerA, outerB, innerB, Vector3.up);
+
+                    // Hole wall: normals point in toward the axis (it's seen from inside the hole).
+                    Vector3 wallA = new Vector3(-innerA.x, 0f, -innerA.z).normalized;
+                    Vector3 wallB = new Vector3(-innerB.x, 0f, -innerB.z).normalized;
+                    Vector3 lowA = new Vector3(innerA.x, bottom, innerA.z);
+                    Vector3 lowB = new Vector3(innerB.x, bottom, innerB.z);
+                    Quad(innerA, innerB, lowB, lowA, wallA, wallB, wallB, wallA, (wallA + wallB) * 0.5f);
+
+                    // Hole floor: a fan slice.
+                    Vector3 centre = new Vector3(0f, bottom, 0f);
+                    Quad(centre, lowA, lowB, centre, Vector3.up, Vector3.up, Vector3.up, Vector3.up, Vector3.up);
+                }
+            }
+
+            var mesh = new Mesh { name = "Plinth" };
+            if (vertices.Count > 65000)
+            {
+                mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+            }
+
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         static Mesh BuildTorus(float majorRadius, float minorRadius, int majorSegments = 96, int minorSegments = 20)

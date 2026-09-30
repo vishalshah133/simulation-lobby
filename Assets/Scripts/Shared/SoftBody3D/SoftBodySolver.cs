@@ -115,6 +115,8 @@ namespace SimulationLobby.Shared
         Vector3 _rbVelocity;
         Vector3 _rbAngularVelocity;
         Matrix3 _rbInverseInertia;
+        readonly Vector3[] _rigidPoints;
+        readonly bool[] _rigidInContact;
         readonly List<RigidContact> _rbContacts = new List<RigidContact>();
 
         struct RigidContact
@@ -207,6 +209,22 @@ namespace SimulationLobby.Shared
             inertia.m20 = inertia.m02;
             inertia.m21 = inertia.m12;
             _rbInverseInertia = inertia.Scaled(0.6f).Inverse();
+
+            // Rigid contact samples: particles + edge midpoints + triangle centres (~6× the particles,
+            // half the spacing). Only the rigid path uses them, where testing points is cheap.
+            var samples = new List<Vector3>(_rest);
+            for (int e = 0; e < _edgeA.Length; e++)
+            {
+                samples.Add((_rest[_edgeA[e]] + _rest[_edgeB[e]]) * 0.5f);
+            }
+
+            for (int t = 0; t < _triangles.Length; t += 3)
+            {
+                samples.Add((_rest[_triangles[t]] + _rest[_triangles[t + 1]] + _rest[_triangles[t + 2]]) / 3f);
+            }
+
+            _rigidPoints = samples.ToArray();
+            _rigidInContact = new bool[_rigidPoints.Length];
         }
 
         public int ParticleCount => _x.Length;
@@ -651,14 +669,16 @@ namespace SimulationLobby.Shared
 
             float thickness = _p.collisionThickness;
             int contacts = 0;
-            for (int i = 0; i < _x.Length; i++)
+            // Contacts are tested at the dense rigid sample set, not just the particles: a thin
+            // feature (a brass lip) can sit between particles and let the body slip through it.
+            for (int i = 0; i < _rigidPoints.Length; i++)
             {
-                _prev[i] = previousPosition + previousRotation * _rest[i];
+                Vector3 previousPoint = previousPosition + previousRotation * _rigidPoints[i];
                 bool touching = false;
                 for (int c = 0; c < _colliders.Count; c++)
                 {
                     SdfCollider collider = _colliders[c];
-                    Vector3 point = _rbPosition + _rbRotation * _rest[i];
+                    Vector3 point = _rbPosition + _rbRotation * _rigidPoints[i];
                     float distance = collider.Distance(point);
                     if (distance >= thickness)
                     {
@@ -667,7 +687,7 @@ namespace SimulationLobby.Shared
 
                     Vector3 normal = collider.Normal(point);
                     float approach = -Vector3.Dot(normal, startVelocity + Vector3.Cross(startAngular, point - _rbPosition));
-                    if (!_inContact[i] && approach > 0f)
+                    if (!_rigidInContact[i] && approach > 0f)
                     {
                         NewContacts++;
                         PeakImpactSpeed = Mathf.Max(PeakImpactSpeed, approach);
@@ -676,8 +696,8 @@ namespace SimulationLobby.Shared
                     float lambda = RigidCorrection(point - _rbPosition, normal, thickness - distance, inverseMass);
 
                     // Static friction: undo this point's tangential travel if it is under the stick limit.
-                    point = _rbPosition + _rbRotation * _rest[i];
-                    Vector3 travel = point - _prev[i];
+                    point = _rbPosition + _rbRotation * _rigidPoints[i];
+                    Vector3 travel = point - previousPoint;
                     Vector3 tangential = travel - normal * Vector3.Dot(travel, normal);
                     float slip = tangential.magnitude;
                     if (slip > 1e-9f && slip < collider.staticFriction * lambda)
@@ -696,7 +716,7 @@ namespace SimulationLobby.Shared
                     touching = true;
                 }
 
-                _inContact[i] = touching;
+                _rigidInContact[i] = touching;
                 if (touching)
                 {
                     contacts++;
@@ -711,29 +731,51 @@ namespace SimulationLobby.Shared
             Quaternion delta = _rbRotation * Conjugate(previousRotation);
             _rbAngularVelocity = new Vector3(delta.x, delta.y, delta.z) * (2f / h * (delta.w >= 0f ? 1f : -1f));
 
-            // Velocity pass: sliding friction and restitution. Restitution only for real impacts — a
-            // body resting on a surface arrives at gravity × h every substep, and bouncing that would
-            // make it buzz.
-            float restingSpeed = 2f * _p.gravity.magnitude * h;
+            // Velocity pass: sliding friction and restitution, applied ONCE at the λ-weighted average
+            // contact. Applying them contact by contact looked right on a flat floor and broke on a
+            // ring-shaped lip: each tilted contact added its own bounce and the processing order made
+            // it lopsided — a centred drop at 4.4 m/s left at 2.6 m/s up and 1.1 m/s sideways.
+            // Restitution only for real impacts: a body resting on a surface arrives at gravity × h
+            // every substep, and bouncing that would make it buzz.
+            float lambdaSum = 0f;
+            Vector3 normalSum = Vector3.zero;
+            Vector3 offsetSum = Vector3.zero;
+            float approachSum = 0f;
+            float frictionSum = 0f;
             for (int k = 0; k < _rbContacts.Count; k++)
             {
                 RigidContact contact = _rbContacts[k];
-                Vector3 r = contact.offset;
+                float weight = Mathf.Max(contact.lambda, 1e-9f);
+                lambdaSum += weight;
+                normalSum += contact.normal * weight;
+                offsetSum += contact.offset * weight;
+                approachSum += contact.approachSpeed * weight;
+                frictionSum += contact.friction * weight;
+            }
+
+            if (_rbContacts.Count > 0 && normalSum.sqrMagnitude > 1e-12f)
+            {
+                Vector3 normal = normalSum.normalized;
+                Vector3 r = offsetSum / lambdaSum;
+                float approach = approachSum / lambdaSum;
+                float friction = frictionSum / lambdaSum;
+                float restingSpeed = 2f * _p.gravity.magnitude * h;
+
                 Vector3 velocity = _rbVelocity + Vector3.Cross(_rbAngularVelocity, r);
-                float normalSpeed = Vector3.Dot(contact.normal, velocity);
-                Vector3 tangentVelocity = velocity - contact.normal * normalSpeed;
+                float normalSpeed = Vector3.Dot(normal, velocity);
+                Vector3 tangentVelocity = velocity - normal * normalSpeed;
                 Vector3 change = Vector3.zero;
 
                 float tangentSpeed = tangentVelocity.magnitude;
                 if (tangentSpeed > 1e-6f)
                 {
-                    change -= tangentVelocity / tangentSpeed * Mathf.Min(contact.friction * contact.lambda / h, tangentSpeed);
+                    change -= tangentVelocity / tangentSpeed * Mathf.Min(friction * lambdaSum / h, tangentSpeed);
                 }
 
-                float bounce = contact.approachSpeed > restingSpeed ? _p.restitution * contact.approachSpeed : 0f;
+                float bounce = approach > restingSpeed ? _p.restitution * approach : 0f;
                 if (normalSpeed < bounce)
                 {
-                    change += contact.normal * (bounce - normalSpeed);
+                    change += normal * (bounce - normalSpeed);
                 }
 
                 RigidImpulse(r, change, inverseMass);
