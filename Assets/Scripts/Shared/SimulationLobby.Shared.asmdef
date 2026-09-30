@@ -1,0 +1,16 @@
+{
+    "name": "SimulationLobby.Shared",
+    "rootNamespace": "SimulationLobby.Shared",
+    "references": [
+        "SimulationLobby.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

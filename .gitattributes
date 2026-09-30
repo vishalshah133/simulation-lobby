@@ -1,0 +1,28 @@
+# Normalise line endings in the repo; each checkout uses its platform's native endings.
+* text=auto
+
+# Unity YAML (force text so scenes/assets diff and merge as text)
+*.unity   text
+*.prefab  text
+*.asset   text
+*.mat     text
+*.meta    text
+*.anim    text
+*.controller text
+*.physicsMaterial text
+*.asmdef  text
+*.shader  text
+*.hlsl    text
+*.cs      text diff=csharp
+
+# Binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.psd  binary
+*.tga  binary
+*.exr  binary
+*.fbx  binary
+*.ttf  binary
+*.otf  binary
+*.dll  binary

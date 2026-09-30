@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de7c09b52b3c3e458cb62a3c88c5729, type: 3}
+  m_Name: SoftDrop_100
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Impact::SimulationLobby.Simulations.Impact.SoftDropConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 10
+  intent: impact-003 take at 100% soft. Identical to its siblings except softness.
+  softness: 1
+  capsuleRadius: 0.45
+  capsuleHalfLength: 0.2
+  capsuleSegments: 40
+  capsuleMass: 1
+  dropHeight: 1
+  dropOffsetX: 0
+  dropTiltDegrees: 0
+  plinthSize: {x: 2, y: 0.75, z: 2}
+  substeps: 16
+  gravity: 9.81
+  collisionThickness: 0.014
+  staticFriction: 1
+  dynamicFriction: 0.7
+  rigidRestitution: 0.3
+  softRestitution: 0.05
+  shapeRateAtHalf: 0.3
+  shapeRateExponent: 1.26
+  edgeCompliance: 1
+  volumeCompliance: 0
+  airDamping: 0.05
+  wobbleDampingStiff: 5
+  wobbleDampingSoft: 3
+  impactMinSpeed: 0.35
+  impactCooldownSeconds: 0.18

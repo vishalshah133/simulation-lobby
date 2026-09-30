@@ -1,0 +1,24 @@
+{
+    "name": "SimulationLobby.Simulations.Impact.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.Impact.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "SimulationLobby.Simulations.Impact"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

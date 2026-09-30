@@ -1,0 +1,1118 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SimulationLobby.Shared
+{
+    /// <summary>Everything that decides how a soft body behaves. Filled from a format's config.</summary>
+    public struct SoftBodyParameters
+    {
+        public float totalMass;
+        public Vector3 gravity;
+
+        /// <summary>Solver substeps per <see cref="SoftBodySolver.Step"/>. Raise before anything else when unstable.</summary>
+        public int substeps;
+
+        /// <summary>XPBD compliance of every surface edge (inverse stiffness). 0 = inextensible skin.</summary>
+        public float edgeCompliance;
+
+        /// <summary>XPBD compliance of the global volume constraint. 0 = incompressible, like a water balloon.</summary>
+        public float volumeCompliance;
+
+        /// <summary>Target volume as a multiple of the rest volume. 1 = keep its size.</summary>
+        public float pressure;
+
+        /// <summary>
+        /// When true the body is simulated as a true rigid body (position, rotation, linear and angular
+        /// velocity) instead of as particles — see <see cref="SoftBodySolver"/>'s remarks for why this
+        /// is a separate path rather than infinitely stiff shape matching. The particles still exist
+        /// and follow it, so views and metrics work unchanged.
+        /// </summary>
+        public bool rigid;
+
+        /// <summary>
+        /// Bounciness, 0 = lands dead, 1 = perfectly elastic. The rigid path applies it per contact
+        /// (glass on metal ≈ 0.3). The soft path applies it to the body as a whole: while touching
+        /// anything, the centre of mass may leave the contact no faster than this × the speed it arrived
+        /// at. Without that cap a stiff shell around an incompressible volume is a rubber ball — it
+        /// rebounded ~70% of its drop height in testing, and no amount of deformation damping helped,
+        /// because the energy comes back through the whole body's motion rather than as jiggle.
+        /// </summary>
+        public float restitution;
+
+        /// <summary>
+        /// How quickly the body pulls back toward its rest shape, per second (0 = never — pure
+        /// membrane). Expressed per second rather than per substep so the feel does not change when the
+        /// substep count does.
+        /// </summary>
+        public float shapeMatchingRate;
+
+        /// <summary>Damping of the body's overall motion, per second. Keep tiny: this is air, not glue.</summary>
+        public float airDamping;
+
+        /// <summary>
+        /// Damping of deformation, per second: how quickly motion that isn't rigid (jiggle, ringing,
+        /// the rebound of a squashed body) dies out. Separate from <see cref="airDamping"/> so a jelly
+        /// can wobble while still falling and tumbling at full speed. Unused by the rigid path, which
+        /// has no deformation.
+        /// </summary>
+        public float wobbleDamping;
+
+        /// <summary>Distance particles are kept from collider surfaces. About half the particle spacing.</summary>
+        public float collisionThickness;
+    }
+
+    /// <summary>
+    /// Extended position-based dynamics (XPBD) soft body over a closed triangle surface: stretch
+    /// constraints on every edge, one global volume constraint, and shape matching toward the rest
+    /// shape. One solver covers the whole range from rigid glass to jelly by changing
+    /// <see cref="SoftBodyParameters"/> alone.
+    /// </summary>
+    /// <remarks>
+    /// Plain single-threaded C# over fixed-order arrays: the same inputs produce the same floats on
+    /// the same machine, which is what lets a take be re-rendered. Do not move this to Burst or jobs
+    /// without <c>FloatMode.Deterministic</c> — fast-math reorders additions and breaks that.
+    /// <para>
+    /// Collisions are against analytic <see cref="SdfCollider"/>s, per particle. A sharp spike can
+    /// slip <i>between</i> particles, so each <see cref="AddPointGuard"/> sphere is also tested
+    /// against every triangle.
+    /// </para>
+    /// <para>
+    /// A fully rigid body (<see cref="SoftBodyParameters.rigid"/>) takes a separate path: XPBD rigid
+    /// body dynamics (Müller et al. 2020), where a contact correction is weighted by the body's mass
+    /// and inertia at the contact point. Rigidity by shape matching alone does not work — a push on
+    /// one particle of ~900 moves the best-fit pose by 1/900th, so the body barely feels the spike,
+    /// sinks onto it, and is then ejected at tens of metres per second.
+    /// </para>
+    /// </remarks>
+    public sealed class SoftBodySolver
+    {
+        readonly Vector3[] _x;
+        readonly Vector3[] _prev;
+        readonly Vector3[] _v;
+        readonly Vector3[] _rest;
+        readonly Vector3[] _grad;
+        readonly bool[] _inContact;
+        readonly bool[] _touching;
+        readonly Vector3[] _contactNormal;
+        readonly int[] _triangles;
+        readonly int[] _edgeA;
+        readonly int[] _edgeB;
+        readonly float[] _edgeRest;
+        readonly float _invMass;
+        readonly float _restVolume;
+        readonly List<SdfCollider> _colliders = new List<SdfCollider>();
+        readonly List<Vector4> _guards = new List<Vector4>();
+
+        SoftBodyParameters _p;
+        Quaternion _shapeRotation = Quaternion.identity;
+        bool _bodyInContact;
+        float _arrivalSpeed;
+        Vector3 _freeVelocity;
+
+        // Rigid path state: body pose maps rest offsets to world (x_i = _rbPosition + _rbRotation * _rest[i]).
+        Vector3 _rbPosition;
+        Quaternion _rbRotation = Quaternion.identity;
+        Vector3 _rbVelocity;
+        Vector3 _rbAngularVelocity;
+        Matrix3 _rbInverseInertia;
+        readonly List<RigidContact> _rbContacts = new List<RigidContact>();
+
+        struct RigidContact
+        {
+            public Vector3 normal;
+            public Vector3 offset; // contact point relative to the centre of mass, world space
+            public float lambda; // accumulated normal correction (m), for friction limits
+            public float approachSpeed; // normal speed into the surface before the substep
+            public float friction;
+        }
+
+        public SoftBodySolver(SoftBodyShape shape, Vector3 position, Quaternion rotation, SoftBodyParameters parameters)
+        {
+            int n = shape.positions.Length;
+            _x = new Vector3[n];
+            _prev = new Vector3[n];
+            _v = new Vector3[n];
+            _rest = new Vector3[n];
+            _grad = new Vector3[n];
+            _inContact = new bool[n];
+            _touching = new bool[n];
+            _contactNormal = new Vector3[n];
+            _triangles = (int[])shape.triangles.Clone();
+            _p = parameters;
+            _p.substeps = Mathf.Max(1, _p.substeps);
+            _invMass = n / Mathf.Max(1e-4f, _p.totalMass);
+
+            for (int i = 0; i < n; i++)
+            {
+                _x[i] = position + rotation * shape.positions[i];
+            }
+
+            Vector3 centroid = Average(_x);
+            for (int i = 0; i < n; i++)
+            {
+                _rest[i] = _x[i] - centroid;
+            }
+
+            // Unique edges, in first-seen order so the constraint order (and therefore the result)
+            // never depends on hashing.
+            var seen = new HashSet<long>();
+            var a = new List<int>();
+            var b = new List<int>();
+            for (int t = 0; t < _triangles.Length; t += 3)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    int i0 = _triangles[t + k];
+                    int i1 = _triangles[t + (k + 1) % 3];
+                    long key = i0 < i1 ? ((long)i0 << 32) | (uint)i1 : ((long)i1 << 32) | (uint)i0;
+                    if (seen.Add(key))
+                    {
+                        a.Add(i0);
+                        b.Add(i1);
+                    }
+                }
+            }
+
+            _edgeA = a.ToArray();
+            _edgeB = b.ToArray();
+            _edgeRest = new float[_edgeA.Length];
+            for (int e = 0; e < _edgeA.Length; e++)
+            {
+                _edgeRest[e] = Vector3.Distance(_x[_edgeA[e]], _x[_edgeB[e]]);
+            }
+
+            _restVolume = Volume();
+            VolumeRatio = 1f;
+            Centroid = centroid;
+
+            // Rigid path: centre of mass at the centroid, inertia from the particles as point masses.
+            // Those sit on the surface, so this is a hollow shell's inertia; scaled toward a solid
+            // body's (a solid sphere has 3/5 of a shell's), since the object reads as solid glass.
+            _rbPosition = centroid;
+            float particleMass = _p.totalMass / n;
+            var inertia = new Matrix3();
+            for (int i = 0; i < n; i++)
+            {
+                Vector3 r = _rest[i];
+                float rr = Vector3.Dot(r, r);
+                inertia.m00 += particleMass * (rr - r.x * r.x);
+                inertia.m11 += particleMass * (rr - r.y * r.y);
+                inertia.m22 += particleMass * (rr - r.z * r.z);
+                inertia.m01 -= particleMass * r.x * r.y;
+                inertia.m02 -= particleMass * r.x * r.z;
+                inertia.m12 -= particleMass * r.y * r.z;
+            }
+
+            inertia.m10 = inertia.m01;
+            inertia.m20 = inertia.m02;
+            inertia.m21 = inertia.m12;
+            _rbInverseInertia = inertia.Scaled(0.6f).Inverse();
+        }
+
+        public int ParticleCount => _x.Length;
+
+        /// <summary>Live particle positions in world space. Read-only by contract — views copy, never write.</summary>
+        public Vector3[] Positions => _x;
+
+        public int[] Triangles => _triangles;
+
+        public float RestVolume => _restVolume;
+
+        public SoftBodyParameters Parameters => _p;
+
+        // ---- Metrics, refreshed every Step. Presentation reads these and nothing else. ----
+
+        public Vector3 Centroid { get; private set; }
+
+        public Vector3 CentroidVelocity { get; private set; }
+
+        /// <summary>Mean squared speed of particles relative to the centre — how much it is jiggling.</summary>
+        public float WobbleEnergy { get; private set; }
+
+        /// <summary>Mean absolute edge strain (|length / rest − 1|). 0 at rest shape.</summary>
+        public float SurfaceStrain { get; private set; }
+
+        /// <summary>Current volume over rest volume.</summary>
+        public float VolumeRatio { get; private set; }
+
+        /// <summary>Particles that touched a collider this step having not touched one the substep before.</summary>
+        public int NewContacts { get; private set; }
+
+        /// <summary>Fastest approach speed among this step's new contacts, m/s.</summary>
+        public float PeakImpactSpeed { get; private set; }
+
+        /// <summary>Particles currently touching any collider.</summary>
+        public int ContactCount { get; private set; }
+
+        public void AddCollider(SdfCollider collider)
+        {
+            _colliders.Add(collider);
+        }
+
+        /// <summary>
+        /// A sphere tested against every triangle, not just every particle — for sharp features (a
+        /// spike's tip) smaller than the spacing between particles.
+        /// </summary>
+        public void AddPointGuard(Vector3 center, float radius)
+        {
+            _guards.Add(new Vector4(center.x, center.y, center.z, radius));
+        }
+
+        /// <summary>Advance by <paramref name="dt"/> seconds in <see cref="SoftBodyParameters.substeps"/> substeps.</summary>
+        public void Step(float dt)
+        {
+            int substeps = _p.substeps;
+            float h = dt / substeps;
+            float shapeStiffness = _p.rigid ? 1f : _p.shapeMatchingRate > 0f ? 1f - Mathf.Exp(-_p.shapeMatchingRate * h) : 0f;
+
+            NewContacts = 0;
+            PeakImpactSpeed = 0f;
+
+            if (_p.rigid)
+            {
+                for (int s = 0; s < substeps; s++)
+                {
+                    StepRigid(h);
+                }
+
+                UpdateMetrics();
+                return;
+            }
+
+            for (int s = 0; s < substeps; s++)
+            {
+                bool last = s == substeps - 1;
+                for (int i = 0; i < _x.Length; i++)
+                {
+                    _prev[i] = _x[i];
+                    _v[i] += _p.gravity * h;
+                    _x[i] += _v[i] * h;
+                }
+
+                SolveEdges(h, last);
+                SolveVolume(h);
+                if (shapeStiffness > 0f)
+                {
+                    SolveShapeMatching(shapeStiffness);
+                }
+
+                SolveCollisions(h);
+                SolveGuards();
+
+                float inverseH = 1f / h;
+                for (int i = 0; i < _x.Length; i++)
+                {
+                    _v[i] = (_x[i] - _prev[i]) * inverseH;
+
+                    // Contact velocity pass. A particle pushed out of a surface this substep would
+                    // otherwise leave with the push as velocity: energy injected at every contact, which
+                    // is both the buzzing jitter (pushed out, pulled back in by its neighbours, pushed out
+                    // again) and a super-ball rebound. Touching particles may slide but not separate.
+                    if (_touching[i])
+                    {
+                        float separating = Vector3.Dot(_v[i], _contactNormal[i]);
+                        if (separating > 0f)
+                        {
+                            _v[i] -= _contactNormal[i] * separating;
+                        }
+                    }
+                }
+
+                LimitRebound();
+                Damp(h);
+            }
+
+            UpdateMetrics();
+        }
+
+        void SolveEdges(float h, bool measure)
+        {
+            float alpha = _p.edgeCompliance / (h * h);
+            float w = _invMass;
+            float strainSum = 0f;
+            for (int e = 0; e < _edgeA.Length; e++)
+            {
+                int ia = _edgeA[e];
+                int ib = _edgeB[e];
+                Vector3 d = _x[ib] - _x[ia];
+                float length = d.magnitude;
+                if (length < 1e-9f)
+                {
+                    continue;
+                }
+
+                float c = length - _edgeRest[e];
+                if (measure)
+                {
+                    strainSum += Mathf.Abs(c) / _edgeRest[e];
+                }
+
+                float lambda = -c / (w + w + alpha);
+                Vector3 correction = d * (lambda / length);
+                _x[ia] -= correction * w;
+                _x[ib] += correction * w;
+            }
+
+            if (measure)
+            {
+                SurfaceStrain = strainSum / Mathf.Max(1, _edgeA.Length);
+            }
+        }
+
+        void SolveVolume(float h)
+        {
+            System.Array.Clear(_grad, 0, _grad.Length);
+
+            // Relative to the centroid, accumulated in double. The per-triangle terms are triple
+            // products of positions; measured from the world origin (the body sits metres up) they are
+            // tens of times larger than the volume they sum to, and float32 cancellation leaves ~0.5%
+            // noise in it. The solver then "corrects" that noise every substep, which is metres per
+            // second of jitter — enough to fling a body off the plinth.
+            Vector3 origin = Average(_x);
+            double volume = 0.0;
+            for (int t = 0; t < _triangles.Length; t += 3)
+            {
+                int ia = _triangles[t];
+                int ib = _triangles[t + 1];
+                int ic = _triangles[t + 2];
+                Vector3 a = _x[ia] - origin;
+                Vector3 b = _x[ib] - origin;
+                Vector3 c = _x[ic] - origin;
+                volume += Vector3.Dot(a, Vector3.Cross(b, c));
+                _grad[ia] += Vector3.Cross(b, c);
+                _grad[ib] += Vector3.Cross(c, a);
+                _grad[ic] += Vector3.Cross(a, b);
+            }
+
+            volume /= 6.0;
+            VolumeRatio = (float)(volume / _restVolume);
+
+            float constraint = (float)(volume - _restVolume * _p.pressure);
+            float denominator = _p.volumeCompliance / (h * h);
+            for (int i = 0; i < _grad.Length; i++)
+            {
+                _grad[i] /= 6f;
+                denominator += _invMass * _grad[i].sqrMagnitude;
+            }
+
+            if (denominator < 1e-12f)
+            {
+                return;
+            }
+
+            float lambda = -constraint / denominator;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                _x[i] += _grad[i] * (lambda * _invMass);
+            }
+        }
+
+        void SolveShapeMatching(float stiffness)
+        {
+            Vector3 centroid = Average(_x);
+
+            // A = Σ (x − c) qᵀ, kept as its three columns.
+            Vector3 col0 = Vector3.zero;
+            Vector3 col1 = Vector3.zero;
+            Vector3 col2 = Vector3.zero;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                Vector3 p = _x[i] - centroid;
+                Vector3 q = _rest[i];
+                col0 += p * q.x;
+                col1 += p * q.y;
+                col2 += p * q.z;
+            }
+
+            _shapeRotation = ExtractRotation(col0, col1, col2, _shapeRotation);
+            for (int i = 0; i < _x.Length; i++)
+            {
+                Vector3 goal = centroid + _shapeRotation * _rest[i];
+                _x[i] += (goal - _x[i]) * stiffness;
+            }
+        }
+
+        /// <summary>
+        /// Rotational part of a deformation matrix, warm-started from the last result. Müller et al.,
+        /// "A Robust Method to Extract the Rotational Part of Deformations" (2016): stable through
+        /// inversion, where a polar decomposition via SVD would flip.
+        /// </summary>
+        static Quaternion ExtractRotation(Vector3 a0, Vector3 a1, Vector3 a2, Quaternion q)
+        {
+            for (int iteration = 0; iteration < 12; iteration++)
+            {
+                Vector3 r0 = q * Vector3.right;
+                Vector3 r1 = q * Vector3.up;
+                Vector3 r2 = q * Vector3.forward;
+                Vector3 omega = Vector3.Cross(r0, a0) + Vector3.Cross(r1, a1) + Vector3.Cross(r2, a2);
+                float scale = 1f / (Mathf.Abs(Vector3.Dot(r0, a0) + Vector3.Dot(r1, a1) + Vector3.Dot(r2, a2)) + 1e-9f);
+                omega *= scale;
+                float angle = omega.magnitude;
+                if (angle < 1e-9f)
+                {
+                    break;
+                }
+
+                q = Quaternion.AngleAxis(angle * Mathf.Rad2Deg, omega / angle) * q;
+                q = Quaternion.Normalize(q);
+            }
+
+            return q;
+        }
+
+        void SolveCollisions(float h)
+        {
+            float thickness = _p.collisionThickness;
+            int contacts = 0;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                bool touching = false;
+                for (int c = 0; c < _colliders.Count; c++)
+                {
+                    SdfCollider collider = _colliders[c];
+                    float distance = collider.Distance(_x[i]);
+                    if (distance >= thickness)
+                    {
+                        continue;
+                    }
+
+                    Vector3 normal = collider.Normal(_x[i]);
+                    float penetration = thickness - distance;
+                    Vector3 displacement = _x[i] - _prev[i];
+
+                    if (!_inContact[i])
+                    {
+                        float approach = -Vector3.Dot(displacement, normal) / h;
+                        if (approach > 0f)
+                        {
+                            NewContacts++;
+                            PeakImpactSpeed = Mathf.Max(PeakImpactSpeed, approach);
+                        }
+                    }
+
+                    if (collider.pierceable)
+                    {
+                        // Impaled: part the skin sideways and let the body slide along the collider,
+                        // gripped by drag rather than held off by the surface.
+                        normal = collider.PierceNormal(_x[i]);
+                        _x[i] += normal * penetration;
+                        float travelY = _x[i].y - _prev[i].y;
+                        _x[i].y -= travelY * (1f - Mathf.Exp(-collider.pierceDrag * h));
+                        touching = true;
+                        _contactNormal[i] = normal;
+                        continue;
+                    }
+
+                    _x[i] += normal * penetration;
+
+                    // Coulomb friction on this substep's tangential travel: stick below the static
+                    // limit, otherwise slide with the dynamic coefficient.
+                    displacement = _x[i] - _prev[i];
+                    Vector3 tangential = displacement - normal * Vector3.Dot(displacement, normal);
+                    float slip = tangential.magnitude;
+                    if (slip > 1e-9f)
+                    {
+                        if (slip < collider.staticFriction * penetration)
+                        {
+                            _x[i] -= tangential;
+                        }
+                        else
+                        {
+                            _x[i] -= tangential * Mathf.Min(collider.dynamicFriction * penetration / slip, 1f);
+                        }
+                    }
+
+                    touching = true;
+                    _contactNormal[i] = normal;
+                }
+
+                _inContact[i] = touching;
+                _touching[i] = touching;
+                if (touching)
+                {
+                    contacts++;
+                }
+            }
+
+            ContactCount = contacts;
+        }
+
+        void SolveGuards()
+        {
+            float thickness = _p.collisionThickness;
+            for (int g = 0; g < _guards.Count; g++)
+            {
+                Vector3 center = _guards[g];
+                float radius = _guards[g].w;
+                float reach = radius + thickness;
+
+                for (int t = 0; t < _triangles.Length; t += 3)
+                {
+                    int ia = _triangles[t];
+                    int ib = _triangles[t + 1];
+                    int ic = _triangles[t + 2];
+                    if (!GuardPush(center, reach, _x[ia], _x[ib], _x[ic], out Vector3 push, out _, out float u, out float v,
+                            out float w))
+                    {
+                        continue;
+                    }
+
+                    // Split the push across the corners by barycentric weight (equal masses), scaled so
+                    // the closest point itself moves by exactly the push.
+                    float weightSquares = u * u + v * v + w * w;
+                    if (weightSquares < 1e-9f)
+                    {
+                        continue;
+                    }
+
+                    _x[ia] += push * (u / weightSquares);
+                    _x[ib] += push * (v / weightSquares);
+                    _x[ic] += push * (w / weightSquares);
+
+                    // These corners are touching the guard now: same no-separation rule as a contact.
+                    Vector3 normal = push.normalized;
+                    _touching[ia] = _touching[ib] = _touching[ic] = true;
+                    _contactNormal[ia] = _contactNormal[ib] = _contactNormal[ic] = normal;
+                }
+            }
+        }
+
+        /// <summary>
+        /// How far triangle abc must move to clear a guard sphere of radius <paramref name="reach"/>
+        /// (radius + thickness). False when it doesn't touch.
+        /// </summary>
+        static bool GuardPush(Vector3 center, float reach, Vector3 a, Vector3 b, Vector3 c, out Vector3 push,
+            out Vector3 closest, out float u, out float v, out float w)
+        {
+            push = Vector3.zero;
+            closest = Vector3.zero;
+            u = v = w = 0f;
+
+            // Cheap reject before any real work: a triangle nowhere near the guard.
+            Vector3 mid = (a + b + c) / 3f;
+            float span = Mathf.Max((a - mid).sqrMagnitude, Mathf.Max((b - mid).sqrMagnitude, (c - mid).sqrMagnitude));
+            float limit = reach + Mathf.Sqrt(span) + 0.1f;
+            if ((center - mid).sqrMagnitude > limit * limit)
+            {
+                return false;
+            }
+
+            Vector3 normal = Vector3.Cross(b - a, c - a);
+            float normalLength = normal.magnitude;
+            if (normalLength < 1e-12f)
+            {
+                return false;
+            }
+
+            normal /= normalLength;
+            closest = ClosestPointOnTriangle(center, a, b, c, out u, out v, out w);
+
+            // The guard lives outside the body, i.e. on each triangle's outward side. A guard behind
+            // a triangle (but not by more than a sliver) has poked through it.
+            float side = Vector3.Dot(center - closest, normal);
+            if (side < reach && side > -reach - 0.08f && IsInterior(u, v, w))
+            {
+                push = -normal * (reach - side);
+                return true;
+            }
+
+            Vector3 offset = closest - center;
+            float distance = offset.magnitude;
+            if (side <= 0f || distance >= reach || distance < 1e-9f)
+            {
+                return false;
+            }
+
+            push = offset / distance * (reach - distance);
+            return true;
+        }
+
+        static bool IsInterior(float u, float v, float w) => u > 1e-4f && v > 1e-4f && w > 1e-4f;
+
+        // ------------------------------------------------------------------ rigid path
+
+        /// <summary>
+        /// One substep of XPBD rigid-body dynamics: integrate the pose, resolve contacts as positional
+        /// corrections weighted by mass and inertia at the contact point, derive velocities from the
+        /// pose change, then a velocity pass for restitution and sliding friction.
+        /// </summary>
+        void StepRigid(float h)
+        {
+            float inverseMass = 1f / Mathf.Max(1e-4f, _p.totalMass);
+            Vector3 previousPosition = _rbPosition;
+            Quaternion previousRotation = _rbRotation;
+            Vector3 startVelocity = _rbVelocity;
+            Vector3 startAngular = _rbAngularVelocity;
+
+            _rbVelocity += _p.gravity * h;
+            _rbPosition += _rbVelocity * h;
+            _rbRotation = Rotate(_rbRotation, _rbAngularVelocity * h);
+            _rbContacts.Clear();
+
+            float thickness = _p.collisionThickness;
+            int contacts = 0;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                _prev[i] = previousPosition + previousRotation * _rest[i];
+                bool touching = false;
+                for (int c = 0; c < _colliders.Count; c++)
+                {
+                    SdfCollider collider = _colliders[c];
+                    Vector3 point = _rbPosition + _rbRotation * _rest[i];
+                    float distance = collider.Distance(point);
+                    if (distance >= thickness)
+                    {
+                        continue;
+                    }
+
+                    Vector3 normal = collider.Normal(point);
+                    float approach = -Vector3.Dot(normal, startVelocity + Vector3.Cross(startAngular, point - _rbPosition));
+                    if (!_inContact[i] && approach > 0f)
+                    {
+                        NewContacts++;
+                        PeakImpactSpeed = Mathf.Max(PeakImpactSpeed, approach);
+                    }
+
+                    float lambda = RigidCorrection(point - _rbPosition, normal, thickness - distance, inverseMass);
+
+                    // Static friction: undo this point's tangential travel if it is under the stick limit.
+                    point = _rbPosition + _rbRotation * _rest[i];
+                    Vector3 travel = point - _prev[i];
+                    Vector3 tangential = travel - normal * Vector3.Dot(travel, normal);
+                    float slip = tangential.magnitude;
+                    if (slip > 1e-9f && slip < collider.staticFriction * lambda)
+                    {
+                        RigidCorrection(point - _rbPosition, -tangential / slip, slip, inverseMass);
+                    }
+
+                    _rbContacts.Add(new RigidContact
+                    {
+                        normal = normal,
+                        offset = point - _rbPosition,
+                        lambda = lambda,
+                        approachSpeed = approach,
+                        friction = collider.dynamicFriction
+                    });
+                    touching = true;
+                }
+
+                _inContact[i] = touching;
+                if (touching)
+                {
+                    contacts++;
+                }
+            }
+
+            ContactCount = contacts;
+            RigidGuards(inverseMass, startVelocity, startAngular);
+
+            // Velocities from the pose change.
+            _rbVelocity = (_rbPosition - previousPosition) / h;
+            Quaternion delta = _rbRotation * Conjugate(previousRotation);
+            _rbAngularVelocity = new Vector3(delta.x, delta.y, delta.z) * (2f / h * (delta.w >= 0f ? 1f : -1f));
+
+            // Velocity pass: sliding friction and restitution. Restitution only for real impacts — a
+            // body resting on a surface arrives at gravity × h every substep, and bouncing that would
+            // make it buzz.
+            float restingSpeed = 2f * _p.gravity.magnitude * h;
+            for (int k = 0; k < _rbContacts.Count; k++)
+            {
+                RigidContact contact = _rbContacts[k];
+                Vector3 r = contact.offset;
+                Vector3 velocity = _rbVelocity + Vector3.Cross(_rbAngularVelocity, r);
+                float normalSpeed = Vector3.Dot(contact.normal, velocity);
+                Vector3 tangentVelocity = velocity - contact.normal * normalSpeed;
+                Vector3 change = Vector3.zero;
+
+                float tangentSpeed = tangentVelocity.magnitude;
+                if (tangentSpeed > 1e-6f)
+                {
+                    change -= tangentVelocity / tangentSpeed * Mathf.Min(contact.friction * contact.lambda / h, tangentSpeed);
+                }
+
+                float bounce = contact.approachSpeed > restingSpeed ? _p.restitution * contact.approachSpeed : 0f;
+                if (normalSpeed < bounce)
+                {
+                    change += contact.normal * (bounce - normalSpeed);
+                }
+
+                RigidImpulse(r, change, inverseMass);
+            }
+
+            _rbVelocity *= Mathf.Exp(-_p.airDamping * h);
+            _rbAngularVelocity *= Mathf.Exp(-_p.airDamping * h);
+
+            for (int i = 0; i < _x.Length; i++)
+            {
+                Vector3 r = _rbRotation * _rest[i];
+                _x[i] = _rbPosition + r;
+                _v[i] = _rbVelocity + Vector3.Cross(_rbAngularVelocity, r);
+            }
+        }
+
+        /// <summary>
+        /// Guard spheres against the rigid body's triangles: a few passes, each clearing the deepest
+        /// overlap with one rigid correction at the closest point.
+        /// </summary>
+        void RigidGuards(float inverseMass, Vector3 startVelocity, Vector3 startAngular)
+        {
+            if (_guards.Count == 0)
+            {
+                return;
+            }
+
+            float thickness = _p.collisionThickness;
+            for (int pass = 0; pass < 4; pass++)
+            {
+                for (int i = 0; i < _x.Length; i++)
+                {
+                    _x[i] = _rbPosition + _rbRotation * _rest[i];
+                }
+
+                bool found = false;
+                Vector3 deepestPush = Vector3.zero;
+                Vector3 deepestPoint = Vector3.zero;
+                for (int g = 0; g < _guards.Count; g++)
+                {
+                    Vector3 center = _guards[g];
+                    float reach = _guards[g].w + thickness;
+                    for (int t = 0; t < _triangles.Length; t += 3)
+                    {
+                        if (GuardPush(center, reach, _x[_triangles[t]], _x[_triangles[t + 1]], _x[_triangles[t + 2]],
+                                out Vector3 push, out Vector3 closest, out _, out _, out _) &&
+                            push.sqrMagnitude > deepestPush.sqrMagnitude)
+                        {
+                            found = true;
+                            deepestPush = push;
+                            deepestPoint = closest;
+                        }
+                    }
+                }
+
+                if (!found)
+                {
+                    return;
+                }
+
+                float depth = deepestPush.magnitude;
+                Vector3 normal = deepestPush / depth;
+                Vector3 r = deepestPoint - _rbPosition;
+                float approach = -Vector3.Dot(normal, startVelocity + Vector3.Cross(startAngular, r));
+                if (pass == 0 && approach > 0f)
+                {
+                    NewContacts++;
+                    PeakImpactSpeed = Mathf.Max(PeakImpactSpeed, approach);
+                }
+
+                float lambda = RigidCorrection(r, normal, depth, inverseMass);
+                _rbContacts.Add(new RigidContact
+                {
+                    normal = normal,
+                    offset = r,
+                    lambda = lambda,
+                    approachSpeed = approach,
+                    friction = 0.35f
+                });
+            }
+        }
+
+        /// <summary>
+        /// Moves the rigid pose so the point at offset <paramref name="r"/> travels
+        /// <paramref name="depth"/> along <paramref name="direction"/>, split between translation and
+        /// rotation by the generalised inverse mass. Returns the correction magnitude (λ).
+        /// </summary>
+        float RigidCorrection(Vector3 r, Vector3 direction, float depth, float inverseMass)
+        {
+            Vector3 rn = Vector3.Cross(r, direction);
+            float w = inverseMass + Vector3.Dot(rn, WorldInverseInertia(rn));
+            if (w < 1e-9f)
+            {
+                return 0f;
+            }
+
+            float lambda = depth / w;
+            Vector3 correction = direction * lambda;
+            _rbPosition += correction * inverseMass;
+            _rbRotation = Rotate(_rbRotation, WorldInverseInertia(Vector3.Cross(r, correction)));
+            return lambda;
+        }
+
+        /// <summary>Changes the velocity of the point at offset <paramref name="r"/> by <paramref name="change"/>.</summary>
+        void RigidImpulse(Vector3 r, Vector3 change, float inverseMass)
+        {
+            float size = change.magnitude;
+            if (size < 1e-9f)
+            {
+                return;
+            }
+
+            Vector3 direction = change / size;
+            Vector3 rn = Vector3.Cross(r, direction);
+            float w = inverseMass + Vector3.Dot(rn, WorldInverseInertia(rn));
+            Vector3 impulse = direction * (size / w);
+            _rbVelocity += impulse * inverseMass;
+            _rbAngularVelocity += WorldInverseInertia(Vector3.Cross(r, impulse));
+        }
+
+        Vector3 WorldInverseInertia(Vector3 v)
+        {
+            return _rbRotation * _rbInverseInertia.Multiply(Conjugate(_rbRotation) * v);
+        }
+
+        /// <summary>q advanced by a small rotation vector θ: q + ½[θ, 0]q, renormalised.</summary>
+        static Quaternion Rotate(Quaternion q, Vector3 theta)
+        {
+            var spin = new Quaternion(theta.x, theta.y, theta.z, 0f) * q;
+            return Quaternion.Normalize(new Quaternion(q.x + 0.5f * spin.x, q.y + 0.5f * spin.y, q.z + 0.5f * spin.z,
+                q.w + 0.5f * spin.w));
+        }
+
+        static Quaternion Conjugate(Quaternion q) => new Quaternion(-q.x, -q.y, -q.z, q.w);
+
+        /// <summary>Minimal 3×3 matrix for the inertia tensor.</summary>
+        struct Matrix3
+        {
+            public float m00, m01, m02, m10, m11, m12, m20, m21, m22;
+
+            public Vector3 Multiply(Vector3 v) => new Vector3(
+                m00 * v.x + m01 * v.y + m02 * v.z,
+                m10 * v.x + m11 * v.y + m12 * v.z,
+                m20 * v.x + m21 * v.y + m22 * v.z);
+
+            public Matrix3 Scaled(float s) => new Matrix3
+            {
+                m00 = m00 * s, m01 = m01 * s, m02 = m02 * s,
+                m10 = m10 * s, m11 = m11 * s, m12 = m12 * s,
+                m20 = m20 * s, m21 = m21 * s, m22 = m22 * s
+            };
+
+            public Matrix3 Inverse()
+            {
+                float c00 = m11 * m22 - m12 * m21;
+                float c01 = m02 * m21 - m01 * m22;
+                float c02 = m01 * m12 - m02 * m11;
+                float c10 = m12 * m20 - m10 * m22;
+                float c11 = m00 * m22 - m02 * m20;
+                float c12 = m02 * m10 - m00 * m12;
+                float c20 = m10 * m21 - m11 * m20;
+                float c21 = m01 * m20 - m00 * m21;
+                float c22 = m00 * m11 - m01 * m10;
+                float det = m00 * c00 + m01 * c10 + m02 * c20;
+                float inv = Mathf.Abs(det) > 1e-12f ? 1f / det : 0f;
+                return new Matrix3
+                {
+                    m00 = c00 * inv, m01 = c01 * inv, m02 = c02 * inv,
+                    m10 = c10 * inv, m11 = c11 * inv, m12 = c12 * inv,
+                    m20 = c20 * inv, m21 = c21 * inv, m22 = c22 * inv
+                };
+            }
+        }
+
+        /// <summary>Closest point on triangle abc to p, with its barycentric weights (Ericson, RTCD 5.1.5).</summary>
+        static Vector3 ClosestPointOnTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c, out float u, out float v,
+            out float w)
+        {
+            Vector3 ab = b - a;
+            Vector3 ac = c - a;
+            Vector3 ap = p - a;
+            float d1 = Vector3.Dot(ab, ap);
+            float d2 = Vector3.Dot(ac, ap);
+            if (d1 <= 0f && d2 <= 0f)
+            {
+                u = 1f; v = 0f; w = 0f;
+                return a;
+            }
+
+            Vector3 bp = p - b;
+            float d3 = Vector3.Dot(ab, bp);
+            float d4 = Vector3.Dot(ac, bp);
+            if (d3 >= 0f && d4 <= d3)
+            {
+                u = 0f; v = 1f; w = 0f;
+                return b;
+            }
+
+            float vc = d1 * d4 - d3 * d2;
+            if (vc <= 0f && d1 >= 0f && d3 <= 0f)
+            {
+                float t = d1 / (d1 - d3);
+                u = 1f - t; v = t; w = 0f;
+                return a + ab * t;
+            }
+
+            Vector3 cp = p - c;
+            float d5 = Vector3.Dot(ab, cp);
+            float d6 = Vector3.Dot(ac, cp);
+            if (d6 >= 0f && d5 <= d6)
+            {
+                u = 0f; v = 0f; w = 1f;
+                return c;
+            }
+
+            float vb = d5 * d2 - d1 * d6;
+            if (vb <= 0f && d2 >= 0f && d6 <= 0f)
+            {
+                float t = d2 / (d2 - d6);
+                u = 1f - t; v = 0f; w = t;
+                return a + ac * t;
+            }
+
+            float va = d3 * d6 - d5 * d4;
+            if (va <= 0f && d4 - d3 >= 0f && d5 - d6 >= 0f)
+            {
+                float t = (d4 - d3) / (d4 - d3 + (d5 - d6));
+                u = 0f; v = 1f - t; w = t;
+                return b + (c - b) * t;
+            }
+
+            float denominator = 1f / (va + vb + vc);
+            v = vb * denominator;
+            w = vc * denominator;
+            u = 1f - v - w;
+            return a + ab * v + ac * w;
+        }
+
+        /// <summary>
+        /// Body-level restitution for the soft path (see <see cref="SoftBodyParameters.restitution"/>):
+        /// while any particle touches a surface, the centre of mass may move away from the mean contact
+        /// normal no faster than restitution × the speed it arrived at. Applied to every particle equally,
+        /// so it removes rebound without touching the shape or the wobble.
+        /// </summary>
+        void LimitRebound()
+        {
+            Vector3 normalSum = Vector3.zero;
+            for (int i = 0; i < _touching.Length; i++)
+            {
+                if (_touching[i])
+                {
+                    normalSum += _contactNormal[i];
+                }
+            }
+
+            Vector3 mean = Average(_v);
+            float normalLength = normalSum.magnitude;
+            if (normalLength < 1e-6f)
+            {
+                _bodyInContact = false;
+                _freeVelocity = mean;
+                return;
+            }
+
+            Vector3 normal = normalSum / normalLength;
+            if (!_bodyInContact)
+            {
+                // Arrival speed comes from the last substep the body was entirely free.
+                _bodyInContact = true;
+                _arrivalSpeed = Mathf.Max(0f, -Vector3.Dot(_freeVelocity, normal));
+            }
+
+            float allowed = _p.restitution * _arrivalSpeed;
+            float leaving = Vector3.Dot(mean, normal);
+            if (leaving <= allowed)
+            {
+                return;
+            }
+
+            Vector3 excess = normal * (leaving - allowed);
+            for (int i = 0; i < _v.Length; i++)
+            {
+                _v[i] -= excess;
+            }
+        }
+
+        /// <summary>
+        /// Deformation damping (Müller et al. 2007, §3.5): each particle's velocity is pulled toward
+        /// the body's best-fit rigid motion — centre-of-mass velocity plus a rigid spin — rather than
+        /// toward the mean velocity alone. Damping only the <i>deviation</i> from rigid motion is what
+        /// lets a jelly fall and tumble at full speed while its jiggle and ringing die out; damping
+        /// relative to the mean would also brake every tumble.
+        /// </summary>
+        void Damp(float h)
+        {
+            Vector3 centre = Average(_x);
+            Vector3 mean = Average(_v);
+
+            // Angular momentum and inertia about the centre (unit particle masses — they cancel).
+            Vector3 momentum = Vector3.zero;
+            var inertia = new Matrix3();
+            for (int i = 0; i < _x.Length; i++)
+            {
+                Vector3 r = _x[i] - centre;
+                momentum += Vector3.Cross(r, _v[i] - mean);
+                float rr = Vector3.Dot(r, r);
+                inertia.m00 += rr - r.x * r.x;
+                inertia.m11 += rr - r.y * r.y;
+                inertia.m22 += rr - r.z * r.z;
+                inertia.m01 -= r.x * r.y;
+                inertia.m02 -= r.x * r.z;
+                inertia.m12 -= r.y * r.z;
+            }
+
+            inertia.m10 = inertia.m01;
+            inertia.m20 = inertia.m02;
+            inertia.m21 = inertia.m12;
+            Vector3 spin = inertia.Inverse().Multiply(momentum);
+
+            float air = Mathf.Exp(-_p.airDamping * h);
+            float keep = Mathf.Exp(-_p.wobbleDamping * h);
+            for (int i = 0; i < _v.Length; i++)
+            {
+                Vector3 rigid = mean + Vector3.Cross(spin, _x[i] - centre);
+                _v[i] = rigid * air + (_v[i] - rigid) * keep;
+            }
+        }
+
+        void UpdateMetrics()
+        {
+            Centroid = Average(_x);
+            Vector3 mean = Average(_v);
+            CentroidVelocity = mean;
+            float energy = 0f;
+            for (int i = 0; i < _v.Length; i++)
+            {
+                energy += (_v[i] - mean).sqrMagnitude;
+            }
+
+            WobbleEnergy = energy / _v.Length;
+        }
+
+        float Volume()
+        {
+            Vector3 origin = Average(_x);
+            double volume = 0.0;
+            for (int t = 0; t < _triangles.Length; t += 3)
+            {
+                volume += Vector3.Dot(_x[_triangles[t]] - origin,
+                    Vector3.Cross(_x[_triangles[t + 1]] - origin, _x[_triangles[t + 2]] - origin));
+            }
+
+            return (float)(volume / 6.0);
+        }
+
+        static Vector3 Average(Vector3[] values)
+        {
+            Vector3 sum = Vector3.zero;
+            for (int i = 0; i < values.Length; i++)
+            {
+                sum += values[i];
+            }
+
+            return sum / values.Length;
+        }
+
+        /// <summary>
+        /// Order-sensitive fingerprint of every particle position. Two runs that agree on this after the
+        /// same number of steps took the same path — the soft-body determinism check.
+        /// </summary>
+        public float StateHash()
+        {
+            double hash = 0.0;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                hash += (i + 1) * (_x[i].x * 0.7331 + _x[i].y * 0.1377 + _x[i].z * 0.5021);
+            }
+
+            return (float)(hash % 100000.0);
+        }
+    }
+}

@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ef27d65c1cad645b94053c575d3f3c, type: 3}
+  m_Name: WallSurvivalConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Survival::SimulationLobby.Simulations.Survival.WallSurvivalConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 180
+  intent: 'surv-001. 300 blocks, one wall that is never rebuilt, hit by an escalating
+    ball until nothing stands. Hook: guess how many hits. Target 90-170s; reject
+    takes that hit the shot cap.'
+  columns: 25
+  rows: 12
+  blockSize: 0.4
+  blockMass: 1
+  blockGapFraction: 0.1
+  positionJitterFraction: 0.05
+  maxDepenetrationVelocity: 1.5
+  blockLinearDamping: 1.5
+  maxHits: 25
+  openingHoldSeconds: 3
+  preLaunchHoldSeconds: 1
+  maxHitFlightSeconds: 5
+  hitResultHoldSeconds: 0.9
+  finalHoldSeconds: 4
+  eliminationsPerTick: 1.5
+  lastStandBlocks: 12
+  radiusGrowthPerHit: 1.07
+  speedGrowthPerHit: 1.03
+  massGrowthPerHit: 1.25
+  ballRadius: 0.405
+  ballMass: 8
+  ballSpeedMin: 11
+  ballSpeedMax: 14
+  ballSpawnDistance: 12
+  aimJitterBallRadii: 0.5
+  unseededAim: 0
+  settleVelocityThreshold: 0.05
+  settleTicksRequired: 15
+  eliminationDistanceBlocks: 0.2
+  eliminationTiltDegrees: 25
+  minNeighboursToStand: 1
+  slowMotionOnEveryHit: 1
+  slowMotionSeconds: 0.9
+  lastStandSlowMotionBonus: 0.8
+  wipeoutSlowMotionSeconds: 2.2

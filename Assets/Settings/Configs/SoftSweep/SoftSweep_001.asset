@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 558c08d809e544a4e8837b57a7214c3f, type: 3}
+  m_Name: SoftSweep_001
+  m_EditorClassIdentifier: SimulationLobby.Core::SimulationLobby.Core.SweepConfig
+  captionFormat: SOFT {0}
+  takes:
+  - config: {fileID: 11400000, guid: f9d4fbe27c014094fb2edccaeaf68632, type: 2}
+    label: 0%
+  - config: {fileID: 11400000, guid: 632da190c5da71c40a38679696299b06, type: 2}
+    label: 25%
+  - config: {fileID: 11400000, guid: 6318b83375e195448ae43b1b1a46f5d0, type: 2}
+    label: 50%
+  - config: {fileID: 11400000, guid: 5cee50e338aea5b479dd3f5566fefec9, type: 2}
+    label: 75%
+  - config: {fileID: 11400000, guid: 515d1ccc35407044ea366e1f7376cef1, type: 2}
+    label: 100%
+  firstLeadInSeconds: 1.2
+  leadInSeconds: 0.35
+  takeSeconds: 3.4
+  endHoldSeconds: 0.4
+  intent: 'impact-003 ''0% vs 100% Soft'': amber glass capsule onto a chrome spike,
+    five takes. Target 14-22s, loopable.'

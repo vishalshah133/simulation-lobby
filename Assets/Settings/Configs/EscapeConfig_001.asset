@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846a9ad4a2c3d4642b253c8625f38d04, type: 3}
+  m_Name: EscapeConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Escape::SimulationLobby.Simulations.Escape.EscapeConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 178.8
+  intent: 'esc-001 published 2026-09-27, "The Ball Grows Every Bounce. Can It Escape?".
+    7 rounds, growth x1.035/bounce (~29 bounces/round), gap 24deg, trapped at +10%
+    over the gap. Values pinned explicitly here (rather than left to fall through to
+    code defaults) so a future change to EscapeConfig''s field defaults cannot silently
+    retune an already-published video.'
+  initialSizeFractionMin: 0.07692308
+  initialSizeFractionMax: 0.09090909
+  randomizeSizePerAttempt: 0
+  speedMin: 8
+  speedMax: 10
+  attemptCount: 7
+  maxAttemptSeconds: 24
+  interAttemptSeconds: 0.8
+  trappedMarginFraction: 0.1
+  growth:
+    mode: 1
+    magnitude: 1.035
+    startValue: 1
+    maxValue: 6
+    minValue: 0.1
+  gapDegrees: 24
+  gapCenterDegrees: 90
+  gapAngularSpeed: 0
+  gapDirectionSeeded: 1
+  nearMissGapWidths: 1
