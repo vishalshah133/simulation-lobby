@@ -92,7 +92,7 @@ namespace SimulationLobby.Simulations.Impact
                 plinth = new SdfSubtract(plinth,
                     new SdfCylinderY(Vector3.zero, _config.holeRadius, top - _config.holeDepth, top + 10f));
                 colliders.Add(new SdfTorusY(new Vector3(0f, top, 0f), _config.holeRadius + _config.lipRadius,
-                    _config.lipRadius));
+                    _config.lipRadius) { thin = true });
             }
 
             colliders.Add(plinth);

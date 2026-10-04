@@ -27,6 +27,9 @@ namespace SimulationLobby.Core
         public enum SweepPhase
         {
             Idle,
+            /// <summary>3-2-1 before the first take. The first take is already initialised and on
+            /// screen (so its first-frame costs are paid now), but nothing moves.</summary>
+            Countdown,
             /// <summary>Take initialised and captioned, nothing moving yet.</summary>
             LeadIn,
             /// <summary>Take ticking.</summary>
@@ -141,8 +144,22 @@ namespace SimulationLobby.Core
             }
 
             StartTake(solo ? soloTake : 0);
+            if (sweep.CountdownTicks > 0)
+            {
+                // The take is initialised (on screen, warming up) but the clock hasn't started: the
+                // countdown runs first, then the take's own lead-in. Nothing is ticked, so the take
+                // is identical with or without a countdown.
+                Phase = SweepPhase.Countdown;
+            }
+
             return true;
         }
+
+        /// <summary>Whole seconds left on the countdown (3, 2, 1), or 0 outside it. For presentation.</summary>
+        public int CountdownRemaining =>
+            Phase == SweepPhase.Countdown
+                ? Mathf.Max(1, Mathf.CeilToInt((sweep.CountdownTicks - PhaseTick) * sweep.FixedTimestep - 1e-4f))
+                : 0;
 
         void StartTake(int take)
         {
@@ -163,6 +180,16 @@ namespace SimulationLobby.Core
         {
             switch (Phase)
             {
+                case SweepPhase.Countdown:
+                    Advance();
+                    if (PhaseTick >= sweep.CountdownTicks)
+                    {
+                        PhaseTick = 0;
+                        Phase = sweep.LeadInTicks(TakeIndex) > 0 ? SweepPhase.LeadIn : SweepPhase.Running;
+                    }
+
+                    break;
+
                 case SweepPhase.LeadIn:
                     Advance();
                     if (PhaseTick >= sweep.LeadInTicks(TakeIndex))

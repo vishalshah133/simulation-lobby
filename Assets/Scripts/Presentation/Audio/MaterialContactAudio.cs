@@ -149,34 +149,14 @@ namespace SimulationLobby.Presentation
             _contactCount++;
 
             bool rigid = softness01 <= clinkMaxSoftness;
-            float hard = rigid ? 1f : 0f;
-            float soft = rigid ? 0f : Mathf.Lerp(0.6f, 1f, softness01);
-
-            if (hard > 0.02f)
+            if (rigid)
             {
-                // Softer glass rings shorter and a touch lower — the ring is damped by the give.
-                int key = Mathf.RoundToInt(softness01 * 20f) * 16 + _contactCount % 4;
-                if (!_clinks.TryGetValue(key, out AudioClip clink))
-                {
-                    clink = ProceduralToneBank.CreateGlassClink(
-                        clinkPitch * (1f - 0.18f * softness01) * (1f + 0.03f * (_contactCount % 4)),
-                        Mathf.Lerp(1.6f, 0.5f, softness01), 30 + key, $"Clink_{key}");
-                    _clinks[key] = clink;
-                }
-
-                Play(clink, contactVolume * hard * loudness);
+                Play(Clink(softness01, _contactCount % ClinkVariants), contactVolume * loudness);
             }
-
-            if (soft > 0.02f)
+            else
             {
-                int key = Mathf.RoundToInt(softness01 * 20f) * 16 + _contactCount % 3;
-                if (!_squelches.TryGetValue(key, out AudioClip squelch))
-                {
-                    squelch = ProceduralToneBank.CreateSquelch(softness01, 70 + key, $"Squelch_{key}");
-                    _squelches[key] = squelch;
-                }
-
-                Play(squelch, contactVolume * soft * loudness);
+                Play(Squelch(softness01, _contactCount % SquelchVariants),
+                    contactVolume * Mathf.Lerp(0.6f, 1f, softness01) * loudness);
             }
 
             SetDucked(false);
@@ -185,27 +165,100 @@ namespace SimulationLobby.Presentation
         /// <summary>The fall. Length should match the time to contact so it peaks on the hit.</summary>
         public void PlayWhoosh(float seconds)
         {
-            int key = Mathf.RoundToInt(Mathf.Clamp(seconds, 0.15f, 3f) * 100f);
-            if (!_whooshes.TryGetValue(key, out AudioClip whoosh))
-            {
-                whoosh = ProceduralToneBank.CreateWhoosh(key / 100f, 2, $"Whoosh_{key}");
-                _whooshes[key] = whoosh;
-            }
-
-            Play(whoosh, whooshVolume);
+            Play(Whoosh(seconds), whooshVolume);
         }
 
         /// <summary>A bell note on the pentatonic ladder. Rising one degree per take gives a sweep a melody.</summary>
         public void PlayNote(int degree)
         {
-            if (!_notes.TryGetValue(degree, out AudioClip note))
+            Play(Note(degree), noteVolume);
+        }
+
+        /// <summary>
+        /// Generates every clip a run will need up front — call it before anything moves (during a
+        /// countdown). Synthesising a squelch or clink takes milliseconds of main-thread work; done
+        /// on demand it landed exactly on the first impact of each take and stuttered it.
+        /// </summary>
+        public void Prewarm(IEnumerable<float> softnesses, float whooshSeconds, IEnumerable<int> noteDegrees)
+        {
+            foreach (float softness in softnesses)
             {
-                note = ProceduralToneBank.CreateTone(ProceduralToneBank.DegreeToFrequency(noteRootHz, degree),
-                    noteDuration, $"Note_{degree}");
-                _notes[degree] = note;
+                float s = Mathf.Clamp01(softness);
+                if (s <= clinkMaxSoftness)
+                {
+                    for (int v = 0; v < ClinkVariants; v++)
+                    {
+                        Clink(s, v);
+                    }
+                }
+                else
+                {
+                    for (int v = 0; v < SquelchVariants; v++)
+                    {
+                        Squelch(s, v);
+                    }
+                }
             }
 
-            Play(note, noteVolume);
+            Whoosh(whooshSeconds);
+            foreach (int degree in noteDegrees)
+            {
+                Note(degree);
+            }
+        }
+
+        const int ClinkVariants = 4;
+        const int SquelchVariants = 3;
+
+        AudioClip Clink(float softness01, int variant)
+        {
+            int key = Mathf.RoundToInt(softness01 * 20f) * 16 + variant;
+            if (!_clinks.TryGetValue(key, out AudioClip clip))
+            {
+                // Softer glass rings shorter and a touch lower — the ring is damped by the give.
+                clip = ProceduralToneBank.CreateGlassClink(
+                    clinkPitch * (1f - 0.18f * softness01) * (1f + 0.03f * variant),
+                    Mathf.Lerp(1.6f, 0.5f, softness01), 30 + key, $"Clink_{key}");
+                _clinks[key] = clip;
+            }
+
+            return clip;
+        }
+
+        AudioClip Squelch(float softness01, int variant)
+        {
+            int key = Mathf.RoundToInt(softness01 * 20f) * 16 + variant;
+            if (!_squelches.TryGetValue(key, out AudioClip clip))
+            {
+                clip = ProceduralToneBank.CreateSquelch(softness01, 70 + key, $"Squelch_{key}");
+                _squelches[key] = clip;
+            }
+
+            return clip;
+        }
+
+        AudioClip Whoosh(float seconds)
+        {
+            int key = Mathf.RoundToInt(Mathf.Clamp(seconds, 0.15f, 3f) * 100f);
+            if (!_whooshes.TryGetValue(key, out AudioClip clip))
+            {
+                clip = ProceduralToneBank.CreateWhoosh(key / 100f, 2, $"Whoosh_{key}");
+                _whooshes[key] = clip;
+            }
+
+            return clip;
+        }
+
+        AudioClip Note(int degree)
+        {
+            if (!_notes.TryGetValue(degree, out AudioClip clip))
+            {
+                clip = ProceduralToneBank.CreateTone(ProceduralToneBank.DegreeToFrequency(noteRootHz, degree),
+                    noteDuration, $"Note_{degree}");
+                _notes[degree] = clip;
+            }
+
+            return clip;
         }
 
         /// <summary>Hush the ambient bed (before contact) or let it back in (after).</summary>

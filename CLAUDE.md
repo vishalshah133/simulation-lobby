@@ -190,6 +190,7 @@ same scene.
 | `elim` | Bracket / round-based elimination | Long |
 | `surv` | Survival — something endures an escalating attack (first build: *Wall vs Ball*, guess the hits) | Either |
 | `esc` | Containment/escape — one ball vs a boundary, escalating each bounce | Short |
+| `brk` | Ring breaker — ball breaks out through nested rings of breakable segments, one ring at a time | Short |
 | `impact` | Single-event spectacle — one thing meets another, once (`idea`; rigid scatter proved too short) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.

@@ -31,7 +31,10 @@ namespace SimulationLobby.Simulations.Impact
         [Min(0f)] public float capsuleHalfLength = 0.2f;
         [Tooltip("Particles around the equator; the rest of the mesh matches its spacing. 40 ≈ 750 particles.")]
         [Range(12, 64)] public int capsuleSegments = 40;
-        [Min(0.01f)] public float capsuleMass = 1f;
+        [Tooltip("Weight against the skin's stretchiness: this is what pushes a soft body down through the " +
+                 "narrow lip. At 1kg (lighter than air for its size) even 100% stalled ~0.5m in; at 10kg it " +
+                 "squeezes through almost whole. The rigid take is unaffected by mass.")]
+        [Min(0.01f)] public float capsuleMass = 10f;
 
         [Header("Drop")]
         [Tooltip("Gap between the capsule's lowest point and the plinth top at release.")]
@@ -44,17 +47,17 @@ namespace SimulationLobby.Simulations.Impact
         [Range(-45f, 45f)] public float dropTiltDegrees;
 
         [Header("Plinth (layout — shared with the scene builder)")]
-        [Tooltip("2m wide so any overflow stays on top; 1.2m tall to house a deep hole.")]
-        public Vector3 plinthSize = new Vector3(2f, 1.2f, 2f);
+        [Tooltip("2m wide so any overflow stays on top; 2.4m tall to house a 2m-deep hole.")]
+        public Vector3 plinthSize = new Vector3(2f, 2.4f, 2f);
 
         [Tooltip("Radius of the hole in the plinth top (the opening inside the brass lip). Smaller than the " +
                  "capsule on purpose: the glass rests in it like an egg in a cup, softer takes squeeze in " +
-                 "deeper. 0 = no hole. Tested with depth 1.0: 0% rests 19cm in, 25/50/75/100% reach " +
-                 "39/50/73/91cm.")]
-        [Min(0f)] public float holeRadius = 0.4f;
-        [Tooltip("Depth of the hole. At 0.6 the 75% and 100% takes both hit the floor and looked alike; " +
-                 "1.0 lets every take find its own depth.")]
-        [Min(0.05f)] public float holeDepth = 1f;
+                 "deeper. 0 = no hole. Tested (0.33 opening, 2m deep, 10kg): 0% rests 4cm in, 25/50/75/100% " +
+                 "reach 27/47/83/199cm.")]
+        [Min(0f)] public float holeRadius = 0.33f;
+        [Tooltip("Depth of the hole. Deep enough that no take hits the floor (at 0.6 the 75% and 100% " +
+                 "takes both did and looked alike). The 100% take reaches ~2m.")]
+        [Min(0.05f)] public float holeDepth = 2f;
         [Tooltip("Tube radius of the rounded brass lip around the hole. Keep ≥ 0.06: a thinner lip slips " +
                  "between the capsule's collision points.")]
         [Min(0.01f)] public float lipRadius = 0.08f;
@@ -63,9 +66,10 @@ namespace SimulationLobby.Simulations.Impact
         [Range(1, 48)] public int substeps = 16;
         public float gravity = 9.81f;
         [Min(0.001f)] public float collisionThickness = 0.014f;
-        [Tooltip("High: a splatting body should grip the lacquer and spread evenly, not skate.")]
-        [Range(0f, 2f)] public float staticFriction = 1f;
-        [Range(0f, 2f)] public float dynamicFriction = 0.7f;
+        [Tooltip("Low: polished glass and brass are slippery. At 1.0 a soft body pressed against the lip " +
+                 "and hole wall stuck there instead of squeezing through.")]
+        [Range(0f, 2f)] public float staticFriction = 0.2f;
+        [Range(0f, 2f)] public float dynamicFriction = 0.14f;
 
         [Header("Bounce")]
         [Tooltip("0% only (the rigid take): glass off lacquer. ~0.3 gives a small hop and a clean clink.")]

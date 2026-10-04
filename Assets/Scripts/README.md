@@ -19,8 +19,9 @@ so a wrong reference is a compile error rather than a code-review catch.
 | `Core/Editor/` | `SimulationLobby.Core.Editor` | `Core` | built |
 | `Shared/` | `SimulationLobby.Shared` | `Core` | built (escalation, 2D physics, arena) |
 | `Presentation/` | `SimulationLobby.Presentation` | `Core` | not built |
-| `Capture/` | `SimulationLobby.Capture` | `Core` | not built |
+| `Capture/` | `SimulationLobby.Capture` | `Core` | built (`SeedScanner`, `SeedScanProfile`) |
 | `Simulations/Escape/` | `SimulationLobby.Simulations.Escape` | `Core`, `Shared` | built (`esc`) |
+| `Simulations/Breaker/` | `SimulationLobby.Simulations.Breaker` | `Core`, `Shared`, `Presentation` | built (`brk`) |
 | `Simulations/<X>/` | `SimulationLobby.Simulations.<X>` | `Core`, `Shared`, `Presentation` | not built |
 | `Simulations/Elimination/` | `SimulationLobby.Simulations.Elimination` | the above + wrapped formats | not built |
 

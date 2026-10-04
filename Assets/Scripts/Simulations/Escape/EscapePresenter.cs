@@ -26,6 +26,10 @@ namespace SimulationLobby.Simulations.Escape
         [Tooltip("The hook, stated as a question the viewer wants answered.")]
         [SerializeField] string _question = "WHO WILL WIN?";
 
+        [Tooltip("Restart the melody at each new round. Turn off when the melody is a song, so the tune " +
+                 "carries on across rounds instead of replaying its first line every round.")]
+        [SerializeField] bool _restartMelodyEachRound = true;
+
         int _lastBounceCount;
         int _lastAttemptsPlayed;
 
@@ -67,7 +71,10 @@ namespace SimulationLobby.Simulations.Escape
             {
                 _lastAttemptsPlayed = _simulation.AttemptsPlayed;
                 _lastBounceCount = 0;
-                _melody.ResetMelody();
+                if (_restartMelodyEachRound)
+                {
+                    _melody.ResetMelody();
+                }
             }
 
             int bounces = _simulation.BounceCount;
@@ -141,6 +148,14 @@ namespace SimulationLobby.Simulations.Escape
             _simulation = simulation;
             _hud = hud;
             _melody = melody;
+        }
+
+        /// <summary>Assigned by the scene builder, for variants with their own copy.</summary>
+        public void SetCopy(string title, string question, bool restartMelodyEachRound)
+        {
+            _title = title;
+            _question = question;
+            _restartMelodyEachRound = restartMelodyEachRound;
         }
     }
 }

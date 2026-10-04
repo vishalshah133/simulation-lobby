@@ -1,0 +1,178 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd46ebcfd904493ca74c5f896c79d6a1, type: 3}
+  m_Name: BaaBaaBlackSheep
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.MelodySequence
+  songTitle: BAA BAA BLACK SHEEP
+  source: Traditional English nursery rhyme (words 1744), sung to the 1761 French air 'Ah! vous
+    dirai-je, maman' (also Twinkle Twinkle). Public domain worldwide.
+  tonicHz: 220
+  notes:
+  - semitone: 0
+    beats: 1
+    endsPhrase: 0
+  - semitone: 0
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 1
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 2
+    endsPhrase: 1
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 1
+    endsPhrase: 0
+  - semitone: 2
+    beats: 1
+    endsPhrase: 0
+  - semitone: 2
+    beats: 1
+    endsPhrase: 0
+  - semitone: 0
+    beats: 2
+    endsPhrase: 1
+  - semitone: 7
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 2
+    beats: 2
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 5
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 5
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 4
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 2
+    beats: 2
+    endsPhrase: 1
+  - semitone: 0
+    beats: 1
+    endsPhrase: 0
+  - semitone: 0
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 1
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 9
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 2
+    endsPhrase: 1
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 5
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 1
+    endsPhrase: 0
+  - semitone: 4
+    beats: 1
+    endsPhrase: 0
+  - semitone: 2
+    beats: 1
+    endsPhrase: 0
+  - semitone: 2
+    beats: 1
+    endsPhrase: 0
+  - semitone: 0
+    beats: 2
+    endsPhrase: 1

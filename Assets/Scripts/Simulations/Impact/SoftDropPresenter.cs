@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SimulationLobby.Core;
 using SimulationLobby.Presentation;
 using SimulationLobby.Shared;
@@ -49,6 +50,8 @@ namespace SimulationLobby.Simulations.Impact
         int _lastTick;
         float _lastStrain;
         bool _whooshPlayed;
+        bool _prewarmed;
+        int _lastCountdown;
 
         void LateUpdate()
         {
@@ -60,6 +63,12 @@ namespace SimulationLobby.Simulations.Impact
             SweepRunner.SweepPhase phase = _runner.Phase;
             if (phase == SweepRunner.SweepPhase.Idle)
             {
+                return;
+            }
+
+            if (phase == SweepRunner.SweepPhase.Countdown)
+            {
+                TickCountdown();
                 return;
             }
 
@@ -95,6 +104,70 @@ namespace SimulationLobby.Simulations.Impact
 
             _lastImpacts = impacts;
             TickContinuousVoices(phase, config);
+        }
+
+        /// <summary>
+        /// 3-2-1 before the first take: a big number in the caption slot, a soft tick on each count
+        /// climbing toward the first take's note. The first frame of the countdown is also where all
+        /// audio is generated, so no take ever pays for synthesis mid-drop.
+        /// </summary>
+        void TickCountdown()
+        {
+            if (!_prewarmed)
+            {
+                _prewarmed = true;
+                PrewarmAudio();
+                if (_hud != null)
+                {
+                    _hud.SetSubline(string.Empty);
+                    _hud.SetFooter(footer);
+                }
+            }
+
+            int remaining = _runner.CountdownRemaining;
+            if (remaining == _lastCountdown)
+            {
+                return;
+            }
+
+            _lastCountdown = remaining;
+            if (_hud != null)
+            {
+                _hud.SetCaption(remaining.ToString());
+            }
+
+            if (_audio != null)
+            {
+                // Rising into the first take's note: 3 → degree −3, 2 → −2, 1 → −1, take 1 → 0.
+                _audio.PlayNote(-remaining);
+            }
+        }
+
+        void PrewarmAudio()
+        {
+            if (_audio == null)
+            {
+                return;
+            }
+
+            var softnesses = new List<float>();
+            float fall = 0.45f;
+            foreach (SweepConfig.Take take in _runner.sweep.takes)
+            {
+                if (take.config is SoftDropConfig drop)
+                {
+                    softnesses.Add(drop.softness);
+                    fall = drop.FallSeconds;
+                }
+            }
+
+            var degrees = new List<int> { -3, -2, -1 };
+            if (noteDegrees != null)
+            {
+                degrees.AddRange(noteDegrees);
+            }
+
+            _audio.Prewarm(softnesses, fall + 0.06f, degrees);
         }
 
         void OnTakeStarted(int take)

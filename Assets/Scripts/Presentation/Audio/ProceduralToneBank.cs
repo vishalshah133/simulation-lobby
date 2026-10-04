@@ -356,6 +356,66 @@ namespace SimulationLobby.Presentation
         }
 
         /// <summary>
+        /// Glass breaking: a sharp high-passed noise crack, then a scatter of short inharmonic pings
+        /// (fragments landing) thinning out over the tail. Sits above a melody rather than under it,
+        /// so it reads on phone speakers without masking the notes.
+        /// </summary>
+        /// <param name="size">0..1. Bigger = longer tail and more fragments (a whole ring vs one segment).</param>
+        /// <param name="seed">Noise and fragment placement. Same seed, same clip — re-renders must match.</param>
+        public static AudioClip CreateShatter(float size = 1f, int seed = 9, string name = "Shatter")
+        {
+            size = Mathf.Clamp01(size);
+            float duration = Mathf.Lerp(0.25f, 0.9f, size);
+            int sampleCount = Mathf.Max(1, Mathf.RoundToInt(SampleRate * duration));
+            var samples = new float[sampleCount];
+            var random = new System.Random(seed);
+
+            // The crack: white noise minus its own low-passed copy (a cheap high-pass), decaying fast.
+            float low = 0f;
+            for (int i = 0; i < sampleCount; i++)
+            {
+                float t = i / (float)SampleRate;
+                float noise = (float)(random.NextDouble() * 2.0 - 1.0);
+                low += (noise - low) * 0.2f;
+                samples[i] = (noise - low) * Mathf.Exp(-28f * t) * 0.8f;
+            }
+
+            // Fragments: short bright pings at random inharmonic pitches, denser near the start.
+            int fragments = Mathf.RoundToInt(Mathf.Lerp(5f, 22f, size));
+            for (int f = 0; f < fragments; f++)
+            {
+                double u = random.NextDouble();
+                int start = Mathf.RoundToInt((float)(u * u) * (sampleCount - 1) * 0.85f);
+                float hz = 2200f + (float)random.NextDouble() * 4200f;
+                float gain = 0.12f + (float)random.NextDouble() * 0.18f;
+                int length = Mathf.Min(sampleCount - start, Mathf.RoundToInt(SampleRate * 0.06f));
+                for (int i = 0; i < length; i++)
+                {
+                    float t = i / (float)SampleRate;
+                    samples[start + i] += Mathf.Sin(2f * Mathf.PI * hz * t) * Mathf.Exp(-70f * t) * gain;
+                }
+            }
+
+            float peak = 0f;
+            for (int i = 0; i < sampleCount; i++)
+            {
+                peak = Mathf.Max(peak, Mathf.Abs(samples[i]));
+            }
+
+            if (peak > 0.95f)
+            {
+                for (int i = 0; i < sampleCount; i++)
+                {
+                    samples[i] *= 0.95f / peak;
+                }
+            }
+
+            var clip = AudioClip.Create(name, sampleCount, 1, SampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        /// <summary>
         /// A wet "squelch": a low body thump, a burst of noise through a resonant band-pass sweeping
         /// down (the slap of something soft deforming), and a scatter of tiny rising chirps — the
         /// classic procedural recipe for a bubble, and what makes it read as <i>wet</i> rather than

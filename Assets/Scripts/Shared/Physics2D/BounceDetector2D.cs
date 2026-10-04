@@ -33,6 +33,12 @@ namespace SimulationLobby.Shared
         /// <summary>Contact point of the most recent collision, in world space.</summary>
         public Vector2 LastContactPoint { get; private set; }
 
+        /// <summary>
+        /// What the most recent counted collision hit, for formats where the wall itself reacts (a
+        /// segment that breaks). Only the first collision in a tick is kept, matching the dedupe.
+        /// </summary>
+        public Collider2D LastCollider { get; private set; }
+
         void OnCollisionEnter2D(Collision2D collision)
         {
             // Flag, not increment: several contact points in one collision must still be one bounce.
@@ -44,6 +50,7 @@ namespace SimulationLobby.Shared
             _bouncedThisStep = true;
             _totalBounces++;
             LastImpactSpeed = collision.relativeVelocity.magnitude;
+            LastCollider = collision.collider;
 
             if (collision.contactCount > 0)
             {
@@ -74,6 +81,7 @@ namespace SimulationLobby.Shared
             _bouncedThisStep = false;
             LastImpactSpeed = 0f;
             LastContactPoint = Vector2.zero;
+            LastCollider = null;
         }
     }
 }

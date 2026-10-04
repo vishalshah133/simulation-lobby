@@ -435,6 +435,7 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
                 };
             }
 
+            sweep.countdownSeconds = 3;
             sweep.firstLeadInSeconds = 1.2f;
             sweep.leadInSeconds = 0.35f;
             sweep.takeSeconds = 3.4f;

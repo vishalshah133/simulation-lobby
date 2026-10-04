@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f07c95bd7d509774d8043a6c244171db, type: 3}
+  m_Name: BreakerConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Breaker::SimulationLobby.Simulations.Breaker.BreakerConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 150
+  intent: 'brk-001: 5 rings of 14-18 segments, 2 touches each (crack, then break),
+    spinning 18deg/s alternating; ball 6.8 u/s +0.4 per ring (15% slower: the song
+    sounded rushed), 2 fewer segments per ring to hold a ~55s median against the
+    60s clock. Fur Elise A section (93 notes), one note per touch.'
+  ringCount: 5
+  innerRadius: 1.6
+  ringSpacing: 0.75
+  ringThickness: 0.24
+  innerSegments: 14
+  extraSegmentsPerRing: 1
+  innerHitPoints: 2
+  outerHitPoints: 2
+  ringAngularSpeed: 18
+  alternateDirections: 1
+  spinDirectionSeeded: 1
+  ballRadius: 0.16
+  startSpeed: 6.8
+  speedPerRing: 0.4
+  startOffsetMax: 0.6
+  timeLimitSeconds: 60
+  finishHoldSeconds: 1.2

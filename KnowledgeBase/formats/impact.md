@@ -117,6 +117,39 @@ volume and determinism. Every bug below was invisible in code review and obvious
   *opaque* image, which never contains transparent objects. So the outer glass is plain
   alpha-blended URP Lit, drawn after the hero glass (queue +10), not a second refraction shader.
   Otherwise each would be invisible to the other.
+- **Fourth playtest: "the capsule doesn't interact with the brass lip."** The scene had been
+  hand-scaled (plinth ×2, lip moved). **Physics reads the config, never scene transforms.** Change
+  the layout in the take configs and rebuild; editing scene objects only moves the picture. Then:
+  2.4m plinth, 2m hole, narrower 0.33 opening. A narrow neck needed two more things. **Weight**:
+  at 1kg (lighter than air for its size) even 100% stalled ~0.5m in, while at 10kg it squeezes
+  through almost whole (4/27/47/83/199cm). And **low friction** (0.2): at 1.0 the body stuck to
+  the lip. Also a bug: rigid friction limits compared distances with λ, which scales with mass,
+  so a heavier glass skated off the lip. Limits now use penetration depth, and rigid behaviour is
+  identical at 1/10/20kg.
+- **"Light is harsh, background needs contrast."** URP has no realtime area lights, so the
+  softness comes from: lower intensities, wide cones with ~0 inner angle (long falloff), half-strength
+  shadows, a brighter cool ambient, and large dim softbox cards. The backdrop went from
+  charcoal-to-black to a cool slate gradient. It's lighter than the smoked glass, and the complement
+  of the amber hero.
+- **Fifth playtest: "not smooth at the start" and "make the background white-to-beige."**
+  Stutter had three causes, all in presentation, none in the sim: first-frame shader and probe
+  work, audio clips synthesised *on the first impact*, and a mesh updated only at 60Hz with no
+  interpolation. Fixes: a 3-2-1 countdown (`SweepConfig.countdownSeconds`, first take already on
+  screen), all audio pre-generated on the countdown's first frame, and `SoftBodyMeshView`
+  interpolating between steps, but only while the solver is stepping, or holds would flicker.
+  A Unity Recorder capture at a fixed frame rate never shows editor hitches anyway. The bright
+  backdrop also needed dark captions (white text vanished) and a bloom threshold raised to 1.5,
+  because lit white surfaces were blooming into a haze.
+- **Sixth playtest: "still choppy."** The real cause was cost, not first-frame work. The harness
+  measured 1.5–4ms per step, but that was *optimised* .NET. The editor runs Mono in Debug
+  code-optimisation mode by default, and unoptimised the step took 18–42ms against a 16.7ms
+  budget. Unity then ran several steps per frame to catch up, and interpolation can't hide that.
+  **Always benchmark the solver unoptimised.** Fixes, none changing behaviour: a broad phase
+  (colliders out of reach skipped per substep), analytic SDF normals (central differences cost
+  6 extra evaluations per contact), the rigid path's dense samples tested only against `thin`
+  colliders, and hot loops written in plain floats instead of Vector3 operators (each is a real
+  call in Debug Mono). Unoptimised 42→12.5ms (rigid) and 18–23→7.5–9ms (soft), optimised
+  1.5–2.4ms. Release code optimisation in the editor gives further headroom.
 - **Lacquer is only as bright as what it reflects.** The plinth front read as a black hole until a
   softbox card sat where that face's reflection lands (behind the camera, just above camera
   height).

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dff07a21819446fab5b09c3e56d8db0, type: 3}
+  m_Name: SeedScan_BreakerConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Capture::SimulationLobby.Capture.SeedScanProfile
+  firstSeed: 1
+  seedCount: 200
+  requirements:
+  - metric: hits
+    min: 35
+    max: 100000
+  weights:
+  - metric: rings_broken
+    weight: 1
+    mode: 0
+    target: 0
+  - metric: seconds_left
+    weight: -0.25
+    mode: 0
+    target: 0
+  - metric: last_ring_progress
+    weight: 2
+    mode: 0
+    target: 0
+  verifyTopCount: 10
+  printTopCount: 15
+  intent: 'brk-001 ring breaker vs a 60s clock. Ranks the closest finishes first: wins with
+    little time left and losses on the last ring with most of it broken. At least 35
+    touches so the whole Fur Elise theme plays.'

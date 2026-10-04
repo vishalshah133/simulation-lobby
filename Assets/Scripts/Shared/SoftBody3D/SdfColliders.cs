@@ -39,6 +39,13 @@ namespace SimulationLobby.Shared
         /// </summary>
         public float pierceDrag;
 
+        /// <summary>
+        /// A thin feature (a lip, a rod) that can fit between a body's particles. The rigid path tests
+        /// thin colliders against its dense contact samples and everything else against the particles
+        /// alone — the dense set is ~6× the work and only thin features need it.
+        /// </summary>
+        public bool thin;
+
         public abstract float Distance(Vector3 point);
 
         /// <summary>Outward surface normal at a point near the surface. Central differences by default.</summary>
@@ -91,10 +98,39 @@ namespace SimulationLobby.Shared
 
         public override float Distance(Vector3 p)
         {
-            Vector3 q = p - center;
-            q = new Vector3(Mathf.Abs(q.x), Mathf.Abs(q.y), Mathf.Abs(q.z)) - halfExtents;
-            Vector3 outside = Vector3.Max(q, Vector3.zero);
-            return outside.magnitude + Mathf.Min(Mathf.Max(q.x, Mathf.Max(q.y, q.z)), 0f);
+            float qx = Mathf.Abs(p.x - center.x) - halfExtents.x;
+            float qy = Mathf.Abs(p.y - center.y) - halfExtents.y;
+            float qz = Mathf.Abs(p.z - center.z) - halfExtents.z;
+            float ox = qx > 0f ? qx : 0f;
+            float oy = qy > 0f ? qy : 0f;
+            float oz = qz > 0f ? qz : 0f;
+            float inside = Mathf.Max(qx, Mathf.Max(qy, qz));
+            return Mathf.Sqrt(ox * ox + oy * oy + oz * oz) + (inside < 0f ? inside : 0f);
+        }
+
+        public override Vector3 Normal(Vector3 p)
+        {
+            float dx = p.x - center.x;
+            float dy = p.y - center.y;
+            float dz = p.z - center.z;
+            float qx = Mathf.Abs(dx) - halfExtents.x;
+            float qy = Mathf.Abs(dy) - halfExtents.y;
+            float qz = Mathf.Abs(dz) - halfExtents.z;
+            if (qx > 0f || qy > 0f || qz > 0f)
+            {
+                // Outside: toward the nearest point on the surface (edges and corners blend).
+                var n = new Vector3(qx > 0f ? Mathf.Sign(dx) * qx : 0f, qy > 0f ? Mathf.Sign(dy) * qy : 0f,
+                    qz > 0f ? Mathf.Sign(dz) * qz : 0f);
+                return n.normalized;
+            }
+
+            // Inside: out through the nearest face.
+            if (qx >= qy && qx >= qz)
+            {
+                return new Vector3(dx >= 0f ? 1f : -1f, 0f, 0f);
+            }
+
+            return qy >= qz ? new Vector3(0f, dy >= 0f ? 1f : -1f, 0f) : new Vector3(0f, 0f, dz >= 0f ? 1f : -1f);
         }
     }
 
@@ -124,6 +160,25 @@ namespace SimulationLobby.Shared
             float outsideV = Mathf.Max(vertical, 0f);
             return Mathf.Min(Mathf.Max(radial, vertical), 0f) + Mathf.Sqrt(outsideR * outsideR + outsideV * outsideV);
         }
+
+        public override Vector3 Normal(Vector3 p)
+        {
+            float dx = p.x - axisPoint.x;
+            float dz = p.z - axisPoint.z;
+            float length = Mathf.Sqrt(dx * dx + dz * dz);
+            float radial = length - radius;
+            float below = yMin - p.y;
+            float above = p.y - yMax;
+            float vertical = Mathf.Max(below, above);
+            var radialDir = length > 1e-6f ? new Vector3(dx / length, 0f, dz / length) : Vector3.right;
+            var verticalDir = above >= below ? Vector3.up : Vector3.down;
+            if (radial > 0f && vertical > 0f)
+            {
+                return (radialDir * radial + verticalDir * vertical).normalized;
+            }
+
+            return radial > vertical ? radialDir : verticalDir;
+        }
     }
 
     /// <summary>Horizontal torus (a ring lying flat) — a rounded lip around a hole.</summary>
@@ -148,6 +203,25 @@ namespace SimulationLobby.Shared
             float qy = p.y - center.y;
             return Mathf.Sqrt(qx * qx + qy * qy) - minorRadius;
         }
+
+        public override Vector3 Normal(Vector3 p)
+        {
+            float dx = p.x - center.x;
+            float dz = p.z - center.z;
+            float length = Mathf.Sqrt(dx * dx + dz * dz);
+            float qx = length - majorRadius;
+            float qy = p.y - center.y;
+            float tube = Mathf.Sqrt(qx * qx + qy * qy);
+            if (tube < 1e-6f)
+            {
+                return Vector3.up;
+            }
+
+            // Away from the tube's centre-line: radial component in the ring's plane, plus vertical.
+            float rx = length > 1e-6f ? dx / length : 1f;
+            float rz = length > 1e-6f ? dz / length : 0f;
+            return new Vector3(rx * qx / tube, qy / tube, rz * qx / tube);
+        }
     }
 
     /// <summary>
@@ -167,6 +241,12 @@ namespace SimulationLobby.Shared
         }
 
         public override float Distance(Vector3 p) => Mathf.Max(solid.Distance(p), -cut.Distance(p));
+
+        /// <summary>The normal of whichever surface is nearer: the solid's own, or the cut's flipped.</summary>
+        public override Vector3 Normal(Vector3 p)
+        {
+            return solid.Distance(p) >= -cut.Distance(p) ? solid.Normal(p) : -cut.Normal(p);
+        }
     }
 
     /// <summary>

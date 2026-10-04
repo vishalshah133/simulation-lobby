@@ -17,15 +17,28 @@ namespace SimulationLobby.Shared
     /// <remarks>
     /// Read-only over the solver, and runs in <c>LateUpdate</c> after the fixed step. The mesh is in
     /// world space, so keep this object's transform at identity.
+    /// <para>
+    /// <b>Interpolated</b>, like a Rigidbody set to Interpolate: the drawn pose blends from the
+    /// previous fixed step to the latest by how far the frame is between them. Without it the mesh
+    /// only moves at the physics rate (60 Hz), so on a faster display the same pose repeats for
+    /// several frames and the motion judders — part of the "not smooth" first-playtest note. It
+    /// costs one physics step of latency and never touches the simulation.
+    /// </para>
     /// </remarks>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public sealed class SoftBodyMeshView : MonoBehaviour
     {
         [SerializeField] MonoBehaviour _source;
 
+        [Tooltip("Blend between physics steps for smooth motion at any frame rate.")]
+        public bool interpolate = true;
+
         ISoftBodySource _softBodySource;
         SoftBodySolver _boundSolver;
         Mesh _mesh;
+        Vector3[] _blended;
+        int _seenSteps = -1;
+        float _lastStepFixedTime = -1f;
 
         public void Bind(MonoBehaviour source)
         {
@@ -51,17 +64,43 @@ namespace SimulationLobby.Shared
                 return;
             }
 
+            Vector3[] current = solver.Positions;
             if (!ReferenceEquals(solver, _boundSolver))
             {
                 // New take: new solver. Topology can differ between configs, so rebuild from scratch.
                 _boundSolver = solver;
+                _blended = new Vector3[current.Length];
                 _mesh.Clear();
-                _mesh.vertices = solver.Positions;
+                _mesh.vertices = current;
                 _mesh.triangles = solver.Triangles;
+            }
+
+            // Only blend while the solver is actually stepping: during a hold (lead-in, end hold) the
+            // last two poses are stale, and blending them every frame would make the body flicker.
+            // "Stepping" = it advanced during the most recent fixed update.
+            if (solver.StepCount != _seenSteps)
+            {
+                _seenSteps = solver.StepCount;
+                _lastStepFixedTime = Time.fixedTime;
+            }
+
+            bool stepping = Mathf.Approximately(_lastStepFixedTime, Time.fixedTime);
+            if (interpolate && stepping && solver.StepCount > 0 && Time.fixedDeltaTime > 0f)
+            {
+                // Time.time runs ahead of the last fixed step by up to one step; that fraction is how
+                // far to blend from the previous pose to the latest.
+                float alpha = Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime);
+                Vector3[] previous = solver.PreviousPositions;
+                for (int i = 0; i < current.Length; i++)
+                {
+                    _blended[i] = Vector3.LerpUnclamped(previous[i], current[i], alpha);
+                }
+
+                _mesh.vertices = _blended;
             }
             else
             {
-                _mesh.vertices = solver.Positions;
+                _mesh.vertices = current;
             }
 
             _mesh.RecalculateNormals();

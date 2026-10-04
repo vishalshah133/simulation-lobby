@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846a9ad4a2c3d4642b253c8625f38d04, type: 3}
+  m_Name: EscapeConfig_004
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Escape::SimulationLobby.Simulations.Escape.EscapeConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 173.6
+  intent: 'esc-004 guess the song: esc-003 tuning unchanged, melody swapped to Fur
+    Elise (35 notes). Tests whether the song hook repeats.'
+  initialSizeFractionMin: 0.07692308
+  initialSizeFractionMax: 0.09090909
+  randomizeSizePerAttempt: 0
+  speedMin: 9
+  speedMax: 9
+  attemptCount: 7
+  maxAttemptSeconds: 24
+  interAttemptSeconds: 0.8
+  trappedMarginFraction: 0.1
+  growth:
+    mode: 1
+    magnitude: 1.035
+    startValue: 1
+    maxValue: 6
+    minValue: 0.1
+  gapDegrees: 24
+  gapCenterDegrees: 90
+  gapAngularSpeed: 20
+  gapDirectionSeeded: 1
+  nearMissGapWidths: 1

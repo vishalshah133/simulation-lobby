@@ -10,8 +10,9 @@ using UnityEngine;
 namespace SimulationLobby.Simulations.Escape.EditorTools
 {
     /// <summary>
-    /// Builds <c>Assets/Scenes/Escape_Circle_2D.unity</c> from code.
-    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ Escape_Circle_2D</c>.
+    /// Builds the <c>esc</c> scenes from code: <c>Escape_Circle_2D</c> (esc-001) and
+    /// <c>Escape_Circle_2D_Song</c> (esc-003, guess the song).
+    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ …</c>.
     /// </summary>
     /// <remarks>
     /// Scene-as-code for the same reason seeds and configs are committed: a video must stay
@@ -22,8 +23,6 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
     /// </remarks>
     static class EscapeSceneBuilder
     {
-        const string ScenePath = "Assets/Scenes/Escape_Circle_2D.unity";
-        const string ConfigPath = "Assets/Settings/Configs/EscapeConfig_001.asset";
         const string CircleSpritePath = "Assets/Art/Generated/Circle_256.png";
         const string SquareSpritePath = "Assets/Art/Generated/Square_64.png";
 
@@ -32,8 +31,73 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
         const float ArenaRadius = 4.2f;
         const float OrthographicSize = 9.6f;
 
+        /// <summary>
+        /// What differs between esc scenes. Everything else (arena, collision safety, ball, HUD
+        /// layout) is shared, so a variant can't drift from the tuned baseline.
+        /// </summary>
+        sealed class Variant
+        {
+            public string scenePath;
+            public string configPath;
+            public System.Action<EscapeConfig> configDefaults;
+            public int seed;
+            public string title = "WALL VS BALL";
+            public string question = "WHO WILL WIN?";
+            /// <summary>Optional. Set: the bounces play this song and the run ends on a reveal.</summary>
+            public string melodyPath;
+        }
+
         [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D")]
-        static void Build()
+        static void BuildOriginal()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_001.asset",
+                configDefaults = Esc001Defaults,
+                seed = 12345
+            });
+        }
+
+        /// <summary>
+        /// esc-003: esc-002's rotating gap (our best video so far) over 7 rounds, with the bounces
+        /// playing a public-domain song that carries on across rounds and is revealed at the end.
+        /// </summary>
+        [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D_Song")]
+        static void BuildSong()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D_Song.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_003.asset",
+                configDefaults = Esc003Defaults,
+                seed = 1,
+                title = "GUESS THE SONG",
+                question = "WILL IT ESCAPE?",
+                melodyPath = "Assets/Settings/Melodies/BaaBaaBlackSheep.asset"
+            });
+        }
+
+        /// <summary>
+        /// esc-004: esc-003 with a different song and nothing else changed, to test whether the song
+        /// hook repeats or v7 was luck.
+        /// </summary>
+        [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D_Song_FurElise")]
+        static void BuildSongFurElise()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D_Song_FurElise.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_004.asset",
+                configDefaults = Esc004Defaults,
+                seed = 1,
+                title = "GUESS THE SONG",
+                question = "WILL IT ESCAPE?",
+                melodyPath = "Assets/Settings/Melodies/FurElise.asset"
+            });
+        }
+
+        static void Build(Variant variant)
         {
             // Building a scene replaces the open one, which the editor forbids mid-play. Fail with the
             // fix rather than an InvalidOperationException from deep inside EditorSceneManager.
@@ -46,7 +110,18 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
 
             Sprite circle = EnsureSprite(CircleSpritePath, 256, true);
             Sprite square = EnsureSprite(SquareSpritePath, 64, false);
-            EscapeConfig config = EnsureConfig();
+            EscapeConfig config = EnsureConfig(variant);
+
+            MelodySequence song = null;
+            if (!string.IsNullOrEmpty(variant.melodyPath))
+            {
+                song = AssetDatabase.LoadAssetAtPath<MelodySequence>(variant.melodyPath);
+                if (song == null)
+                {
+                    Debug.LogError($"[esc] Melody not found at {variant.melodyPath}. Scene not built.");
+                    return;
+                }
+            }
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -135,7 +210,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             SimulationRunner runner = runnerObject.AddComponent<SimulationRunner>();
             EscapeSimulation simulation = runnerObject.AddComponent<EscapeSimulation>();
             runner.config = config;
-            runner.seed = 12345;
+            runner.seed = variant.seed;
             runner.autoStart = true;
 
             // Private [SerializeField] wiring, done through SerializedObject so the fields stay private.
@@ -147,7 +222,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             serialized.FindProperty("_boundary").objectReferenceValue = boundary;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
-            VersusScoreboardHud hud = BuildScoreboard();
+            VersusScoreboardHud hud = BuildScoreboard(variant, config);
 
             // --- Bounce audio: tones are generated at runtime, so there is no audio asset ---
             var audioObject = new GameObject("Bounce Audio");
@@ -157,12 +232,21 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             melody.noteDuration = 1.1f;
             melody.voiceCount = 8;
             melody.volume = 0.55f;
+            melody.melody = song;
 
             EscapePresenter presenter = runnerObject.AddComponent<EscapePresenter>();
             presenter.Bind(simulation, hud, melody);
+            // A song carries on across rounds. Restarting it each round would replay the first line
+            // and the tune would never finish.
+            presenter.SetCopy(variant.title, variant.question, restartMelodyEachRound: song == null);
+
+            if (song != null)
+            {
+                runnerObject.AddComponent<SongReveal>().Bind(simulation, hud, melody);
+            }
 
             Directory.CreateDirectory("Assets/Scenes");
-            EditorSceneManager.SaveScene(scene, ScenePath);
+            EditorSceneManager.SaveScene(scene, variant.scenePath);
 
             // Physics2D settings are part of determinism — flag rather than silently change them.
             float safeSpeed = ConstantSpeed2D.MaxSafeSpeed(config.fixedTimestep, boundary.thickness);
@@ -178,15 +262,20 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
                 ? Mathf.Log(trappedDiameter / minStartDiameter) / Mathf.Log(config.growth.magnitude)
                 : -1f;
 
+            string songNote = song != null
+                ? $"\n  song: {song.songTitle}, {song.Count} notes " +
+                  $"(~{song.Count / Mathf.Max(1f, bouncesToTrapped):0.0} rounds per playthrough at worst case)"
+                : "";
+
             Debug.Log(
-                $"Built {ScenePath}\n" +
+                $"Built {variant.scenePath}\n" +
                 $"  arena radius {ArenaRadius}, wall thickness {boundary.thickness:0.00}, " +
                 $"gap {config.gapDegrees}° (chord {boundary.GapChordWidth:0.00})\n" +
                 $"  start diameter {minStartDiameter:0.00}-{ArenaRadius * config.initialSizeFractionMax * 2f:0.00}, " +
                 $"trapped past {trappedDiameter:0.00} (~{bouncesToTrapped:0} bounces)\n" +
                 $"  {config.attemptCount} attempts, up to {config.maxAttemptSeconds}s each" +
-                speedNote +
-                "\n  Press Play to run seed 12345.");
+                speedNote + songNote +
+                $"\n  Press Play to run seed {variant.seed}.");
 
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
@@ -198,16 +287,16 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
         /// here, since <c>surv</c> needs the identical canvas and a second copy of the layout rules
         /// is how they drift apart. Only the copy and the two sides' colours are esc's own.
         /// </summary>
-        static VersusScoreboardHud BuildScoreboard()
+        static VersusScoreboardHud BuildScoreboard(Variant variant, EscapeConfig config)
         {
             return ScoreboardCanvasBuilder.Build(
                 new ScoreboardCanvasBuilder.Labels
                 {
-                    title = "WALL VS BALL",
-                    question = "WHO WILL WIN?",
+                    title = variant.title,
+                    question = variant.question,
                     leftName = "WALL",
                     rightName = "BALL",
-                    round = "ROUND 1 / 3",
+                    round = $"ROUND 1 / {config.attemptCount}",
                     counter = "0  BOUNCES"
                 },
                 ScoreboardCanvasBuilder.Palette.Default);
@@ -215,9 +304,9 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
 
 
 
-        static EscapeConfig EnsureConfig()
+        static EscapeConfig EnsureConfig(Variant variant)
         {
-            var existing = AssetDatabase.LoadAssetAtPath<EscapeConfig>(ConfigPath);
+            var existing = AssetDatabase.LoadAssetAtPath<EscapeConfig>(variant.configPath);
             if (existing != null)
             {
                 return existing;
@@ -225,6 +314,14 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
 
             Directory.CreateDirectory("Assets/Settings/Configs");
             var config = ScriptableObject.CreateInstance<EscapeConfig>();
+            variant.configDefaults(config);
+            AssetDatabase.CreateAsset(config, variant.configPath);
+            return config;
+        }
+
+        /// <summary>Only used when the asset doesn't exist yet. The committed asset is the truth.</summary>
+        static void Esc001Defaults(EscapeConfig config)
+        {
             // Starting values from the plan's tuning table — deliberately the plan's numbers, not new ones.
             config.fixedTimestep = 0.01f;
             config.attemptCount = 7;
@@ -245,8 +342,34 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             config.growth.maxValue = 6f;
             config.intent = "esc-001 first build. 7 rounds, growth x1.035/bounce (~29 bounces/round), " +
                             "gap 24deg, trapped at +10% over the gap. Tuning baseline.";
-            AssetDatabase.CreateAsset(config, ConfigPath);
-            return config;
+        }
+
+        /// <summary>
+        /// esc-002's rotating gap (20°/s) and 7-round series. Speed is fixed at 9
+        /// rather than drawn from 6-13: bounce rate is the song's tempo, and a per-round draw could double it.
+        /// 7 rounds of up to ~29 bounces is up to ~200 bounces, about 3-4 playthroughs of a 53-note song.
+        /// </summary>
+        static void Esc003Defaults(EscapeConfig config)
+        {
+            Esc001Defaults(config);
+            config.speedMin = 9f;
+            config.speedMax = 9f;
+            config.gapAngularSpeed = 20f;
+            config.gapDirectionSeeded = true;
+            config.maxDurationSeconds = config.SeriesSeconds;
+            config.intent = "esc-003 guess the song. esc-002 rotating gap (20deg/s), speed fixed at 9, " +
+                            "7 rounds like v4, bounces play Baa Baa Black Sheep across rounds.";
+        }
+
+        /// <summary>
+        /// Identical tuning to esc-003, so the song is the only difference from v7. Its own asset all
+        /// the same: a published video is scene + config + seed, and 003's asset belongs to v7.
+        /// </summary>
+        static void Esc004Defaults(EscapeConfig config)
+        {
+            Esc003Defaults(config);
+            config.intent = "esc-004 guess the song: esc-003 tuning unchanged, melody swapped to Fur Elise " +
+                            "(35 notes). Tests whether the song hook repeats.";
         }
 
         static PhysicsMaterial2D EnsureBouncyMaterial()

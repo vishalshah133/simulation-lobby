@@ -19,19 +19,19 @@ MonoBehaviour:
   capsuleRadius: 0.45
   capsuleHalfLength: 0.2
   capsuleSegments: 40
-  capsuleMass: 1
+  capsuleMass: 10
   dropHeight: 1
   dropOffsetX: 0
   dropTiltDegrees: 0
-  plinthSize: {x: 2, y: 1.2, z: 2}
-  holeRadius: 0.4
-  holeDepth: 1
+  plinthSize: {x: 2, y: 2.4, z: 2}
+  holeRadius: 0.33
+  holeDepth: 2
   lipRadius: 0.08
   substeps: 16
   gravity: 9.81
   collisionThickness: 0.014
-  staticFriction: 1
-  dynamicFriction: 0.7
+  staticFriction: 0.2
+  dynamicFriction: 0.14
   rigidRestitution: 0.3
   softRestitution: 0.05
   shapeRateAtHalf: 0.3
