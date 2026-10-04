@@ -1,0 +1,298 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd46ebcfd904493ca74c5f896c79d6a1, type: 3}
+  m_Name: FurElise
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.MelodySequence
+  songTitle: "FÜR ELISE"
+  source: Beethoven, Bagatelle No. 25 in A minor (WoO 59, 1810), A section (theme, C-major
+    middle passage, run-up, theme), right-hand melody. Public domain worldwide.
+  tonicHz: 220
+  notes:
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 3
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 11
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 3
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 10
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 20
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 8
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 3
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 11
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 18
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 19
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 17
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 3
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 1.5
+    endsPhrase: 1
+  - semitone: 7
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 15
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 14
+    beats: 0.5
+    endsPhrase: 0
+  - semitone: 12
+    beats: 3
+    endsPhrase: 1

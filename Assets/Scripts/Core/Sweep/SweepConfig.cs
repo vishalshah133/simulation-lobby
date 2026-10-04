@@ -31,6 +31,13 @@ namespace SimulationLobby.Core
         public Take[] takes = Array.Empty<Take>();
 
         [Header("Rhythm")]
+        [Tooltip("A 3-2-1 countdown before the first take, with the first take already on screen. " +
+                 "Gives the editor time to finish its first-frame work (shader compiles, reflection " +
+                 "probe, audio generation) before anything moves, so the first drop isn't stuttery. " +
+                 "Whole seconds: one count per second. 0 = no countdown. Trim it in the edit if the " +
+                 "video shouldn't show it.")]
+        [Min(0)] public int countdownSeconds = 3;
+
         [Tooltip("Seconds the first take sits still with its caption up before anything moves. " +
                  "Longer than the rest: it has to state the premise.")]
         [Min(0f)] public float firstLeadInSeconds = 1.2f;
@@ -61,12 +68,14 @@ namespace SimulationLobby.Core
 
         public int EndHoldTicks => Mathf.RoundToInt(endHoldSeconds / FixedTimestep);
 
-        /// <summary>Total length on screen, in seconds, before any slow-motion.</summary>
+        public int CountdownTicks => Mathf.RoundToInt(countdownSeconds / FixedTimestep);
+
+        /// <summary>Total length on screen, in seconds, before any slow-motion. Includes the countdown.</summary>
         public float TotalSeconds
         {
             get
             {
-                int ticks = EndHoldTicks;
+                int ticks = EndHoldTicks + CountdownTicks;
                 for (int i = 0; i < TakeCount; i++)
                 {
                     ticks += LeadInTicks(i) + TakeTicks;

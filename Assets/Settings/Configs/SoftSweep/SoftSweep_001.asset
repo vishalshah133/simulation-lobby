@@ -24,6 +24,7 @@ MonoBehaviour:
     label: 75%
   - config: {fileID: 11400000, guid: 515d1ccc35407044ea366e1f7376cef1, type: 2}
     label: 100%
+  countdownSeconds: 3
   firstLeadInSeconds: 1.2
   leadInSeconds: 0.35
   takeSeconds: 3.4

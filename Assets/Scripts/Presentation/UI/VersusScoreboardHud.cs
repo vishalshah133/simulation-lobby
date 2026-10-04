@@ -125,6 +125,30 @@ namespace SimulationLobby.Presentation
             }
         }
 
+        /// <summary>
+        /// Free-text counter line, e.g. a countdown "0:07". <paramref name="alert"/> switches it to the
+        /// failure colour, for the last seconds of a clock.
+        /// </summary>
+        public void SetCounterText(string text, bool alert = false)
+        {
+            if (_counterText == null)
+            {
+                return;
+            }
+
+            if (!_counterColorCaptured)
+            {
+                _counterBaseColor = _counterText.color;
+                _counterColorCaptured = true;
+            }
+
+            _counterText.text = text ?? string.Empty;
+            _counterText.color = alert ? failureColor : _counterBaseColor;
+        }
+
+        Color _counterBaseColor;
+        bool _counterColorCaptured;
+
         /// <summary>Flash a round's outcome. Pass null to clear it.</summary>
         public void ShowResult(string text, bool success)
         {

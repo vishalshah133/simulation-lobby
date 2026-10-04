@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dff07a21819446fab5b09c3e56d8db0, type: 3}
+  m_Name: SeedScan_EscapeConfig_003
+  m_EditorClassIdentifier: SimulationLobby.Capture::SimulationLobby.Capture.SeedScanProfile
+  firstSeed: 1
+  seedCount: 500
+  requirements:
+  - metric: attempt_*_bounces
+    min: 53
+    max: 100000
+  - metric: escapes
+    min: 1
+    max: 6
+  weights:
+  - metric: attempt_*_near_misses
+    weight: 1
+    mode: 0
+    target: 0
+  - metric: attempt_7_near_misses
+    weight: 2
+    mode: 0
+    target: 0
+  - metric: escapes
+    weight: 1
+    mode: 1
+    target: 3.5
+  verifyTopCount: 10
+  printTopCount: 10
+  intent: 'esc-003 guess the song. Needs >= 53 bounces so the whole melody plays
+    before the reveal, at least one escape and one trap, and rewards near misses,
+    especially in the last attempt, plus a close score.'

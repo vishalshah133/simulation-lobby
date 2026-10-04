@@ -1,0 +1,19 @@
+{
+    "name": "SimulationLobby.Capture.Editor",
+    "rootNamespace": "SimulationLobby.Capture.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Capture"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,6 +1,17 @@
 # Block: Bounce Audio Sequencer
 
-**Status:** `planned` · **Layer:** `Assets/Scripts/Shared/` · **Used by:** `esc`, `race`, `surv`
+**Status:** `built` (2026-10-03, for [esc-003](../videos/esc-003-guess-the-song.md)) · **Layer:** `Assets/Scripts/Presentation/Audio/` · **Used by:** `esc`; ready for `race`, `surv`
+
+> **As built.** Audio is presentation (it reads the run and never writes it), so it lives in
+> `Presentation`, not `Shared` as first planned. The pieces:
+> - `MelodySequence`: ScriptableObject with notes (semitone, beats, endsPhrase), `songTitle`, `source`, `tonicHz`
+> - `BounceMelodyPlayer.melody`: assigned = step through the song and loop. Empty = the original pentatonic climb
+> - `BounceMelodyPlayer.NotesPlayed`: bounce-driven notes only, for the tunneling check
+> - `BounceMelodyPlayer.FinishPhrase()`: plays out the current line with no bounces, for the ending
+> - `SongReveal`: watches `ISimulation.IsComplete`, swaps the HUD question for the title, calls `FinishPhrase`
+>
+> Not built yet: `Hold`/`Advance octave` end modes (songs only loop) and the pitch-ramp layer.
+> Add them when a video needs them.
 
 Each collision plays the next note of a melody. As the action accelerates, notes come faster and the
 tune becomes recognizable, resolving near the climax.

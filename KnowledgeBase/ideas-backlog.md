@@ -56,6 +56,22 @@ actually being built, per this file's own rule.
   `Core`'s determinism directly, but the creative cost shifts to designing a visually interesting
   *rule* each time — harder to templatize than `esc`'s single-number tuning table.
 
+## From the 2D reference pass (2026-10-03, see `reference-channels.md` § 2D pass)
+
+- `esc` — `[built]` esc-003 with *Baa Baa Black Sheep*, 2026-10-03. **Name the song**: same scene, the bounce melody plays a public-domain piece (Für Elise,
+  Hall of the Mountain King, Ode to Joy, Canon in D). Near config-only. Era of mega-hits (35M+), now ~100K
+- `esc` — **Reach the core** (inverted escape): ball starts outside nested rotating rings and must break
+  or slip inward to the center. Reuses `CircularBoundary2D` + rotating gap. CodeCrafted #1 at 25.7M
+- `rom` — **Crusher × multiply**: every ball the press/saw crushes splits into 3, counter climbs to a
+  huge number. Needs pooling + hard cap, which `rom` needs anyway. 1.9M / 1.7M / 725K references
+- `rom` — **1 → quintillion in 60 bounces**: doubling-per-bounce counter, bodies capped and the
+  number carries the climb. 456K / 367K references
+- `esc` — **Polygon loses a side every bounce** (FuncFlow 11M, 2024-era evidence, may be stale)
+- `esc` — **Multi-ball race to escape** (already listed above). CodeCrafted *"How did the 4th ball even miss it?"* 16.1M
+- **Element vs element** (fire/water/lava, "the LAST flame"). Highest S2DS bucket median, but needs a
+  2D particle/fluid layer. Its own format slug if built
+- `esc` — **A 30-45s cut** of an existing `esc` config, to test length against the 2:05 originals
+
 ## Experiments / untested
 
 - Viewer-voted path: pinned comment decides the next video's gate layout

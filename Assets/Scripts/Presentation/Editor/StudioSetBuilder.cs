@@ -63,6 +63,11 @@ namespace SimulationLobby.Presentation.EditorTools
             Directory.CreateDirectory(Folder);
             Materials materials = EnsureMaterials(options);
 
+            // The backdrop gradient is part of the light rig, not a hand-tuned material: re-apply it every
+            // build so a change to the house backdrop reaches scenes whose material predates it.
+            materials.cyclorama.SetTexture("_BaseMap", EnsureGradientTexture());
+            EditorUtility.SetDirty(materials.cyclorama);
+
             BuildCyclorama(materials.cyclorama, camera.transform.position);
             BuildLights(options);
             BuildSoftboxCards(camera, options);
@@ -206,10 +211,17 @@ namespace SimulationLobby.Presentation.EditorTools
             });
         }
 
-        /// <summary>Vertical gradient for the cyclorama: soft charcoal floor into a near-black top.</summary>
+        /// <summary>
+        /// Vertical gradient for the cyclorama: a near-white floor rising into warm beige.
+        /// </summary>
+        /// <remarks>
+        /// v1 was charcoal-to-black, and a smoked-glass plinth and a dark-tinted capsule disappeared
+        /// into it. v2 tried mid-tone slate. v3 (playtest 5) goes white-to-beige: the dark glass
+        /// objects read as clean silhouettes on a bright field — the high-key product-shot look.
+        /// </remarks>
         static Texture2D EnsureGradientTexture()
         {
-            string path = "Assets/Art/Generated/StudioGradient.png";
+            string path = "Assets/Art/Generated/StudioGradient_v3.png";
             var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
             if (existing != null)
             {
@@ -221,10 +233,10 @@ namespace SimulationLobby.Presentation.EditorTools
             var texture = new Texture2D(4, height, TextureFormat.RGBA32, false);
             var stops = new[]
             {
-                new KeyValuePair<float, Color>(0f, new Color(0.13f, 0.125f, 0.12f)),
-                new KeyValuePair<float, Color>(0.35f, new Color(0.11f, 0.105f, 0.10f)),
-                new KeyValuePair<float, Color>(0.5f, new Color(0.075f, 0.072f, 0.07f)),
-                new KeyValuePair<float, Color>(1f, new Color(0.008f, 0.008f, 0.009f))
+                new KeyValuePair<float, Color>(0f, new Color(0.97f, 0.96f, 0.94f)),
+                new KeyValuePair<float, Color>(0.35f, new Color(0.95f, 0.93f, 0.89f)),
+                new KeyValuePair<float, Color>(0.55f, new Color(0.90f, 0.86f, 0.79f)),
+                new KeyValuePair<float, Color>(1f, new Color(0.80f, 0.74f, 0.64f))
             };
             for (int y = 0; y < height; y++)
             {
@@ -358,51 +370,57 @@ namespace SimulationLobby.Presentation.EditorTools
             float size = Mathf.Max(1f, options.subjectHeight);
             var root = new GameObject("Studio Lights").transform;
 
-            // Key: high front-left, warm, soft shadows. The one light that casts.
-            Light key = CreateLight(root, "Key", LightType.Directional, new Color(1f, 0.95f, 0.88f), 1.25f);
+            // Diffuse by design (playtest 4: "light is harsh"). URP has no realtime area lights, so
+            // softness comes from: lower intensities spread across more lights, wide spot cones with
+            // a near-zero inner angle (a long, gradual falloff instead of a hard-edged pool), weaker
+            // shadows, a brighter ambient fill, and large dim softbox cards for broad reflections
+            // rather than small hot ones.
+
+            // Key: high front-left, warm. The one light that casts, with soft, half-strength shadows.
+            Light key = CreateLight(root, "Key", LightType.Directional, new Color(1f, 0.96f, 0.9f), 0.85f);
             key.transform.rotation = Quaternion.Euler(40f, 148f, 0f);
             key.shadows = LightShadows.Soft;
-            key.shadowStrength = 0.88f;
+            key.shadowStrength = 0.5f;
             key.shadowResolution = UnityEngine.Rendering.LightShadowResolution.VeryHigh;
 
-            // Rims: two spots behind the subject, either side, aimed at it. They draw the thin bright
-            // edge down both sides of the glass — the single strongest "product shot" cue.
+            // Rims: two spots behind the subject, either side. They draw the bright edge down both
+            // sides of the glass — the strongest "product shot" cue — now as a wide soft glow.
             for (int side = -1; side <= 1; side += 2)
             {
                 Light rim = CreateLight(root, side < 0 ? "Rim Left" : "Rim Right", LightType.Spot,
-                    new Color(0.9f, 0.95f, 1f), 16f);
+                    new Color(0.9f, 0.95f, 1f), 8f);
                 rim.transform.position = subject + new Vector3(side * 1.9f * size * 0.5f + side * 1.2f, size * 0.55f, -1.8f);
                 rim.transform.LookAt(subject);
-                rim.range = 9f;
-                rim.spotAngle = 48f;
-                rim.innerSpotAngle = 20f;
+                rim.range = 10f;
+                rim.spotAngle = 75f;
+                rim.innerSpotAngle = 2f;
             }
 
-            // Halo: a warm pool on the backdrop behind the subject, so it separates from the dark.
-            Light halo = CreateLight(root, "Backdrop Halo", LightType.Spot,
-                Color.Lerp(Color.white, options.hue, 0.35f), 22f);
+            // Halo: a gentle neutral glow on the backdrop behind the subject, lifting it a touch
+            // brighter right where the dark subject sits — maximum contrast at the focal point.
+            Light halo = CreateLight(root, "Backdrop Halo", LightType.Spot, new Color(1f, 0.98f, 0.95f), 6f);
             halo.transform.position = subject + new Vector3(0f, -size * 0.2f, -1.2f);
             halo.transform.LookAt(new Vector3(subject.x, subject.y + size * 0.3f, -6f));
-            halo.range = 14f;
-            halo.spotAngle = 75f;
-            halo.innerSpotAngle = 10f;
+            halo.range = 16f;
+            halo.spotAngle = 100f;
+            halo.innerSpotAngle = 2f;
 
-            // Front fill: soft, low and from the camera side, so the front faces of whatever the subject
-            // stands on aren't left in the key light's shadow side. Warm-neutral, below the key's level.
-            Light fill = CreateLight(root, "Front Fill", LightType.Spot, new Color(1f, 0.96f, 0.9f), 14f);
-            fill.transform.position = new Vector3(subject.x, subject.y * 0.55f, subject.z + 5.5f);
+            // Front fill: broad and low from the camera side, so the front of whatever the subject
+            // stands on isn't left in the key light's shadow side.
+            Light fill = CreateLight(root, "Front Fill", LightType.Spot, new Color(1f, 0.97f, 0.93f), 9f);
+            fill.transform.position = new Vector3(subject.x, subject.y * 0.55f, subject.z + 6f);
             fill.transform.LookAt(new Vector3(subject.x, subject.y * 0.3f, subject.z));
-            fill.range = 14f;
-            fill.spotAngle = 55f;
-            fill.innerSpotAngle = 15f;
+            fill.range = 16f;
+            fill.spotAngle = 85f;
+            fill.innerSpotAngle = 2f;
 
-            // Top: a soft pool on the plinth so its lacquer top reads, and the spike catches a crown.
-            Light top = CreateLight(root, "Top", LightType.Spot, new Color(1f, 0.97f, 0.93f), 9f);
+            // Top: a broad soft wash from above, so the top surfaces read without a hot spot.
+            Light top = CreateLight(root, "Top", LightType.Spot, new Color(1f, 0.97f, 0.93f), 5f);
             top.transform.position = subject + Vector3.up * (size * 1.4f + 1.5f);
             top.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-            top.range = 12f;
-            top.spotAngle = 55f;
-            top.innerSpotAngle = 15f;
+            top.range = 14f;
+            top.spotAngle = 90f;
+            top.innerSpotAngle = 2f;
         }
 
         static Light CreateLight(Transform parent, string name, LightType type, Color color, float intensity)
@@ -420,6 +438,10 @@ namespace SimulationLobby.Presentation.EditorTools
         static void BuildSoftboxCards(Camera camera, Options options)
         {
             Material cardMaterial = EnsureCardMaterial();
+            // Rig-owned like the lights: re-applied each build. Dimmer than the first build's 3.2 —
+            // large, moderately bright cards give broad soft reflections; small hot ones read harsh.
+            cardMaterial.SetColor("_BaseColor", new Color(1.8f, 1.8f, 1.8f, 1f));
+            EditorUtility.SetDirty(cardMaterial);
             Transform cam = camera.transform;
             Vector3 subject = options.subjectCenter;
             var root = new GameObject("Softbox Cards (reflection only)").transform;
@@ -442,14 +464,14 @@ namespace SimulationLobby.Presentation.EditorTools
 
             // All behind the camera plane: invisible to it at any aspect, visible to every reflection.
             Vector3 behind = -cam.forward;
-            Card("Softbox Overhead", cam.position + behind * 2.5f + Vector3.up * 3.2f, new Vector2(7f, 3f));
+            Card("Softbox Overhead", cam.position + behind * 2.5f + Vector3.up * 3.2f, new Vector2(11f, 5f));
 
             // The one the front faces see. A vertical face, viewed from a camera slightly above it,
             // mirrors a band just above camera height behind the camera. Without a card there the
             // lacquer front reflects darkness and reads as a black hole in the frame (first playtest).
-            Card("Softbox Front (low)", cam.position + behind * 2.5f + Vector3.up * 0.6f, new Vector2(8f, 1.8f));
-            Card("Strip Left", cam.position + behind * 1.5f - cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(0.9f, 6f));
-            Card("Strip Right", cam.position + behind * 1.5f + cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(0.9f, 6f));
+            Card("Softbox Front (low)", cam.position + behind * 2.5f + Vector3.up * 0.6f, new Vector2(11f, 2.8f));
+            Card("Strip Left", cam.position + behind * 1.5f - cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(1.8f, 7f));
+            Card("Strip Right", cam.position + behind * 1.5f + cam.right * 4.5f + Vector3.up * 0.5f, new Vector2(1.8f, 7f));
         }
 
         static void BuildReflectionProbe(Options options)
@@ -507,6 +529,16 @@ namespace SimulationLobby.Presentation.EditorTools
                 EditorUtility.SetDirty(profile);
             }
 
+            // Rig-owned: re-applied every build. On a bright white set, lit surfaces exceed the old 1.05
+            // threshold and bloom turns into a haze over the whole frame, flattening the contrast the
+            // backdrop exists for. Only true glints (above ~1.5) should bloom.
+            if (profile.TryGet(out Bloom bloomSettings))
+            {
+                bloomSettings.threshold.Override(1.5f);
+                bloomSettings.intensity.Override(0.35f);
+                EditorUtility.SetDirty(profile);
+            }
+
             var volumeObject = new GameObject("Studio Post");
             Volume volume = volumeObject.AddComponent<Volume>();
             volume.isGlobal = true;
@@ -517,7 +549,9 @@ namespace SimulationLobby.Presentation.EditorTools
         static void ConfigureCamera(Camera camera)
         {
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color(0.008f, 0.008f, 0.01f, 1f);
+            // Matches the top of the backdrop gradient, so anything past the cyclorama (and the fog)
+            // blends into it rather than into black.
+            camera.backgroundColor = new Color(0.80f, 0.74f, 0.64f, 1f);
             camera.allowHDR = true;
             UniversalAdditionalCameraData data = camera.GetUniversalAdditionalCameraData();
             data.renderPostProcessing = true;
@@ -534,14 +568,16 @@ namespace SimulationLobby.Presentation.EditorTools
             float distance = Vector3.Distance(camera.transform.position, options.subjectCenter);
             RenderSettings.skybox = null;
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.1f, 0.1f, 0.11f);
-            RenderSettings.ambientEquatorColor = new Color(0.06f, 0.058f, 0.056f);
-            RenderSettings.ambientGroundColor = new Color(0.025f, 0.024f, 0.023f);
+            // Bright, warm ambient (it bounces off a white studio): the shadow side is filled rather than black, which is most of
+            // what makes light read as diffuse instead of harsh.
+            RenderSettings.ambientSkyColor = new Color(0.42f, 0.41f, 0.39f);
+            RenderSettings.ambientEquatorColor = new Color(0.34f, 0.32f, 0.29f);
+            RenderSettings.ambientGroundColor = new Color(0.20f, 0.19f, 0.17f);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = camera.backgroundColor;
-            RenderSettings.fogStartDistance = distance * 1.2f;
-            RenderSettings.fogEndDistance = distance * 3.2f;
+            RenderSettings.fogStartDistance = distance * 1.5f;
+            RenderSettings.fogEndDistance = distance * 4f;
         }
 
         /// <summary>

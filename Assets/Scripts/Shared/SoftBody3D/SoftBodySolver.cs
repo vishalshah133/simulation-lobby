@@ -87,6 +87,7 @@ namespace SimulationLobby.Shared
     public sealed class SoftBodySolver
     {
         readonly Vector3[] _x;
+        readonly Vector3[] _previousPositions;
         readonly Vector3[] _prev;
         readonly Vector3[] _v;
         readonly Vector3[] _rest;
@@ -101,6 +102,8 @@ namespace SimulationLobby.Shared
         readonly float _invMass;
         readonly float _restVolume;
         readonly List<SdfCollider> _colliders = new List<SdfCollider>();
+        readonly List<SdfCollider> _nearby = new List<SdfCollider>();
+        float _rigidRadius;
         readonly List<Vector4> _guards = new List<Vector4>();
 
         SoftBodyParameters _p;
@@ -123,7 +126,8 @@ namespace SimulationLobby.Shared
         {
             public Vector3 normal;
             public Vector3 offset; // contact point relative to the centre of mass, world space
-            public float lambda; // accumulated normal correction (m), for friction limits
+            public float lambda; // normal correction (mass-weighted) — weights the average contact
+            public float depth; // penetration resolved (m) — friction limits use this, never λ, which scales with mass
             public float approachSpeed; // normal speed into the surface before the substep
             public float friction;
         }
@@ -149,6 +153,7 @@ namespace SimulationLobby.Shared
                 _x[i] = position + rotation * shape.positions[i];
             }
 
+            _previousPositions = (Vector3[])_x.Clone();
             Vector3 centroid = Average(_x);
             for (int i = 0; i < n; i++)
             {
@@ -225,12 +230,22 @@ namespace SimulationLobby.Shared
 
             _rigidPoints = samples.ToArray();
             _rigidInContact = new bool[_rigidPoints.Length];
+            for (int i = 0; i < n; i++)
+            {
+                _rigidRadius = Mathf.Max(_rigidRadius, _rest[i].magnitude);
+            }
         }
 
         public int ParticleCount => _x.Length;
 
         /// <summary>Live particle positions in world space. Read-only by contract — views copy, never write.</summary>
         public Vector3[] Positions => _x;
+
+        /// <summary>Positions before the most recent <see cref="Step"/> — for render interpolation only.</summary>
+        public Vector3[] PreviousPositions => _previousPositions;
+
+        /// <summary>Steps taken. 0 = still at the initial pose (nothing to interpolate from).</summary>
+        public int StepCount { get; private set; }
 
         public int[] Triangles => _triangles;
 
@@ -283,6 +298,11 @@ namespace SimulationLobby.Shared
             float h = dt / substeps;
             float shapeStiffness = _p.rigid ? 1f : _p.shapeMatchingRate > 0f ? 1f - Mathf.Exp(-_p.shapeMatchingRate * h) : 0f;
 
+            // Snapshot for render interpolation: a view blends this pose into the new one across the
+            // frames between fixed steps. Copied, never read by the solver, so it can't affect a run.
+            System.Array.Copy(_x, _previousPositions, _x.Length);
+            StepCount++;
+
             NewContacts = 0;
             PeakImpactSpeed = 0f;
 
@@ -297,14 +317,26 @@ namespace SimulationLobby.Shared
                 return;
             }
 
+            // Hot loops below are written in plain floats rather than Vector3 operators. Identical
+            // maths; in the Unity editor's Mono (Debug code optimisation by default) every Vector3
+            // operator is a real method call, and the operator form ran ~10× slower than the budget
+            // a 60Hz step allows — the "choppy" playtest note.
+            float gx = _p.gravity.x * h;
+            float gy = _p.gravity.y * h;
+            float gz = _p.gravity.z * h;
             for (int s = 0; s < substeps; s++)
             {
                 bool last = s == substeps - 1;
                 for (int i = 0; i < _x.Length; i++)
                 {
-                    _prev[i] = _x[i];
-                    _v[i] += _p.gravity * h;
-                    _x[i] += _v[i] * h;
+                    Vector3 x = _x[i];
+                    Vector3 v = _v[i];
+                    _prev[i] = x;
+                    v.x += gx;
+                    v.y += gy;
+                    v.z += gz;
+                    _v[i] = v;
+                    _x[i] = new Vector3(x.x + v.x * h, x.y + v.y * h, x.z + v.z * h);
                 }
 
                 SolveEdges(h, last);
@@ -320,7 +352,11 @@ namespace SimulationLobby.Shared
                 float inverseH = 1f / h;
                 for (int i = 0; i < _x.Length; i++)
                 {
-                    _v[i] = (_x[i] - _prev[i]) * inverseH;
+                    Vector3 x = _x[i];
+                    Vector3 p = _prev[i];
+                    float vx = (x.x - p.x) * inverseH;
+                    float vy = (x.y - p.y) * inverseH;
+                    float vz = (x.z - p.z) * inverseH;
 
                     // Contact velocity pass. A particle pushed out of a surface this substep would
                     // otherwise leave with the push as velocity: energy injected at every contact, which
@@ -328,12 +364,17 @@ namespace SimulationLobby.Shared
                     // again) and a super-ball rebound. Touching particles may slide but not separate.
                     if (_touching[i])
                     {
-                        float separating = Vector3.Dot(_v[i], _contactNormal[i]);
+                        Vector3 n = _contactNormal[i];
+                        float separating = vx * n.x + vy * n.y + vz * n.z;
                         if (separating > 0f)
                         {
-                            _v[i] -= _contactNormal[i] * separating;
+                            vx -= n.x * separating;
+                            vy -= n.y * separating;
+                            vz -= n.z * separating;
                         }
                     }
+
+                    _v[i] = new Vector3(vx, vy, vz);
                 }
 
                 LimitRebound();
@@ -348,12 +389,17 @@ namespace SimulationLobby.Shared
             float alpha = _p.edgeCompliance / (h * h);
             float w = _invMass;
             float strainSum = 0f;
+            float inverseDenominator = 1f / (w + w + alpha);
             for (int e = 0; e < _edgeA.Length; e++)
             {
                 int ia = _edgeA[e];
                 int ib = _edgeB[e];
-                Vector3 d = _x[ib] - _x[ia];
-                float length = d.magnitude;
+                Vector3 a = _x[ia];
+                Vector3 b = _x[ib];
+                float dx = b.x - a.x;
+                float dy = b.y - a.y;
+                float dz = b.z - a.z;
+                float length = Mathf.Sqrt(dx * dx + dy * dy + dz * dz);
                 if (length < 1e-9f)
                 {
                     continue;
@@ -365,10 +411,12 @@ namespace SimulationLobby.Shared
                     strainSum += Mathf.Abs(c) / _edgeRest[e];
                 }
 
-                float lambda = -c / (w + w + alpha);
-                Vector3 correction = d * (lambda / length);
-                _x[ia] -= correction * w;
-                _x[ib] += correction * w;
+                float scale = -c * inverseDenominator / length * w;
+                dx *= scale;
+                dy *= scale;
+                dz *= scale;
+                _x[ia] = new Vector3(a.x - dx, a.y - dy, a.z - dz);
+                _x[ib] = new Vector3(b.x + dx, b.y + dy, b.z + dz);
             }
 
             if (measure)
@@ -387,19 +435,34 @@ namespace SimulationLobby.Shared
             // noise in it. The solver then "corrects" that noise every substep, which is metres per
             // second of jitter — enough to fling a body off the plinth.
             Vector3 origin = Average(_x);
+            float ox = origin.x;
+            float oy = origin.y;
+            float oz = origin.z;
             double volume = 0.0;
             for (int t = 0; t < _triangles.Length; t += 3)
             {
                 int ia = _triangles[t];
                 int ib = _triangles[t + 1];
                 int ic = _triangles[t + 2];
-                Vector3 a = _x[ia] - origin;
-                Vector3 b = _x[ib] - origin;
-                Vector3 c = _x[ic] - origin;
-                volume += Vector3.Dot(a, Vector3.Cross(b, c));
-                _grad[ia] += Vector3.Cross(b, c);
-                _grad[ib] += Vector3.Cross(c, a);
-                _grad[ic] += Vector3.Cross(a, b);
+                Vector3 pa = _x[ia];
+                Vector3 pb = _x[ib];
+                Vector3 pc = _x[ic];
+                float ax = pa.x - ox, ay = pa.y - oy, az = pa.z - oz;
+                float bx = pb.x - ox, by = pb.y - oy, bz = pb.z - oz;
+                float cx = pc.x - ox, cy = pc.y - oy, cz = pc.z - oz;
+
+                // b×c, c×a, a×b — the gradients of a·(b×c) with respect to a, b and c.
+                float bcx = by * cz - bz * cy, bcy = bz * cx - bx * cz, bcz = bx * cy - by * cx;
+                float cax = cy * az - cz * ay, cay = cz * ax - cx * az, caz = cx * ay - cy * ax;
+                float abx = ay * bz - az * by, aby = az * bx - ax * bz, abz = ax * by - ay * bx;
+                volume += ax * bcx + ay * bcy + az * bcz;
+
+                Vector3 ga = _grad[ia];
+                _grad[ia] = new Vector3(ga.x + bcx, ga.y + bcy, ga.z + bcz);
+                Vector3 gb = _grad[ib];
+                _grad[ib] = new Vector3(gb.x + cax, gb.y + cay, gb.z + caz);
+                Vector3 gc = _grad[ic];
+                _grad[ic] = new Vector3(gc.x + abx, gc.y + aby, gc.z + abz);
             }
 
             volume /= 6.0;
@@ -407,10 +470,13 @@ namespace SimulationLobby.Shared
 
             float constraint = (float)(volume - _restVolume * _p.pressure);
             float denominator = _p.volumeCompliance / (h * h);
+            const float sixth = 1f / 6f;
             for (int i = 0; i < _grad.Length; i++)
             {
-                _grad[i] /= 6f;
-                denominator += _invMass * _grad[i].sqrMagnitude;
+                Vector3 g = _grad[i];
+                g = new Vector3(g.x * sixth, g.y * sixth, g.z * sixth);
+                _grad[i] = g;
+                denominator += _invMass * (g.x * g.x + g.y * g.y + g.z * g.z);
             }
 
             if (denominator < 1e-12f)
@@ -418,35 +484,50 @@ namespace SimulationLobby.Shared
                 return;
             }
 
-            float lambda = -constraint / denominator;
+            float step = -constraint / denominator * _invMass;
             for (int i = 0; i < _x.Length; i++)
             {
-                _x[i] += _grad[i] * (lambda * _invMass);
+                Vector3 x = _x[i];
+                Vector3 g = _grad[i];
+                _x[i] = new Vector3(x.x + g.x * step, x.y + g.y * step, x.z + g.z * step);
             }
         }
 
         void SolveShapeMatching(float stiffness)
         {
             Vector3 centroid = Average(_x);
+            float cx = centroid.x;
+            float cy = centroid.y;
+            float cz = centroid.z;
 
             // A = Σ (x − c) qᵀ, kept as its three columns.
-            Vector3 col0 = Vector3.zero;
-            Vector3 col1 = Vector3.zero;
-            Vector3 col2 = Vector3.zero;
+            float a00 = 0f, a10 = 0f, a20 = 0f, a01 = 0f, a11 = 0f, a21 = 0f, a02 = 0f, a12 = 0f, a22 = 0f;
             for (int i = 0; i < _x.Length; i++)
             {
-                Vector3 p = _x[i] - centroid;
+                Vector3 x = _x[i];
                 Vector3 q = _rest[i];
-                col0 += p * q.x;
-                col1 += p * q.y;
-                col2 += p * q.z;
+                float px = x.x - cx, py = x.y - cy, pz = x.z - cz;
+                a00 += px * q.x; a10 += py * q.x; a20 += pz * q.x;
+                a01 += px * q.y; a11 += py * q.y; a21 += pz * q.y;
+                a02 += px * q.z; a12 += py * q.z; a22 += pz * q.z;
             }
 
-            _shapeRotation = ExtractRotation(col0, col1, col2, _shapeRotation);
+            _shapeRotation = ExtractRotation(new Vector3(a00, a10, a20), new Vector3(a01, a11, a21),
+                new Vector3(a02, a12, a22), _shapeRotation);
+
+            // Rotation as a matrix once, so each goal is nine multiply-adds instead of a quaternion op.
+            Vector3 r0 = _shapeRotation * Vector3.right;
+            Vector3 r1 = _shapeRotation * Vector3.up;
+            Vector3 r2 = _shapeRotation * Vector3.forward;
             for (int i = 0; i < _x.Length; i++)
             {
-                Vector3 goal = centroid + _shapeRotation * _rest[i];
-                _x[i] += (goal - _x[i]) * stiffness;
+                Vector3 q = _rest[i];
+                Vector3 x = _x[i];
+                float goalX = cx + r0.x * q.x + r1.x * q.y + r2.x * q.z;
+                float goalY = cy + r0.y * q.x + r1.y * q.y + r2.y * q.z;
+                float goalZ = cz + r0.z * q.x + r1.z * q.y + r2.z * q.z;
+                _x[i] = new Vector3(x.x + (goalX - x.x) * stiffness, x.y + (goalY - x.y) * stiffness,
+                    x.z + (goalZ - x.z) * stiffness);
             }
         }
 
@@ -478,16 +559,68 @@ namespace SimulationLobby.Shared
             return q;
         }
 
+        /// <summary>
+        /// Broad phase: which colliders could touch the body this substep at all. A collider whose
+        /// surface is farther from the body's centre than the body's bounding radius (plus margin)
+        /// can't reach any particle, so it's skipped for all of them — the floor, for instance, is
+        /// metres below a body sitting on a tall plinth. SDF distances never overestimate (the CSG
+        /// subtraction included), so a skip is always safe.
+        /// </summary>
+        int GatherNearbyColliders(Vector3 centre, float radius)
+        {
+            _nearby.Clear();
+            float reach = radius + _p.collisionThickness + 0.05f;
+            for (int c = 0; c < _colliders.Count; c++)
+            {
+                if (_colliders[c].Distance(centre) < reach)
+                {
+                    _nearby.Add(_colliders[c]);
+                }
+            }
+
+            return _nearby.Count;
+        }
+
+        float BoundingRadius(Vector3 centre)
+        {
+            float max = 0f;
+            for (int i = 0; i < _x.Length; i++)
+            {
+                Vector3 x = _x[i];
+                float dx = x.x - centre.x, dy = x.y - centre.y, dz = x.z - centre.z;
+                float d = dx * dx + dy * dy + dz * dz;
+                if (d > max)
+                {
+                    max = d;
+                }
+            }
+
+            return Mathf.Sqrt(max);
+        }
+
         void SolveCollisions(float h)
         {
             float thickness = _p.collisionThickness;
             int contacts = 0;
+            Vector3 centre = Average(_x);
+            if (GatherNearbyColliders(centre, BoundingRadius(centre)) == 0)
+            {
+                for (int i = 0; i < _x.Length; i++)
+                {
+                    _inContact[i] = false;
+                    _touching[i] = false;
+                }
+
+                ContactCount = 0;
+                return;
+            }
+
             for (int i = 0; i < _x.Length; i++)
             {
                 bool touching = false;
-                for (int c = 0; c < _colliders.Count; c++)
+                for (int c = 0; c < _nearby.Count; c++)
                 {
-                    SdfCollider collider = _colliders[c];
+                    SdfCollider collider = _nearby[c];
                     float distance = collider.Distance(_x[i]);
                     if (distance >= thickness)
                     {
@@ -669,15 +802,29 @@ namespace SimulationLobby.Shared
 
             float thickness = _p.collisionThickness;
             int contacts = 0;
-            // Contacts are tested at the dense rigid sample set, not just the particles: a thin
-            // feature (a brass lip) can sit between particles and let the body slip through it.
-            for (int i = 0; i < _rigidPoints.Length; i++)
+            GatherNearbyColliders(_rbPosition, _rigidRadius);
+            bool anyThin = false;
+            for (int c = 0; c < _nearby.Count; c++)
             {
-                Vector3 previousPoint = previousPosition + previousRotation * _rigidPoints[i];
+                anyThin |= _nearby[c].thin;
+            }
+
+            // Particles are tested against every nearby collider; the dense extra samples (edge
+            // midpoints, triangle centres) only against thin ones — a brass lip can sit between
+            // particles and let the body slip through, a plinth top can't.
+            int sampleCount = _nearby.Count == 0 ? 0 : anyThin ? _rigidPoints.Length : _x.Length;
+            for (int i = 0; i < sampleCount; i++)
+            {
+                bool dense = i >= _x.Length;
                 bool touching = false;
-                for (int c = 0; c < _colliders.Count; c++)
+                for (int c = 0; c < _nearby.Count; c++)
                 {
-                    SdfCollider collider = _colliders[c];
+                    SdfCollider collider = _nearby[c];
+                    if (dense && !collider.thin)
+                    {
+                        continue;
+                    }
+
                     Vector3 point = _rbPosition + _rbRotation * _rigidPoints[i];
                     float distance = collider.Distance(point);
                     if (distance >= thickness)
@@ -697,10 +844,11 @@ namespace SimulationLobby.Shared
 
                     // Static friction: undo this point's tangential travel if it is under the stick limit.
                     point = _rbPosition + _rbRotation * _rigidPoints[i];
+                    Vector3 previousPoint = previousPosition + previousRotation * _rigidPoints[i];
                     Vector3 travel = point - previousPoint;
                     Vector3 tangential = travel - normal * Vector3.Dot(travel, normal);
                     float slip = tangential.magnitude;
-                    if (slip > 1e-9f && slip < collider.staticFriction * lambda)
+                    if (slip > 1e-9f && slip < collider.staticFriction * (thickness - distance))
                     {
                         RigidCorrection(point - _rbPosition, -tangential / slip, slip, inverseMass);
                     }
@@ -710,6 +858,7 @@ namespace SimulationLobby.Shared
                         normal = normal,
                         offset = point - _rbPosition,
                         lambda = lambda,
+                        depth = thickness - distance,
                         approachSpeed = approach,
                         friction = collider.dynamicFriction
                     });
@@ -721,6 +870,11 @@ namespace SimulationLobby.Shared
                 {
                     contacts++;
                 }
+            }
+
+            for (int i = sampleCount; i < _rigidPoints.Length; i++)
+            {
+                _rigidInContact[i] = false;
             }
 
             ContactCount = contacts;
@@ -742,10 +896,12 @@ namespace SimulationLobby.Shared
             Vector3 offsetSum = Vector3.zero;
             float approachSum = 0f;
             float frictionSum = 0f;
+            float maxDepth = 0f;
             for (int k = 0; k < _rbContacts.Count; k++)
             {
                 RigidContact contact = _rbContacts[k];
                 float weight = Mathf.Max(contact.lambda, 1e-9f);
+                maxDepth = Mathf.Max(maxDepth, contact.depth);
                 lambdaSum += weight;
                 normalSum += contact.normal * weight;
                 offsetSum += contact.offset * weight;
@@ -769,7 +925,9 @@ namespace SimulationLobby.Shared
                 float tangentSpeed = tangentVelocity.magnitude;
                 if (tangentSpeed > 1e-6f)
                 {
-                    change -= tangentVelocity / tangentSpeed * Mathf.Min(friction * lambdaSum / h, tangentSpeed);
+                    // Coulomb limit: friction can remove up to μ × the normal speed the contacts took
+                    // out this substep (deepest depth / h). In distance units, so mass-independent.
+                    change -= tangentVelocity / tangentSpeed * Mathf.Min(friction * maxDepth / h, tangentSpeed);
                 }
 
                 float bounce = approach > restingSpeed ? _p.restitution * approach : 0f;
@@ -852,6 +1010,7 @@ namespace SimulationLobby.Shared
                     normal = normal,
                     offset = r,
                     lambda = lambda,
+                    depth = depth,
                     approachSpeed = approach,
                     friction = 0.35f
                 });
@@ -1075,32 +1234,48 @@ namespace SimulationLobby.Shared
             Vector3 mean = Average(_v);
 
             // Angular momentum and inertia about the centre (unit particle masses — they cancel).
-            Vector3 momentum = Vector3.zero;
-            var inertia = new Matrix3();
+            float cx = centre.x, cy = centre.y, cz = centre.z;
+            float mx = mean.x, my = mean.y, mz = mean.z;
+            float lx = 0f, ly = 0f, lz = 0f;
+            float i00 = 0f, i11 = 0f, i22 = 0f, i01 = 0f, i02 = 0f, i12 = 0f;
             for (int i = 0; i < _x.Length; i++)
             {
-                Vector3 r = _x[i] - centre;
-                momentum += Vector3.Cross(r, _v[i] - mean);
-                float rr = Vector3.Dot(r, r);
-                inertia.m00 += rr - r.x * r.x;
-                inertia.m11 += rr - r.y * r.y;
-                inertia.m22 += rr - r.z * r.z;
-                inertia.m01 -= r.x * r.y;
-                inertia.m02 -= r.x * r.z;
-                inertia.m12 -= r.y * r.z;
+                Vector3 x = _x[i];
+                Vector3 v = _v[i];
+                float rx = x.x - cx, ry = x.y - cy, rz = x.z - cz;
+                float ux = v.x - mx, uy = v.y - my, uz = v.z - mz;
+                lx += ry * uz - rz * uy;
+                ly += rz * ux - rx * uz;
+                lz += rx * uy - ry * ux;
+                float rr = rx * rx + ry * ry + rz * rz;
+                i00 += rr - rx * rx;
+                i11 += rr - ry * ry;
+                i22 += rr - rz * rz;
+                i01 -= rx * ry;
+                i02 -= rx * rz;
+                i12 -= ry * rz;
             }
 
-            inertia.m10 = inertia.m01;
-            inertia.m20 = inertia.m02;
-            inertia.m21 = inertia.m12;
-            Vector3 spin = inertia.Inverse().Multiply(momentum);
+            var inertia = new Matrix3
+            {
+                m00 = i00, m11 = i11, m22 = i22,
+                m01 = i01, m10 = i01, m02 = i02, m20 = i02, m12 = i12, m21 = i12
+            };
+            Vector3 spin = inertia.Inverse().Multiply(new Vector3(lx, ly, lz));
 
             float air = Mathf.Exp(-_p.airDamping * h);
             float keep = Mathf.Exp(-_p.wobbleDamping * h);
+            float sx = spin.x, sy = spin.y, sz = spin.z;
             for (int i = 0; i < _v.Length; i++)
             {
-                Vector3 rigid = mean + Vector3.Cross(spin, _x[i] - centre);
-                _v[i] = rigid * air + (_v[i] - rigid) * keep;
+                Vector3 x = _x[i];
+                Vector3 v = _v[i];
+                float rx = x.x - cx, ry = x.y - cy, rz = x.z - cz;
+                float gx = mx + sy * rz - sz * ry;
+                float gy = my + sz * rx - sx * rz;
+                float gz = mz + sx * ry - sy * rx;
+                _v[i] = new Vector3(gx * air + (v.x - gx) * keep, gy * air + (v.y - gy) * keep,
+                    gz * air + (v.z - gz) * keep);
             }
         }
 
@@ -1133,13 +1308,17 @@ namespace SimulationLobby.Shared
 
         static Vector3 Average(Vector3[] values)
         {
-            Vector3 sum = Vector3.zero;
+            float x = 0f, y = 0f, z = 0f;
             for (int i = 0; i < values.Length; i++)
             {
-                sum += values[i];
+                Vector3 v = values[i];
+                x += v.x;
+                y += v.y;
+                z += v.z;
             }
 
-            return sum / values.Length;
+            float inverse = 1f / values.Length;
+            return new Vector3(x * inverse, y * inverse, z * inverse);
         }
 
         /// <summary>

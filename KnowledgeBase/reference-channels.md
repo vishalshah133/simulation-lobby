@@ -2,11 +2,8 @@
 
 What's working elsewhere in the genre, and what we take from it. Update as new channels are studied.
 
-> **Research caveat:** YouTube channel pages are JavaScript-rendered and can't be read by automated
-> fetching — video lists, titles, and view counts didn't come through. Findings below are from
-> third-party documentation of the genre, not from a direct pass over the channels' uploads.
-> Treat specifics as approximate and verify by watching directly. Per-video numbers especially
-> should be confirmed by hand before any of this drives a production decision.
+> FuncFlow's section was originally written from third-party documentation. It was verified by
+> live API pull on 2026-10-03 (see [2D pass](#2d-pass--2026-10-03)), and the caveat is retired.
 
 ---
 
@@ -40,9 +37,8 @@ question — test before committing a series.
 - Unlicensed recognizable music. Common in the genre, a claim risk on a monetized channel.
   Public-domain or original melodies only.
 
-**Still to verify by watching directly:** current upload cadence, which escalation variants they run
-most, run lengths, whether they use on-screen counters, and whether recent uploads still perform or
-the format has cooled.
+**Verified 2026-10-03:** see the [2D pass](#2d-pass--2026-10-03) below. In short, the format peaked
+in 2024, and FuncFlow itself went dormant (Dec 2024 to Jul 2026) and came back to ~2K views.
 
 ---
 
@@ -112,6 +108,19 @@ documentation — no unverified-research caveat needed for this section.
 - **Survivorship bias applies to all of the above** — these are seven channels that got named to us
   as examples, i.e. already selected for success. This is not a random sample of the genre.
 
+### MusicMarble3D: nursery-rhyme melodies, checked 2026-10-03
+
+Pulled the last 50 uploads plus `status.madeForKids`, which is public on `videos.list part=status`.
+
+- **Twinkle Twinkle is the channel's engine.** Its top 12 are *Baa Baa Black Sheep* (32.3M, the same
+  tune) and seven Twinkle variants (15.2M, 15.1M, 12.3M, 7.0M, 6.3M, 6.1M, 5.5M), all 8-11s.
+- **None of the 50 is marked made for kids** (0/50). Nursery-rhyme melodies on a general-audience
+  physics channel haven't forced the kids classification there. Our upload setting stays our call,
+  and it should be honest: the audience is general, not children.
+- **Comments are low** (31-140 on 5-32M views), so instant recognition plus a loop drives views.
+  "Guess the song" comment-bait does not. For a tune everyone knows, the hook is the payoff of
+  hearing it emerge, not a quiz.
+
 ---
 
 ## RenderZen — `youtube.com/@renderzen`
@@ -170,6 +179,104 @@ setting. Only the parameter changes between takes. Nothing needs explaining, so 
 
 **Still unverified:** audio design, exact take count and timing (only 4 thumbnail frames seen),
 and retention (owner-only, invisible to us).
+
+## 2D pass — 2026-10-03
+
+Live API pull of **every upload** on five 2D channels (`videos --limit 500 --json`). `--limit` applies
+*before* `--sort`, so an unlimited pull is needed to find a big channel's real top videos.
+
+| Channel | Uploads | Active | Peak | 2026 state |
+|---|---|---|---|---|
+| `@satisfying.ba11s` | 424 | 2023-11 → **2025-05, stopped** | 78M, 38M, 36M (all song-recognition, 2023-24) | Dead. Its last 12 uploads did 60-160K |
+| `@funcflow` | 55 | 2023-11 → 2024-12, then 2 in Jul 2026 | 35.9M *"Will the ball escape?"*, 13.5M, 11.0M | Came back from 19 months dormant to **1-2K views** |
+| `@CodeCraftedPhysics` | 293 | continuous | 25.7M (2026-03), 23.3M, 18.8M | Alive. 2026 has 4 of its top 10 videos |
+| `@satisfying2dsims` | 269 | created 2026-07-06, **~3/day** | 1.9M, 1.7M (Sep 2026) | Fastest riser: 21M views in 3 months, Sep median 44K/Short |
+| `@AlgoMarblerYT` | 94 | 2021 → 2025-12 | 8.0M *Shutter Crush* (10-min Algodoo) | Long form, monthly. Not a Shorts model |
+
+**What the 2D genre looks like now:**
+
+1. **Alive, but the winners are whoever is posting.** Both originators stopped and collapsed, and
+   FuncFlow's return after 19 months got ~2K views. Meanwhile a 3-month-old channel posting 3/day
+   is the fastest riser. The same lesson as our own revival: cadence matters more than format.
+2. **Big numbers and destruction lead `@satisfying2dsims`**: *"It crushed one ball into 15,939
+   pieces"* (1.9M), *"Every ball crushed splits into 3"* (1.7M), *"How many balls can a hydraulic
+   press handle?"* (725K). Multiply plus a crusher, with the count shown on screen.
+3. **Reach-the-center is the inverse of `esc`, and it's hot**: CodeCrafted's #1 is *"When it finally
+   reached the center"* (25.7M, 2026-03), and *"Can it break the whole spiral?"* did 10.7M. On
+   S2DS: *"Can Pac-Man reach the core?"* (670K), *"Can the ice ball reach the molten core?"* (110K).
+4. **Song recognition made the 2023-24 mega-hits**, all of them: ba11s's top 15 and FuncFlow's
+   8.9M *"Do you know this song?"*. FuncFlow used **classical pieces, which are public domain**. Our
+   procedural synth plays the notes, so there's no recording to license either. It's now a mid
+   performer rather than a mega one (S2DS: 90-100K).
+5. **Element vs element** (fire/water/lava) has S2DS's highest bucket median: **82K, n=7**, best
+   842K *"It came down to ONE flame"*. Needs a particle/fluid layer that we don't have.
+6. **Weaker buckets:** colour/territory takeover (median 25K) and grow/shrink-per-bounce (22K,
+   which is our `esc` mechanic, and saturated at S2DS's volume).
+7. **Length:** S2DS's median Short is **34s**, and every 2D hit above is 16-70s. Our `esc` videos
+   run 2:05-2:12. Not proven to hurt (v4 is our best), but it's the most obvious untested gap.
+8. **Title shape has shifted** from plain questions to **outcome or reaction statements with a
+   number**: *"It crushed one ball into 15,939 pieces 💀"*, *"How did the 4th ball even miss it? 😭"*,
+   *"It missed by one ball. It never missed again"*. Questions still work (*"Can the water put out
+   the LAST flame?"*, 44K in 2 days).
+
+**Caveats:** survivorship bias (these channels were named because they succeeded). S2DS's numbers
+are partly volume, since at 3/day some Shorts will hit by chance. Bucket medians come from title
+keywords, not from watching the videos.
+
+---
+
+## Length vs views across channels (2026-10-04)
+
+Live pull of every upload from 10 channels (`videos --limit 600 --json`). Kept Shorts ≤3 min,
+published since **2024-10-15** (when 3-min Shorts opened up), at least 7 days old. FuncFlow and
+moreballs had fewer than 8 in that window and are excluded. Each cell is that bucket's count and
+its median **relative to the channel's own median**, so channels of different size are comparable.
+
+| Channel | n | Channel median | <15s | 15–30s | 30–60s | 1–2m | 2–3m |
+|---|---|---|---|---|---|---|---|
+| `@MusicMarble3D` | 160 | 2.97M | 157 ×1.01 | — | 3 ×0.02 | — | — |
+| `@renderzen` | 284 | 125K | 170 ×1.31 | 98 ×0.73 | 7 ×0.13 | 8 ×0.06 | 1 ×0.02 |
+| `@Oyen_3D` | 104 | 354K | 32 ×1.52 | 65 ×1.06 | 3 ×0.37 | 2 ×1.24 | 2 ×0.28 |
+| `@Kawaken_3DCG` | 146 | 1.97M | 5 ×0.49 | 51 ×0.99 | 90 ×1.09 | — | — |
+| `@satisfying2dsims` | 222 | 35K | 1 ×0.59 | 66 ×1.24 | 148 ×0.98 | 7 ×0.14 | — |
+| `@satisfying.ba11s` | 68 | 63K | 2 ×2.51 | 7 ×1.14 | 49 ×1.00 | 8 ×0.79 | 2 ×0.61 |
+| `@CodeCraftedPhysics` | 102 | 146K | — | 3 ×0.59 | 63 ×0.99 | 36 ×1.18 | — |
+| `@AlgoMarblerYT` | 10 | 116K | — | — | 8 ×1.10 | 1 ×0.75 | 1 ×0.50 |
+
+**Top 3 per channel (length, views):** MusicMarble3D 11s 241M / 11s 208M / 9s 168M · Oyen 16s 103M
+/ 17s 44M / 12s 32M · Kawaken 22s 39M / 29s 37M / 31s 36M · CodeCrafted **63s 25.8M / 68s 18.8M /
+70s 16.4M** · renderzen 14s 20M / 11s 11M / 14s 10M · satisfying2dsims 51s 2.0M / 48s 1.7M / 16s 0.9M.
+
+**Reading:**
+
+- **Length clusters by sub-genre.** 3D spectacle loops live under 30s; 2D story sims live at
+  30–70s. Off-band videos usually underperform their own channel (renderzen's 1–2 min ×0.06 are
+  compilations), so this is partly "videos that don't fit the channel's style", not length alone.
+- **The one channel that tested 60s+ seriously in 2D won with it.** CodeCrafted's 1–2 min uploads
+  sit at ×1.18, with 13 of 36 breaking out at ≥5× its median. In 2026, its 60s+ uploads beat its
+  sub-60s ones in most months (e.g. Mar 2026: 8.7M vs 288K monthly medians). Small monthly samples,
+  but the direction holds.
+- **2–3 min is nearly unoccupied**: 6 videos across 8 channels, all below their channel median.
+  Too few to call.
+
+### Last 90 days: who would pass 10M
+
+Shorts *published* in the last 90 days and the views they've earned so far. This undercounts
+because older uploads keep earning too, and it's the public count, which is higher than the engaged
+views YPP uses.
+
+| Channel | Shorts | Per day | Views | Median | Median length |
+|---|---|---|---|---|---|
+| `@Kawaken_3DCG` | 26 | 0.29 | 119.6M | 1.37M | 36s |
+| `@Oyen_3D` | 20 | 0.22 | 61.0M | 569K | 18s |
+| `@satisfying2dsims` | 256 | 2.84 | 19.7M | 34K | 34s |
+| `@renderzen` | 33 | 0.37 | 8.2M | 117K | 15s |
+| `@CodeCraftedPhysics` | 14 | 0.16 | 7.6M | 252K | 58s |
+| `@funcflow` | 2 | 0.02 | 3.6K | 1.8K | 34s |
+
+Two ways to clear the bar: **volume** (satisfying2dsims, ~3/day at a modest median) or **quality**
+(Kawaken/Oyen: Blender-grade 3D at ~2/week, 1000× the per-video reach). Nobody passes it on cadence
+alone at a low median, or on 2D quality alone at a low cadence (CodeCrafted falls just short).
 
 ---
 
