@@ -493,6 +493,53 @@ namespace SimulationLobby.Presentation
             return clip;
         }
 
+        /// <summary>
+        /// A short mechanical "tick": a burst of high-passed noise over a brief pitched blip, gone in
+        /// about 45ms. The click of a slot reel's detent as each face passes.
+        /// </summary>
+        /// <param name="pitch">Multiplier on a ~1.9 kHz blip.</param>
+        /// <param name="seed">Noise only. Same seed, same clip — re-renders must match.</param>
+        public static AudioClip CreateClick(float pitch = 1f, int seed = 7, string name = "Click")
+        {
+            const float duration = 0.045f;
+            int sampleCount = Mathf.Max(1, Mathf.RoundToInt(SampleRate * duration));
+            var samples = new float[sampleCount];
+            var noiseSource = new System.Random(seed);
+
+            float blipHz = 1900f * pitch;
+            float bodyHz = 420f * pitch;
+            int attackSamples = Mathf.RoundToInt(SampleRate * 0.0008f);
+            float low = 0f;
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                float t = i / (float)SampleRate;
+
+                // Noise minus its own low-passed copy is a cheap high-pass: the crisp edge of the tick.
+                float rawNoise = (float)(noiseSource.NextDouble() * 2.0 - 1.0);
+                low += (rawNoise - low) * 0.25f;
+                float edge = (rawNoise - low) * Mathf.Exp(-260f * t);
+
+                float blip = Mathf.Sin(2f * Mathf.PI * blipHz * t) * Mathf.Exp(-130f * t);
+                float body = Mathf.Sin(2f * Mathf.PI * bodyHz * t) * Mathf.Exp(-70f * t);
+
+                float attack = attackSamples > 0 ? Mathf.Min(1f, i / (float)attackSamples) : 1f;
+                samples[i] = (edge * 0.5f + blip * 0.45f + body * 0.3f) * attack;
+            }
+
+            // Fade the last few ms so the tail never ends on a click.
+            int fade = Mathf.Min(sampleCount, Mathf.RoundToInt(SampleRate * 0.005f));
+            for (int k = 0; k < fade; k++)
+            {
+                samples[sampleCount - 1 - k] *= k / (float)fade;
+            }
+
+            Normalize(samples, 0.8f);
+            var clip = AudioClip.Create(name, sampleCount, 1, SampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
         /// <summary>Scales a buffer so its loudest sample sits at <paramref name="peak"/>.</summary>
         static void Normalize(float[] samples, float peak)
         {

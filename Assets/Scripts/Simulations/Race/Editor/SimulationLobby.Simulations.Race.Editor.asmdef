@@ -1,0 +1,25 @@
+{
+    "name": "SimulationLobby.Simulations.Race.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.Race.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "SimulationLobby.Simulations.Race"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

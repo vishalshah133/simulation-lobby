@@ -280,7 +280,77 @@ alone at a low median, or on 2D quality alone at a low cadence (CodeCrafted fall
 
 ---
 
+## The Black Cat-Gear — `youtube.com/@TheBlackCatGear` (pulled 2026-10-09)
+
+3D/2D marble-race channel: **198K subs, 124 uploads, 109.9M views**, created 2019-03. Algodoo for 2D,
+Blender for 3D and editing; states "no AI". Full upload list pulled via the API (`--limit 200`).
+
+**It is a long-form channel, and the only one in our set that is.** 107 of 124 uploads are over 3 min
+(85.7M views); the median long-form upload has 414K lifetime views. Caveat on the Short/long split:
+the tool tags anything under 3 min as "S", but the 17 "Shorts" dated before 2024-10 predate 3-minute
+Shorts, so they were ordinary 2-3 min videos, not vertical Shorts. **The channel has no real Shorts
+history**, so it says nothing about Shorts and should not be compared to our Shorts numbers.
+
+| Year | Uploads | Views earned by that year's uploads |
+|---|---|---|
+| 2019 | 32 | 16.1M |
+| 2020 | 28 | 7.6M |
+| 2021 | 14 | 38.0M (one 12.8M hit) |
+| 2022 | 8 | 12.6M |
+| 2023 | 13 | 6.2M |
+| 2024 | 18 | 24.7M (18.4M *Squid Game Marble Race*, 2024-12) |
+| 2025 | 7 | 3.4M |
+| 2026 | 4 | 1.3M (to date) |
+
+**What it shows:**
+
+1. **Hit-driven, with a fat middle.** The top 3 videos are 37% of all views, but the median video
+   still holds 414K. Typical uploads are 100-700K lifetime; a hit is 1-18M, roughly one in 10-15.
+2. **Cadence fell from ~2.5/month (2019-20) to ~1/month (2025-26), and 2025-26 uploads are weaker.**
+   Median 2025-26 long-form is ~378K and 2026-04's *Catapults #2* did 106K. The newest, *Black Holes*
+   (2026-10-02), has 56K in 7 days (~9K/day), so the recent trend is down.
+3. **Evergreen is real here.** 2021-22 races still sit at 1-3.6M, years on. Long-form accumulates
+   where our Shorts go flat after 2-5 days.
+4. **Series IP is the repeatable engine.** Titles are one template: *"The [Theme] Marble Race"*, with
+   sequels (*Squid Game 2* did 1.28M, *Catapults #2* did 106K) and **"(HD)" re-renders of its own older
+   races** (*Dispenser*, *Building Site*, *Catapults*, *Holes*, *Balance*). Pop-culture themes
+   (Squid Game, Super Mario) are the breakouts. The HD re-render habit is exactly what our
+   deterministic seed + config design makes cheap.
+5. **Likes are 0.3-0.6% of views**, similar to the Shorts channels. Subs/views is **0.18%** lifetime
+   (198K / 109.9M), about 2x our ~0.1%, but it's one channel with a 7-year audience.
+6. **Production cost is high.** 8-16 min Blender/Algodoo races, ~1/month. This is a one-person
+   craft channel, which is also why its output has slowed.
+
+**What we take:** the sequel / "(HD)" re-render pattern, the pop-culture-theme title template, and
+the fact that long-form compounds. **What we don't:** its production model (Blender offline, monthly)
+and its Shorts-agnostic growth, which came from the 2019-2022 platform era. **Unverified:** retention
+and watch time (owner-only), and whether the 2025-26 decline is the channel or the platform.
+
+---
+
 ## Sources
 
 - [Will the Ball Escape? / Ball Bouncing Brainrot — Know Your Meme](https://knowyourmeme.com/memes/will-the-ball-escape-ball-bouncing-brainrot)
 - [FuncFlow — YouTube](https://www.youtube.com/@FuncFlow)
+
+## @marblejamboree: Multiply or Release long form (data pulled 2026-10-12)
+
+The direct reference for `terr`. **A small channel:** 5,600 subs, 96 videos, 2.76M lifetime views, created 2023-03.
+Its long-form *Multiply or Release* series (S2 "with Spinner", S3 "[Sq]", a [Hex] beta) is its core, and active uploads
+end around 2024-09.
+
+| Measure | Value |
+|---|---|
+| MoR long-form views | 8.8K–27.6K each; most 11–17K |
+| Best | *[BETA] [Hex] Multiply or Release - Marble Race in Unity*, 27.6K |
+| Length | **35–63 min** typical (one 11:42 special) |
+| Like-rate | 0.57–0.76% (its Shorts run 1.0–2.0%) |
+| Titles | Plain series labels: "Multiply or Release S3 #5 [Sq] - Marble Race in Unity". No hook, no question, no emoji |
+
+**Reading it honestly:**
+- This is a niche with a steady, returning audience (numbered seasons holding 9–18K each), not a breakout genre.
+- It's one channel, so weak evidence on its own (see [[multi-channel-evidence]]).
+- Next to it: `moreballs` long-form marble elimination does 30K–270K, and territory-takeover *Shorts* median about 25K at S2DS.
+- The 35–63 min runtimes matter for the watch-hours route: one 13K-view video at that length banks far more hours than a Short.
+- Its titles and thumbnails are unoptimised, which is the gap we can compete on.
+- Not verified: search-wide genre volume. Our `yt.py` has no search command.

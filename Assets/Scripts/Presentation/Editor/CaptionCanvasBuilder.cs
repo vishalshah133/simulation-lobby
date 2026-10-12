@@ -11,7 +11,41 @@ namespace SimulationLobby.Presentation.EditorTools
     /// </summary>
     public static class CaptionCanvasBuilder
     {
+        /// <summary>Text colours for the three lines. <see cref="Studio"/> is the original look.</summary>
+        public struct Style
+        {
+            public Color caption;
+            public Color subline;
+            public Color footer;
+
+            /// <summary>Add the light underlay halo that keeps dark text legible on a bright backdrop.</summary>
+            public bool halo;
+
+            /// <summary>Dark, heavy text with a light halo, for the bright studio backdrop (the default).</summary>
+            public static Style Studio => new Style
+            {
+                caption = new Color(0.11f, 0.10f, 0.09f, 1f),
+                subline = new Color(0.28f, 0.26f, 0.23f, 1f),
+                footer = new Color(0.32f, 0.30f, 0.27f, 0.85f),
+                halo = true
+            };
+
+            /// <summary>Light text for a dark backdrop, no halo.</summary>
+            public static Style Dark => new Style
+            {
+                caption = Color.white,
+                subline = new Color(0.78f, 0.82f, 0.9f, 1f),
+                footer = new Color(0.8f, 0.84f, 0.92f, 0.85f),
+                halo = false
+            };
+        }
+
         public static CaptionHud Build(string caption, string subline, string footer)
+        {
+            return Build(caption, subline, footer, Style.Studio);
+        }
+
+        public static CaptionHud Build(string caption, string subline, string footer, Style style)
         {
             var canvasObject = new GameObject("Caption Canvas");
             var canvas = canvasObject.AddComponent<Canvas>();
@@ -37,17 +71,20 @@ namespace SimulationLobby.Presentation.EditorTools
             // Dark and heavy on the bright studio backdrop: the caption is the only text that matters
             // and must survive 480px wide. (It was white on the original near-black backdrop.)
             TMP_Text captionText = ScoreboardCanvasBuilder.CreateText(topPanel, "Caption", caption, 132f,
-                new Color(0.11f, 0.10f, 0.09f, 1f), FontStyles.Bold);
+                style.caption, FontStyles.Bold);
             captionText.characterSpacing = 4f;
-            AddShadow(captionText);
             TMP_Text sublineText = ScoreboardCanvasBuilder.CreateText(topPanel, "Subline", subline, 50f,
-                new Color(0.28f, 0.26f, 0.23f, 1f), FontStyles.Normal);
-            AddShadow(sublineText);
+                style.subline, FontStyles.Normal);
+            if (style.halo)
+            {
+                AddShadow(captionText);
+                AddShadow(sublineText);
+            }
 
             RectTransform bottomPanel = ScoreboardCanvasBuilder.CreatePanel(canvasObject.transform, "BottomPanel",
                 new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 120f), new Vector2(-80f, 120f));
             TMP_Text footerText = ScoreboardCanvasBuilder.CreateText(bottomPanel, "Footer", footer, 40f,
-                new Color(0.32f, 0.30f, 0.27f, 0.85f), FontStyles.Normal);
+                style.footer, FontStyles.Normal);
             var footerRect = footerText.rectTransform;
             footerRect.anchorMin = Vector2.zero;
             footerRect.anchorMax = Vector2.one;

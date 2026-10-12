@@ -1,6 +1,6 @@
 # Block: Seed-Scan Harness
 
-**Status:** `built` (2026-10-04, compiles; first in-Unity run pending) · **Layer:** `Assets/Scripts/Capture/` · **Used by:** every video
+**Status:** `built` (2026-10-04, compiles; first in-Unity run pending) · **Opt-in only since 2026-10-05**: seeds are random by default and no video plan needs a scan (CLAUDE.md, *Working agreements*) · **Layer:** `Assets/Scripts/Capture/` · **Used by:** every video
 
 ## Use it
 

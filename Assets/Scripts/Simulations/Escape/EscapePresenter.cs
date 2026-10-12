@@ -32,6 +32,7 @@ namespace SimulationLobby.Simulations.Escape
 
         int _lastBounceCount;
         int _lastAttemptsPlayed;
+        Transform _gapMarker;
 
         void Reset()
         {
@@ -46,6 +47,10 @@ namespace SimulationLobby.Simulations.Escape
                 _hud.SetQuestion(_question);
                 _hud.SetSides("WALL", "BALL");
             }
+
+            // Built by EscapeSceneBuilder as a child of the wall, so existing scenes need no rewiring.
+            Transform boundary = _simulation != null ? _simulation.BoundaryTransform : null;
+            _gapMarker = boundary != null ? boundary.Find("GapMarker") : null;
         }
 
         void LateUpdate()
@@ -57,6 +62,23 @@ namespace SimulationLobby.Simulations.Escape
 
             UpdateAudio();
             UpdateScoreboard();
+            UpdateGapMarker();
+        }
+
+        /// <summary>Keeps the marker spanning the exit when a series ramp narrows it between rounds.</summary>
+        void UpdateGapMarker()
+        {
+            if (_gapMarker == null)
+            {
+                return;
+            }
+
+            Vector3 scale = _gapMarker.localScale;
+            float width = _simulation.GapChordWidth;
+            if (width > 0f && !Mathf.Approximately(scale.x, width))
+            {
+                _gapMarker.localScale = new Vector3(width, scale.y, scale.z);
+            }
         }
 
         void UpdateAudio()

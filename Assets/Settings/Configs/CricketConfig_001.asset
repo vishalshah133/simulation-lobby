@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 228f11d29ca019b41b9acbe4d2901dbe, type: 3}
+  m_Name: CricketConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Cricket::SimulationLobby.Simulations.Cricket.CricketConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 240
+  intent: 'cric-001: super over (6 balls, 2 wickets), India vs West Indies, 5 lanes
+    x 4 rows (x1.5-x3, HIT, OUT, pass), base 6 m, bands 8/14/20/30/60 m = 1/2/3/4/6,
+    random seed per Play.'
+  teamA: {fileID: 11400000, guid: 2d70ab25357163047b1b96aab771b1ef, type: 2}
+  teamB: {fileID: 11400000, guid: 9ab873ef2e80dab4c9eb48438e77dbcf, type: 2}
+  oversPerInnings: 1
+  ballsPerOver: 6
+  wicketsPerInnings: 2
+  columns:
+  - gates:
+    - kind: 1
+      value: 2
+    - kind: 1
+      value: 1.5
+    - kind: 0
+      value: 1
+    - kind: 2
+      value: 1
+    - kind: 0
+      value: 1
+  - gates:
+    - kind: 1
+      value: 2
+    - kind: 1
+      value: 3
+    - kind: 2
+      value: 1
+    - kind: 0
+      value: 1
+    - kind: 0
+      value: 1
+  - gates:
+    - kind: 1
+      value: 2
+    - kind: 1
+      value: 3
+    - kind: 2
+      value: 1
+    - kind: 0
+      value: 1
+    - kind: 0
+      value: 1
+  - gates:
+    - kind: 1
+      value: 3
+    - kind: 2
+      value: 1
+    - kind: 2
+      value: 1
+    - kind: 3
+      value: 1
+    - kind: 1
+      value: 2
+  shuffleLanesPerDelivery: 1
+  baseDistance: 6
+  bands:
+  - minDistance: 0
+    runs: 0
+  - minDistance: 8
+    runs: 1
+  - minDistance: 14
+    runs: 2
+  - minDistance: 20
+    runs: 3
+  - minDistance: 30
+    runs: 4
+  - minDistance: 60
+    runs: 6
+  maxShotAngle: 150
+  angleJitter: 9
+  ballRadius: 0.14
+  ballBounciness: 0.5
+  flowAcceleration: 4
+  linearDamping: 0.05
+  maxSpeed: 6.5
+  stuckSeconds: 1.2
+  launchSpread: 0.7
+  stripCenter: {x: 0, y: -6.05}
+  stripWidth: 10.4
+  laneHeight: 0.76
+  columnPitch: 2
+  gateThickness: 0.4
+  entryMargin: 2
+  pegLinesPerColumn: 2
+  pegRadius: 0.12
+  pegSpacing: 1
+  groundCenter: {x: 0, y: 2.5}
+  groundRadius: 3.6
+  readoutCenter: {x: 0, y: -2.5}
+  layoutVersion: 3
+  preBallHoldSeconds: 0.7
+  resultHoldSeconds: 2
+  inningsBreakSeconds: 2.5
+  finishHoldSeconds: 4

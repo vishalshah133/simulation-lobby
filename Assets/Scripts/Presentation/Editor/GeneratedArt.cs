@@ -31,6 +31,25 @@ namespace SimulationLobby.Presentation.EditorTools
             });
         }
 
+        /// <summary>Solid white square, one world unit across. For stripes and plain panels with no rounded corners.</summary>
+        public static Sprite Square()
+        {
+            return EnsureSprite("Square_64.png", 64, (x, y) => 1f);
+        }
+
+        /// <summary>A wide, soft round falloff, one world unit across, as a sprite. Sun glow and cloud shadows.</summary>
+        public static Sprite SoftGlow()
+        {
+            const int size = 128;
+            float radius = size * 0.5f;
+            return EnsureSprite("SoftGlow_128.png", size, (x, y) =>
+            {
+                float t = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(radius, radius)) / radius;
+                float falloff = Mathf.Clamp01(1f - t);
+                return falloff * falloff * (3f - 2f * falloff);
+            });
+        }
+
         /// <summary>An irregular triangle — one glass shard. Rotated and stretched per particle, so one is enough.</summary>
         public static Texture2D Shard()
         {
@@ -146,6 +165,40 @@ namespace SimulationLobby.Presentation.EditorTools
             });
         }
 
+        /// <summary>
+        /// White rounded rectangle, 9-sliced (border 24 px of 64). Use Image.Type.Sliced; the corner
+        /// radius then stays 24 sprite pixels (scaled by Image.pixelsPerUnitMultiplier) at any size.
+        /// </summary>
+        public static Sprite RoundedRect()
+        {
+            const int size = 64;
+            const float radius = 24f;
+            return EnsureSprite("RoundedRect_64.png", size, (x, y) =>
+            {
+                float px = x + 0.5f;
+                float py = y + 0.5f;
+                float cx = Mathf.Clamp(px, radius, size - radius);
+                float cy = Mathf.Clamp(py, radius, size - radius);
+                float distance = Vector2.Distance(new Vector2(px, py), new Vector2(cx, cy));
+                return Mathf.Clamp01(Mathf.InverseLerp(radius, radius - 1.5f, distance));
+            }, new Vector4(24f, 24f, 24f, 24f));
+        }
+
+        /// <summary>White right-pointing triangle with softened edges, one world unit across.</summary>
+        public static Sprite ArrowRight()
+        {
+            const int size = 64;
+            Vector2 a = new Vector2(0.06f, 0.06f) * size;
+            Vector2 b = new Vector2(0.06f, 0.94f) * size;
+            Vector2 c = new Vector2(0.96f, 0.5f) * size;
+            return EnsureSprite("ArrowRight_64.png", size, (x, y) =>
+            {
+                var p = new Vector2(x + 0.5f, y + 0.5f);
+                float d = Mathf.Min(EdgeDistance(p, a, c), Mathf.Min(EdgeDistance(p, c, b), EdgeDistance(p, b, a)));
+                return Mathf.Clamp01(d / 1.5f);
+            });
+        }
+
         static float EdgeDistance(Vector2 p, Vector2 from, Vector2 to)
         {
             Vector2 edge = to - from;
@@ -154,6 +207,11 @@ namespace SimulationLobby.Presentation.EditorTools
         }
 
         static Sprite EnsureSprite(string fileName, int size, Func<int, int, float> alpha)
+        {
+            return EnsureSprite(fileName, size, alpha, Vector4.zero);
+        }
+
+        static Sprite EnsureSprite(string fileName, int size, Func<int, int, float> alpha, Vector4 border)
         {
             string path = $"{Folder}/{fileName}";
             var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
@@ -167,6 +225,7 @@ namespace SimulationLobby.Presentation.EditorTools
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.spritePixelsPerUnit = size; // one sprite == one world unit
+            importer.spriteBorder = border;
             importer.mipmapEnabled = false;
             importer.alphaIsTransparency = true;
             importer.SaveAndReimport();

@@ -3,6 +3,21 @@
 Marbles fall through gates labeled with operations — ×2, ×5, +10, RELEASE, HALVE, ×0 — and the count
 compounds or collapses on the way down. Built for Shorts: the number on screen *is* the hook.
 
+## Built design (rom-001, 2026-10-05; not yet watched in Unity)
+
+- **Layout:** 4 lanes x 6 rows of gates, a peg field under each row. Gates are `×n`, `+n`, `÷2`
+  (halve; a lone marble lives on a seeded flip) and `×0` (wipe). The last row is the high-variance one.
+- **Exact count, capped bodies:** a `Marble2D` carries a weight. A multiplier adds real clones while the
+  body budget (`maxBodies`, 400) lasts, then makes the marble heavier instead. Heavy marbles swell and
+  go gold, so the weight is visible. The count saturates at `countCap` (1e12).
+- **Random by default:** lane order per row and every drop position come from the seed, and the scene
+  randomizes the seed each Play (logged). No seed hunting; paste the logged seed back to re-render.
+- **Code split:** `BodyPool2D`, `TriggerZone2D` (Shared), `WorldLabelLayer`, `CountFormat` and the
+  `CaptionHud` (Presentation) are format-agnostic; only the gate rules live in
+  `Simulations/ReleaseOrMultiply`.
+- **Untuned:** length is a first guess (~20-25s). Dials: `startMarbles`, `dropIntervalSeconds`,
+  `gravityScale`, number of rows.
+
 ## Rules on screen
 
 The number is the rules. A huge running count top-center, gates labeled in the marbles' path. No

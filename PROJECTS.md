@@ -24,11 +24,13 @@ in [plans/channel-revival.md](plans/channel-revival.md). Don't duplicate numbers
 
 | Slug | Format | Status | Plan | Scene | Notes |
 |---|---|---|---|---|---|
-| `esc` | Containment / escape | `published` | [esc-001](plans/videos/esc-001-will-the-ball-escape.md), [esc-002](plans/videos/esc-002-rotating-gap.md) — both published · [esc-003](plans/videos/esc-003-guess-the-song.md) guess the song — published 2026-10-03 (v7) · [esc-004](plans/videos/esc-004-fur-elise.md) Für Elise — shelved 2026-10-04, song moved to `brk-001` | `Escape_Circle_2D`, `Escape_Circle_2D_RotatingGap`, `Escape_Circle_2D_Song` (build: **Simulation Lobby ▸ Build Scene ▸ Escape_Circle_2D_Song**) | esc-002 adds a rotating gap (`EscapeConfig.gapAngularSpeed`) + widened speed range (6-13, was 8-10) — config-only variation, no new scene-builder or component. Published with `randomizeSeedOnStart` on, so its take is not reproducible. |
+| `esc` | Containment / escape | `published` | [esc-001](plans/videos/esc-001-will-the-ball-escape.md), [esc-002](plans/videos/esc-002-rotating-gap.md) — both published · [esc-003](plans/videos/esc-003-guess-the-song.md) guess the song — published 2026-10-03 (v7) · [esc-004](plans/videos/esc-004-fur-elise.md) Für Elise — shelved 2026-10-04, song moved to `brk-001` · [esc-005..007](plans/videos/esc-005-rotating-gap-variants.md) rotating-gap variants (v4 replica, shrinking exit, faster gap) — `built` 2026-10-11, not yet played | `Escape_Circle_2D`, `Escape_Circle_2D_RotatingGap`, `Escape_Circle_2D_Song` (build: **Simulation Lobby ▸ Build Scene ▸ Escape_Circle_2D_Song**) | esc-002 adds a rotating gap (`EscapeConfig.gapAngularSpeed`) + widened speed range (6-13, was 8-10) — config-only variation, no new scene-builder or component. Published with `randomizeSeedOnStart` on, so its take is not reproducible. |
 | `brk` | Ring breaker | `built` | [brk-001](plans/videos/brk-001-ring-breaker-fur-elise.md) — 5 rings + *Für Elise*, awaiting playtest | `Breaker_Rings_2D_Song` (build: **Simulation Lobby ▸ Build Scene ▸ Breaker_Rings_2D_Song**) | Ball breaks out through 5 spinning segmented rings; every touch is a note, a broken segment is a real hole, and each ring explodes on escape. Pacing modelled in Python (~46s median), not yet measured in Unity. Brief: `KnowledgeBase/formats/ring-breaker.md`. |
-| `race` | Marble race | `idea` | — | — | Foundational; `elim` depends on it |
-| `rom` | Release or multiply | `idea` | — | — | Needs pooling + hard cap first |
+| `race` | Marble race | `built` (never run in Unity) | [race-001](plans/videos/race-001-grand-prix.md) | `Race_GrandPrix_3D` (build: **Simulation Lobby ▸ Build Scene ▸ Race_GrandPrix_3D**) | 3D, 16:9, long-form anchor. 12 jewel-glass marbles down a procedurally swept black-lacquer course (13 sections: straights, banked curves, a 2-loop helix, a pinch), brass trim, chrome columns, finish gantry. Roster, physics and safety nets in `RaceConfig`; track shape in `RaceTrackLayout`. Chase camera, sliding leaderboard, procedural sound. Course v2 (2026-10-09) adds data-driven obstacles: peg pyramid / plinko grid, kinematic pinwheels (seeded phase), fork divider, bottleneck, chicane, bumps. Start played and approved; obstacle build compiles, not yet played. No model imports needed. |
+| `rom` | Release or multiply | `published` 2026-10-06 | [rom-001](plans/videos/rom-001-release-or-multiply.md) | `Release_Or_Multiply_2D` (build: **Simulation Lobby ▸ Build Scene ▸ Release_Or_Multiply_2D**) | 4 lanes x 6 rows of gates (×n, +n, ÷2, ×0) over peg fields; marbles carry a weight so the count is exact while physics bodies stay capped (400). Lane order and every drop come from the seed, which is **random each Play and logged**. Published as a 40s Short (v9): 912 views at ~13h; day-1/3/7 snapshots pending. Brief: `KnowledgeBase/formats/release-or-multiply.md`. |
+| `cric` | Cricket (super over) | `built` (never run in Unity) | [cric-001](plans/videos/cric-001-super-over.md) | `Cricket_SuperOver_2D` (build: **Simulation Lobby ▸ Build Scene ▸ Cricket_SuperOver_2D**) | Experiment, first sport. One ball per delivery falls through multiply / HIT / OUT gates; distance becomes runs (dot,1,2,3,4,6) and the exit position sets the wagon-wheel angle. Two `CricketTeamDef` assets are set in the inspector. Procedural crowd audio (`ProceduralCrowd`). Pacing and run mix are model-tuned only. Brief: `KnowledgeBase/formats/cricket-super-over.md`. |
 | `surv` | Survival | `published` | [surv-001](plans/videos/surv-001-wall-vs-ball.md) — published 2026-09-30 (v5) | `Survival_WallVsBall_3D` (build in-editor — run **Simulation Lobby ▸ Build Scene ▸ Survival_WallVsBall_3D**) | **Wall vs Ball**, converted from the `impact` build 2026-09-30: one 300-block wall, never rebuilt between hits, hit by an escalating ball until nothing stands. Hook is a guess: *how many hits?* Open-ended (`maxHits` 25 is a safety cap only); misses don't count as hits; aims at the densest standing cluster. Keeps the whole drama layer (slow-mo, push-in + shake, riser, ambient bed, per-hit chime cascade). **3D** — determinism untested in 3D, and here the hit count *is* the content. Other `surv` variants (shrinking ring etc.) still `idea`. Brief: `KnowledgeBase/formats/survival-wall.md`. |
+| `terr` | Territory: multiply or release | `building` 2026-10-11 | [terr-001](plans/videos/terr-001-four-color-territory.md) | `Territory_MultiplyRelease_3D` (build: **Simulation Lobby ▸ Build Scene ▸ Territory_MultiplyRelease_3D**) | 3D, 16:9, long form (10-15 min target). Four colours on a 64x48 tile grid, one cannon and one PhysX Plinko box each: ×2 doubles the bank, R fires it, SPIN runs a seeded jackpot reel. Losing your cannon tile knocks you out. Income is independent of territory, so comebacks are built in. Reference: @marblejamboree. Brief: `KnowledgeBase/formats/territory-multiply-release.md`. |
 | `wars` | Marble wars | `idea` | — | — | Long-form anchor; most expensive |
 | `elim` | Elimination bracket | `idea` | — | — | Blocked: wraps `race`/`wars` via `ISimulation` |
 | `impact` | Object vs. object single event | `published` | [impact-003](plans/videos/impact-003-soft-sweep.md): **0% vs 100% soft sweep**, published 2026-10-01 (v6). impact-001/002 superseded, never published | `Impact_SoftSweep_3D` (build in-editor: run **Simulation Lobby ▸ Build Scene ▸ Impact_SoftSweep_3D**) | Amber glass capsule dropped onto a lacquer plinth, 5 takes (0-100% soft), ~19s. Physics verified headless (squash 0 to 18cm, wobble 0 to 2.3s, deterministic, ~1.5ms/step). Visuals and sound unseen until the playtest. **Spike dropped:** a soft body only slides off a point, and impaling needs a tearing block. Brief: `KnowledgeBase/formats/impact.md`. |
@@ -54,11 +56,18 @@ blocks exist.
 | Parameter sweep runner + caption | `built` | [parameter-sweep](plans/blocks/parameter-sweep.md) | `impact`; any format via `ISimulation` |
 | Studio look 3D (glass/chrome/lacquer kit) | `built` | [studio-look-3d](plans/blocks/studio-look-3d.md) | `impact`; retrofit `surv` |
 | Material contact audio | `built` | [material-contact-audio](plans/blocks/material-contact-audio.md) | `impact` |
+| Contender identity (`ContenderIdentity`) + track path (`TrackPath`) | `built` | (in race-001) | `race`; ready for `wars`, `elim` |
+| Chase camera (`ChaseCameraRig`) + leaderboard HUD (`LeaderboardHud`, landscape canvas) | `built` | (in race-001) | `race`; any format with named contenders |
 | Breakable segmented ring (`SegmentedRing2D`) | `built` | (in brk-001) | `brk`; ready for `surv` shield variants |
 | Shatter VFX (`ShatterBurst2D`) + procedural glass break | `built` | (in brk-001) | `brk`; any 2D break |
-| Seed-scan batch harness | `built` (first Unity run pending) | [seed-scan-harness](plans/blocks/seed-scan-harness.md) | `esc` (profile `SeedScan_EscapeConfig_003`); any `SimulationRunner` scene |
+| Seed-scan batch harness | `built`, **opt-in, not a workflow step** (seeds are random by default, see CLAUDE.md) | [seed-scan-harness](plans/blocks/seed-scan-harness.md) | `esc` (profile `SeedScan_EscapeConfig_003`); any `SimulationRunner` scene |
+| Body pool (`BodyPool2D`, hard cap) | `built` | (in rom-001) | `rom`; any format that spawns many bodies |
+| Trigger zone (`TriggerZone2D`) | `built` | (in rom-001) | `rom`; any checkpoint / finish line |
+| World-anchored labels (`WorldLabelLayer`) + `CountFormat` | `built` | (in rom-001) | `rom`; ready for `race` names, gate values |
+| Territory grid (`OwnershipGrid`, `GridBouncer`, `TileGridView`, `ShareBarHud`) | `building` | [territory-grid](plans/blocks/territory-grid.md) | `terr`; ready for `wars` colour takeovers |
+| Slot-board economy (`SlotEffect`, `CountBank`, `TriggerZone3D`, `BodyPool3D`, `SlotReelHud`) | `building` | [slot-board-economy](plans/blocks/slot-board-economy.md) | `terr`; follow-up: migrate `rom` gates onto it |
+| Turret sweep (`SweepAim`) + focus camera (`FocusCameraRig`) | `building` | (in terr-001) | `terr`; ready for `wars`, `surv` |
 | Shorts capture (9:16) | `planned` | [capture-shorts](plans/blocks/capture-shorts.md) | all Shorts |
-| Contender identity + leaderboard | `idea` | — | `race`, `wars`, `elim` |
 
 ---
 
@@ -69,10 +78,16 @@ The API only knows current totals, so a row filled late reads high and misleads 
 
 | # | Date | Slug | Title | Length | Seed | Config | Views (7d) | Views (30d) | Avg % | Retro |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 7 | 2026-10-03 | esc | Do You Know This Song? 🤔 Will the Ball Escape? | 1:19 | `1`? (scene default — confirm) | `EscapeConfig_003` + `Melodies/BaaBaaBlackSheep` | _due 10-10_ | _due 11-02_ | ? | — |
-| 6 | 2026-10-01 | impact | 0% vs 100% Soft🔥Glass Capsule Squeezes Through Hole | 37s | `0` | `SoftSweep/SoftSweep_001` + `SoftDrop_000..100` | _due 10-08_ | _due 10-31_ | ? | — |
-| 5 | 2026-09-30 | surv | How Many Hits to Destroy 300 Blocks? 🤔 | 1:20 | `1`? (scene default — confirm) | `WallSurvivalConfig_001` | _due 10-07_ | _due 10-30_ | ? | — |
-| 4 | 2026-09-29 | esc | Will It Escape? The Exit Keeps Moving | 2:05 | **none — randomized, not re-renderable** | `EscapeConfig_002` | _due 10-06_ | _due 10-29_ | ? | — |
+| 13 | 2026-10-10 | race | 12 Marbles, 1 Track: Who Wins the Grand Prix? | 2:05 | confirm (Unity console) | `RaceConfig` (race-001) | _due 10-17_ (32 @ day 1.4) | _due 11-09_ | ? | — |
+| 12 | 2026-10-09 | cric | West Indies Beat India in the Super Over! 😱 Marble Cricket | 1:34 | confirm | `CricketConfig_001` | _due 10-16_ (158 @ day 1.8) | _due 11-08_ | ? | — |
+| 11 | 2026-10-09 | cric | Who Wins Today? India vs West Indies Marble Super Over | 1:23 | random (confirm) | `CricketConfig_001` | _due 10-16_ (52 @ day 2.4) | _due 11-08_ | ? | — |
+| 10 | 2026-10-06 | impact | Dropping a 500KG Ball on a Cube Castle 😳 | 51s | confirm | (impact scene; confirm config) | _due 10-13_ | _due 11-05_ | ? | — |
+| 9 | 2026-10-06 | rom | How Many Marbles Reach the Bottom? | 40s | random (logged in Unity console; confirm) | `RomConfig_001` | _due 10-13_ (1,040 @ day 3) | _due 11-05_ | ? | — |
+| 8 | 2026-10-04 | brk | Guess the Song 🎵 Can It Break All 5 Rings in 60 Seconds? | 1:06 | scan #1? (confirm) | `BreakerConfig_001` + Für Elise | **1,742** (day 6.9) | _due 11-03_ | ? | — |
+| 7 | 2026-10-03 | esc | Do You Know This Song? 🤔 Will the Ball Escape? | 1:19 | `1`? (scene default — confirm) | `EscapeConfig_003` + `Melodies/BaaBaaBlackSheep` | **1,649** | _due 11-02_ | ? | — |
+| 6 | 2026-10-01 | impact | 0% vs 100% Soft🔥Glass Capsule Squeezes Through Hole | 37s | `0` | `SoftSweep/SoftSweep_001` + `SoftDrop_000..100` | 1,188 (read day 8; flat since day 2) | _due 10-31_ | ? | — |
+| 5 | 2026-09-30 | surv | How Many Hits to Destroy 300 Blocks? 🤔 | 1:20 | `1`? (scene default — confirm) | `WallSurvivalConfig_001` | 246 (read day 9; flat since day 4) | _due 10-30_ | ? | — |
+| 4 | 2026-09-29 | esc | Will It Escape? The Exit Keeps Moving | 2:05 | **none — randomized, not re-renderable** | `EscapeConfig_002` | **3,150** | _due 10-29_ | ? | — |
 | 3 | 2026-09-27 | esc | The Ball Grows Every Bounce. Can It Escape? | 2:12 | **TBC** | `EscapeConfig_001` | 892 | _due 10-27_ | ? | — |
 | 2 | 2025-05-03 | pre | Marble Volcano 🌋 | 59s | — | — | ? | ? | ? | — |
 | 1 | 2025-05-01 | pre | How many balls will fit? | 48s | — | — | ? | ? | ? | — |
@@ -82,12 +97,18 @@ The API only knows current totals, so a row filled late reads high and misleads 
 > **Video 4 has no seed by design** — `SimulationRunner.randomizeSeedOnStart` was turned on for this
 > scene at the user's explicit request, so the published take cannot be re-rendered. Don't try to
 > backfill a "Seed" value for it later; there isn't one to recover.
-> **Day-7 snapshots:** v3 recorded 2026-10-04 (892). Still due **10-06 (v4), 10-07 (v5), 10-08 (v6),
-> 10-10 (v7)**; can't be reconstructed later if missed (videos 1 and 2 already lost theirs).
+> **Day-7 snapshots:** v3-v8 recorded. Still due **10-13 (v9, v10), 10-16 (v11, v12), 10-17 (v13)**;
+> can't be reconstructed later if missed (videos 1 and 2 already lost theirs).
 > **Video 5's and video 7's seeds are unconfirmed** — both scenes hold `seed: 1`, `randomizeSeedOnStart: 0`;
 > confirm those were the published takes (esc-003's seed table was never filled in).
 >
-> **Current totals, 2026-10-04** (not snapshots): v7 1,524 (day 1) · v6 1,185 (day 3) · v5 240 (day 4) ·
+> **Current totals, 2026-10-11 12:31Z:** v13 32 (day 1.4) · v12 158 · v11 52 · v10 1,082 · v9 1,040 · v8 1,742 · v7 1,652 · v6 1,189 · v5 246 · v4 3,160 · v3 899 · v2 33 · v1 18. Channel: **23 subs · 13 videos · 11,303 views** (per-video sum). **The last three uploads (v11-v13) got 3-15% of the ~1K first push every Short since v6 had** — see `learnings.md` → *10-11 update*. v13 was planned as 16:9 long-form; whether it went up as a Short or a 16:9 video is unconfirmed (the API can't see aspect).
+>
+> *Older, 2026-10-09:* v11 2 (just up) · v10 1,087 (day 3) · v9 1,040 (day 3) · v8 1,738 (day 5) · v7 1,649 (day 6) · v6 1,188 · v5 243 · v4 3,157 · v3 897 · v2 33 · v1 18. Channel: **22 subs · 11 videos · 11,057 views**. Subs flat at 22 since 10-06 despite +2.4K views. v10 and v11 seeds unconfirmed.
+>
+> *Older, 2026-10-06 16:51Z:* v9 912 (~13h) · v8 1,554 · v7 1,635 · v6 1,186 · v5 241 · v4 3,150 · v3 893 · v2 30 · v1 15. Channel: **22 subs · 9 videos · 8,656 views**. v9 seed is random and only in the Unity console log; confirm it if still known.
+>
+> *Older note, 2026-10-04:* **Current totals, 2026-10-04** (not snapshots): v7 1,524 (day 1) · v6 1,185 (day 3) · v5 240 (day 4) ·
 > v4 3,149 (day 5) · v3 892 (day 7) · v2 30 · v1 15. Channel: **19 subs · 7 videos · 5,513 views** (channel
 > endpoint lags; per-video sum is 7,035). All four older videos were flat 10-03 → 10-04. Breakdown and
 > reading in `KnowledgeBase/learnings.md`.
@@ -100,30 +121,32 @@ be recovered.*
 
 Updated after each retro. Three bullets max per section; if it's longer, it isn't a conclusion yet.
 
-**Performing (provisional — one video per variant, one day-7 snapshot so far):**
-- `esc` rotating gap (v4) leads at 3,149 vs static-gap v3's day-7 892. v7 (rotating gap + guess
-  the song) had the best day 1 yet (1,524). v4 vs v7 at day 7 (10-06 / 10-10) is the next comparison.
-- `impact` soft sweep (v6): 1,185, flat since day 1. A 37s 3D render got a first push on par with
-  `esc`, so length isn't what made `esc` work. All older videos went flat on 10-04, see learnings.md.
+**Validated across 10 reference channels (2026-10-05, `learnings.md`):** publishing Fri-Sun UTC beats
+Mon-Tue by ~1.1-1.4x; very short titles (<=25 chars) lose; tags, hashtags, emoji, description length and
+category show **no effect**. Subscriber conversion is ~0.1% (ours: 10 subs on ~11.3K views), so on the
+Shorts route views bind; on the watch-hours route subs bind (4K hours is only ~70K views).
+
+**Performing (provisional, day-7 reads in for v3-v8):**
+- **Threshold Shorts get a reliable ~1-1.7K first push, then stop by day 3-5.** v6-v10 (`impact`, `esc`
+  + song, `brk` + song, `rom`, `impact`) all landed at 1,040-1,742, so formats inside that band are noise.
+- `esc` rotating gap (v4) is still the only breakout-shaped result: **3,150 at day 7**, 2x the band.
+  The song hook on the same arena (v7) landed at 1,649, so the song didn't add reach; it added a longer tail.
 
 **Underperforming:**
-- `surv` Wall vs Ball (v5): 240 at day 4, the lowest of the current era by ~4x. One video, cause
-  unknown (look, title, or the format itself), and it needs Studio retention before anything is retuned.
-- The channel was **dormant from May 2025 to Sept 2026** (~16 months). Broken 2026-09-27 with the
-  first `esc` video. Consistency remains the variable with the most obvious headroom; no format
-  insight competes with simply publishing regularly.
+- **The three newest uploads, all head-to-head contests, got almost no push:** `cric` x2 (52, 158) and
+  `race` Grand Prix (32 at day 1.4), 3-15% of the band. Cause untested: the contest shape, a topic that
+  doesn't match the satisfying-sims audience the feed has learned for us, or a channel-level dip.
+  The next threshold Short tells them apart (see `learnings.md` → *10-11 update*).
+- `surv` Wall vs Ball (v5): 246, the other outlier low. Needs Studio retention before any retune.
 
 **Next pick, and why:**
-- **Goal: YouTube Partner Program via Shorts** (1K subs + 10M views / 90 days), before the bar
-  doubles on 2027-02-01. We're ~100× short of the run rate. The genre benchmark gets there at
-  ~3 Shorts/day (volume) or with Blender-grade 3D at ~2/week (quality, out of reach for now), so
-  **throughput is the first bottleneck**. Math in [channel-revival](plans/channel-revival.md#the-goal).
-- **brk-001 (ring breaker + Für Elise)**: user's pick. It combines the genre's hottest 2D shape
-  (break / reach the centre) with the song hook. First video to take its seed from the scan.
-  esc-004 is shelved.
-- `capture-shorts` deferred: the user records by hand. v7 is already 1:20, close to the 2D genre's
-  30–70s band, so the length test waits until a song result is in.
-- Full queue and reasoning: [plans/channel-revival.md](plans/channel-revival.md).
+- **Goal is ad revenue (2026-10-11), not just entering YPP.** Shorts are the qualification and
+  sub engine; long-form is where the money is once in. Feb-1 via Shorts is out of reach at today's run
+  rate (~800 views/day, ~1% of what's needed). Proposed rethink: [channel-strategy](KnowledgeBase/channel-strategy.md#rethink-2026-10-11-earning-not-just-qualifying).
+- **Immediate:** one proven-shape threshold Short (an `esc` rotating-gap or `brk` variant, config only)
+  as the diagnostic for the v11-v13 dip. Pause `cric`.
+- **Long-form test still hasn't run:** v13 went up at 2:05, not 8-15 min. Next long upload must be a real
+  8-15 min 16:9 video, judged on Studio retention and subs.
 
 ---
 

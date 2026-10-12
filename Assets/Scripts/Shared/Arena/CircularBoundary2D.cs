@@ -146,6 +146,9 @@ namespace SimulationLobby.Shared
 
                 if (Application.isPlaying)
                 {
+                    // Destroy is deferred to the end of the frame; deactivating first takes the collider
+                    // out of any physics steps still to run this frame, so a mid-run rebuild is immediate.
+                    child.SetActive(false);
                     Destroy(child);
                 }
                 else

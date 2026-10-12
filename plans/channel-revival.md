@@ -31,7 +31,9 @@ subscribers + 10M public Shorts views in the trailing 90 days**. It's a 90-day w
 **2026-11-03 → 2027-02-01** has to average **~111K views/day**. The other route, 4,000 public
 long-form watch hours in 12 months, doesn't count Shorts views at all.
 
-**Where we are (2026-10-04):** ~1,000 views/day across the 5 current-era uploads, 19 subs, median
+**Update 2026-10-11:** ~800 views/day since revival, ~120/day since 10-10; 23 subs. The Feb-1 Shorts target is out of reach without a breakout. See *Rethink 2026-10-11* in `channel-strategy.md`.
+
+**Where we were (2026-10-04):** ~1,000 views/day across the 5 current-era uploads, 19 subs, median
 ~1.2K views per Short. That's **~100× short** of the run rate. Be honest about it: qualifying before
 Feb 1 needs at least one breakout Short (1M+) on top of volume, and that can't be scheduled. The
 playbook is the same either way, and if we miss Feb 1 it simply targets 20M.
@@ -60,6 +62,10 @@ Our real progress is lower than the public numbers suggest; read engaged views i
    (S2DS's 1.9M and 1.7M), reach-the-center (CodeCrafted's 25.7M).
 4. **Titles as outcome statements with a number**, not plain questions
    (`KnowledgeBase/reference-channels.md`).
+
+**Update 2026-10-09:** the long-form route (watch hours) now runs alongside this one; see
+`channel-strategy.md` → *Two-track plan*. The throughput lever below applies to Shorts; long-form adds
+a second constraint, the user's hands-on time.
 
 Earlier aim, still true: get back to a publishing rhythm the channel can sustain.
 
@@ -174,6 +180,14 @@ Four uploads in five days (v3–v6) took the channel from 26 views to 5,524. Num
 
 ---
 
+### 2026-10-11 — Stats pull: 13 videos, 11.3K views, 23 subs; goal restated as ad earnings
+
+v7 and v8 day-7 reads are in (1,649 / 1,742). The three newest uploads (`cric` x2, `race` Grand Prix)
+got 32-158 views vs the ~1-1.7K every Short since v6 had. All three are head-to-head contests, and
+race-001 went up at 2:05, not as the planned 8-15 min long-form. The user restated the goal as earning
+from ads, which points the earning job at long-form. A rethink is proposed, not decided:
+`KnowledgeBase/channel-strategy.md` → *Rethink 2026-10-11*. Numbers: `learnings.md` → *10-11 update*.
+
 ## Next steps
 
 Ordered. Keep this list short — a long queue means nothing is actually next.
@@ -189,6 +203,8 @@ Ordered. Keep this list short — a long queue means nothing is actually next.
    #1 seed fresh, and its `[SimulationRunner]` line must match the scan's exactly.
 
 ### Next build
+
+0. **Long-form track (decided 2026-10-09):** build `race` 3D + leaderboard + follow camera, then `capture-long` (16:9 60fps Recorder). First long upload is a stopgap from existing formats (long `rom` run or full `cric` match). Write the anchor series bible (3 themes, title template, finale rule). `capture-shorts` deferred item 4 is reopened by this. See `channel-strategy.md` → *Two-track plan*.
 
 4. **`capture-shorts`**: deferred 2026-10-04. The user records and publishes by hand. Revisit if
    recording becomes what limits cadence. `com.unity.recorder` 5.1.7 is already installed.
@@ -220,4 +236,5 @@ Decisions that would be expensive to silently reverse. Add a row rather than edi
 | 2026-09-30 | The 9-wave `impact` build becomes `surv` (*Wall vs Ball*); `impact` back to `idea` | A format is defined by its tension mechanism; repeated escalating hits on a survivor count is survival, not a single-event spectacle |
 | 2026-09-30 | Wall survival never rebuilds the wall; run is open-ended with a guess-the-hits hook | Persistent damage keeps the guess fair and readable; the hit count only means something if nothing caps it |
 | 2026-09-30 | A miss is not a hit; `surv` aim is seeded by default | In a guessing format the revealed number must be honest and reproducible |
+| 2026-10-09 | **Two tracks in parallel: 1-2 high-production long-form videos/week (16:9, 8-15 min) plus more Shorts than 0.7/day.** Long-form builds on `race`/`elim` as series templates; each long video is also cut into Shorts | Black Cat-Gear study: long-form compounds and is the second YPP route; Shorts views don't count toward watch hours. Supersedes the "one cheap long-form test" idea. Plan, math and risks: `channel-strategy.md` → *Two-track plan* |
 | 2026-10-04 | Goal is YPP via Shorts (1K subs + 10M views / 90 days), aiming before the 2027-02-01 doubling; production throughput is the first bottleneck | The genre benchmark (S2DS: 21M in 3 months) is reached by ~3 Shorts/day; we're at ~0.7/day with a manual render step |

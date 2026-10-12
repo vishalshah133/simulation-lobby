@@ -110,6 +110,12 @@ namespace SimulationLobby.Simulations.Escape
             }
         }
 
+        /// <summary>Current exit width in world units. Changes between rounds under a series ramp.</summary>
+        public float GapChordWidth => _boundary != null ? _boundary.GapChordWidth : 0f;
+
+        /// <summary>The wall's transform, for presentation that decorates it (the gap marker).</summary>
+        public Transform BoundaryTransform => _boundary != null ? _boundary.transform : null;
+
         float TrappedDiameter => _boundary.GapChordWidth * (1f + _config.trappedMarginFraction);
 
         public void Initialize(int seed, SimulationConfig config)
@@ -152,16 +158,28 @@ namespace SimulationLobby.Simulations.Escape
             _attemptSpeed = _random.NextFloat(_config.speedMin, _config.speedMax);
             Vector2 direction = _random.NextDirection2D();
 
+            int attemptIndex = _outcomes.Count;
+
             _gapAngularSpeed = 0f;
             if (_config.gapAngularSpeed != 0f)
             {
                 float sign = _config.gapDirectionSeeded
                     ? (_random.NextBool() ? 1f : -1f)
                     : Mathf.Sign(_config.gapAngularSpeed);
-                _gapAngularSpeed = sign * Mathf.Abs(_config.gapAngularSpeed);
+                _gapAngularSpeed = sign * _config.GapAngularSpeedForAttempt(attemptIndex);
             }
 
             _boundary.transform.rotation = Quaternion.identity;
+
+            // Series ramp: a narrower exit each round. Rebuilt only when the width actually changes, so
+            // configs without a ramp never touch the wall after Initialize.
+            float gapDegrees = _config.GapDegreesForAttempt(attemptIndex);
+            if (!Mathf.Approximately(gapDegrees, _boundary.gapDegrees))
+            {
+                _boundary.gapDegrees = gapDegrees;
+                _boundary.Rebuild();
+                _recorder.SetMetric($"attempt_{attemptIndex + 1}_gap_degrees", gapDegrees);
+            }
 
             float targetRadius = _boundary.radius * sizeFraction;
             float scale = targetRadius / _ballCollider.radius;

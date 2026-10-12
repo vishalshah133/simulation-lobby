@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff95b4eb3b5d94f40bc15c5ee509c116, type: 3}
+  m_Name: RaceConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Race::SimulationLobby.Simulations.Race.RaceConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 240
+  intent: 'race-001: twelve jewel-glass marbles down a black-lacquer course with
+    brass rails. Tune for lead changes first, length second.'
+  track: {fileID: 11400000, guid: caacf95382e62c5439bed599371e1dee, type: 2}
+  roster:
+  - name: RUBY
+    color: {r: 0.86, g: 0.07, b: 0.16, a: 1}
+  - name: EMERALD
+    color: {r: 0.05, g: 0.62, b: 0.3, a: 1}
+  - name: SAPPHIRE
+    color: {r: 0.08, g: 0.28, b: 0.9, a: 1}
+  - name: TOPAZ
+    color: {r: 0.98, g: 0.76, b: 0.08, a: 1}
+  - name: AMETHYST
+    color: {r: 0.58, g: 0.22, b: 0.86, a: 1}
+  - name: PEARL
+    color: {r: 0.96, g: 0.93, b: 0.86, a: 1}
+  - name: CORAL
+    color: {r: 1, g: 0.38, b: 0.3, a: 1}
+  - name: AQUA
+    color: {r: 0.1, g: 0.8, b: 0.82, a: 1}
+  - name: CITRINE
+    color: {r: 0.62, g: 0.86, b: 0.12, a: 1}
+  - name: ROSE
+    color: {r: 1, g: 0.42, b: 0.7, a: 1}
+  - name: COBALT
+    color: {r: 0.3, g: 0.55, b: 1, a: 1}
+  - name: AMBER
+    color: {r: 1, g: 0.5, b: 0.06, a: 1}
+  marbleRadius: 0.11
+  marbleMass: 0.5
+  linearDamping: 0.02
+  angularDamping: 0.04
+  maxDepenetrationVelocity: 2
+  gridColumns: 4
+  gridRowSpacing: 0.32
+  gridJitter: 0.25
+  preReleaseHoldSeconds: 4
+  finishGraceSeconds: 14
+  offTrackDistance: 3
+  stalledSpeed: 0.08
+  stalledSeconds: 2.5
+  stalledNudgeSpeed: 1.5

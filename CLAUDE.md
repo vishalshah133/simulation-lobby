@@ -61,6 +61,7 @@ Assets/
       ReleaseOrMultiply/
       Elimination/
       Survival/
+      Cricket/
   Settings/        URP assets — PC_* for long form, Mobile_* as the cheap preview path
 KnowledgeBase/     Format briefs, channel strategy, production notes (NOT imported by Unity)
 plans/
@@ -158,6 +159,13 @@ Learned building the first 3D format — prototyped as `impact`, shipped as `sur
   `esc`'s "one bounce per tick" assumption (built for a single ball against a single wall) would
   silently drop most of the hits a multi-object format needs to react to.
 
+- **A generated mesh that changes shape must be saved as a fresh asset, never overwritten in place.**
+  `StudioSetBuilder.SaveMesh` copies into the existing asset to keep its GUID; after a layout change the
+  editor kept *drawing the previous build's mesh* while physics and obstacles used the new data, so pegs and
+  marbles hovered over a track that was no longer where it was drawn (`race` course v2). `race` uses its own
+  delete-then-create `SaveMeshFresh`. If a scene's visuals and physics disagree, suspect this first: read the
+  mesh back with `Instantiate(mesh)` on a temp camera render to tell stale display data from bad geometry.
+
 ## On-screen UI
 
 All HUD, scores and counters use a **uGUI Canvas with TextMeshPro** — never world-space `TextMesh`,
@@ -170,6 +178,10 @@ same scene.
   height-dominant; matching width shrinks everything when the same scene renders 16:9).
 - **Top panel:** the question (the hook, stated as a question) and the versus score.
 - **Bottom panel:** the current round's result and the live counter.
+- **Arena decals are the one exception.** Text that belongs to a physical object (a number painted on a board,
+  a slot-chip label, a drum face) is a world-space **TextMeshPro** (3D) decal parented to that object, so it stays
+  perspective-correct and sized to its object. Screen-projected labels over busy 3D boards overlapped in `terr` v2.
+  Legacy `TextMesh` stays banned, and HUD text (captions, scores, clocks, bars) stays on the canvas.
 - Keeping the arena clear between the two panels is the point — the ball must never be behind text.
 - **Versus scores use a `HorizontalLayoutGroup` with `childControlWidth`, `childControlHeight`,
   `childForceExpandWidth` and `childForceExpandHeight` all on.** Equal-width sides keep the score
@@ -192,6 +204,8 @@ same scene.
 | `esc` | Containment/escape — one ball vs a boundary, escalating each bounce | Short |
 | `brk` | Ring breaker — ball breaks out through nested rings of breakable segments, one ring at a time | Short |
 | `impact` | Single-event spectacle — one thing meets another, once (`idea`; rigid scatter proved too short) | Short |
+| `terr` | Territory — four colours, cannons fed by multiply/release Plinko boards, last colour standing (`building`, 3D) | Long |
+| `cric` | Cricket match on a multiply/release board, two international teams, wagon-wheel shots (`built`, first sport, experiment) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 
@@ -237,5 +251,10 @@ noise.** Don't build format conclusions on single-digit view deltas.
   like the other format" is the clearest sign a piece belongs in `Shared`.
 - Don't commit rendered video — `.gitignore` excludes it. Commit seeds and configs instead; footage
   is regenerable.
+- **Seeds are random by default; we don't hunt for a best seed.** Scenes ship with
+  `randomizeSeedOnStart` on, so each Play is a different run, and the runner logs the drawn seed at
+  the start. Determinism stays (fixed timestep, seeded RNG) for one reason only: a take worth keeping
+  can be re-rendered by pasting its logged seed back in. The seed-scan harness is opt-in tooling, not
+  a step in making a video. Record the logged seed with the published video; don't scan for one.
 - When asked to "make a video", the deliverable is a scene + config + seed that renders correctly,
   not just code that compiles.

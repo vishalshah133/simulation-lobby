@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4667982be32804aae42ba5a0bdd2d9, type: 3}
+  m_Name: TerritoryConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Territory::SimulationLobby.Simulations.Territory.TerritoryConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 1500
+  intent: 'terr-001: four colours, four cannons, four Plinko boards. x2 doubles the
+    bank, R fires it, SPIN is a jackpot reel. Tune for lead changes first, length
+    second.'
+  layoutVersion: 7
+  teams:
+  - name: GREEN
+    color: {r: 0.23921569, g: 0.8627451, b: 0.2901961, a: 1}
+  - name: YELLOW
+    color: {r: 1, g: 0.8235294, b: 0.22745098, a: 1}
+  - name: BLUE
+    color: {r: 0.18039216, g: 0.41960785, b: 1, a: 1}
+  - name: RED
+    color: {r: 1, g: 0.23137255, b: 0.23137255, a: 1}
+  gridWidth: 36
+  gridHeight: 48
+  cellSize: 0.33333334
+  baseInsetCells: 3
+  sweepDegreesPerSecond: 30
+  sweepMarginDegrees: 5
+  shotSpeedCellsPerSecond: 12
+  shotHealth: 1
+  fireIntervalSeconds: 0.08
+  maxLiveShotsPerTeam: 60
+  shotMaxLifetimeSeconds: 25
+  boardSlots:
+  - kind: 3
+    value: 0
+  - kind: 2
+    value: 0
+  - kind: 0
+    value: 2
+  - kind: 2
+    value: 0
+  - kind: 0
+    value: 2
+  ballsPerBoard: 6
+  dropIntervalSeconds: 0.85
+  dropSpreadSamples: 3
+  dropSpreadFraction: 0.7
+  spinLaneFraction: 0.5
+  laneGateEnabled: 1
+  laneGateClosedSeconds: 5
+  laneGateOpenSeconds: 1
+  laneGateAngle: 45
+  bankStart: 1
+  bankCap: 4096
+  autoReleaseAtCap: 1
+  ballStuckSeconds: 12
+  ballRecoverMargin: 2
+  spinFaces:
+  - kind: 0
+    effect:
+      kind: 0
+      value: 2
+    value: 0
+    weight: 4
+  - kind: 4
+    effect:
+      kind: 0
+      value: 0
+    value: 3
+    weight: 3
+  - kind: 4
+    effect:
+      kind: 0
+      value: 0
+    value: 5
+    weight: 1
+  - kind: 0
+    effect:
+      kind: 1
+      value: 25
+    value: 0
+    weight: 3
+  - kind: 0
+    effect:
+      kind: 1
+      value: 100
+    value: 0
+    weight: 2
+  - kind: 0
+    effect:
+      kind: 2
+      value: 0
+    value: 0
+    weight: 2
+  - kind: 1
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 3
+  - kind: 2
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 3
+  - kind: 3
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 2
+  spinSeconds: 3.5
+  maxQueuedSpins: 1
+  bombShots: 3
+  bombRadius: 4
+  lineThickness: 2
+  boostSeconds: 10
+  selfDestructRadius: 4
+  escalateAfterSeconds: 360
+  escalateEverySeconds: 60
+  escalateDropFactor: 0.8
+  minDropIntervalSeconds: 0.35
+  preStartHoldSeconds: 5
+  endHoldSeconds: 10
+  decisionAtSeconds: 1200
+  useCameraOverride: 1
+  cameraPosition: {x: -0.06, y: 14.48, z: -5.9}
+  cameraRotation: {x: 0.3907301, y: 0.0020404, z: -0.0008661, w: 0.9205027}
+  boardWidth: 4.5
+  boardLength: 7.4
+  boardTiltDegrees: 25
+  pegRows: 6
+  pegColumns: 4
+  pegRadius: 0.17
+  ballRadius: 0.17
+  tileHeight: 0.03
