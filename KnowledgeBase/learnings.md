@@ -1,6 +1,6 @@
 # Learnings — video vs stats
 
-Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-13 03:14Z** (see *10-13 update* → *03:14Z pull*).
+Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-15 03:20Z** (see *10-15 update*).
 The first table and channel line below are the 10-06 16:51Z pull; the trajectory table keeps the earlier pulls. Public data only: no
 retention/drop-off (needs OAuth + Analytics API, not set up).
 
@@ -389,12 +389,52 @@ No new pull of our own channel. Two channels launched in late September were add
   grow/shrink, reach the centre, sextillion, clone-per-bounce, shatter a shape. It sits at a 3K median and 128 subs.
   A new rival in the same shape is a reason to put experiment-lane slots into new shapes, not more variants.
 - **Hidden-shape reveal** ("can you guess the shape?") was Bouncy Physics' #1 and #2 (25.5K, 18.2K) *(weak lead)*.
-- **Compilation long form on a young Shorts channel got 7 views** (Bouncy Physics, 6:58). This is a second data
-  point after our own v15 that long form doesn't inherit a Shorts audience *(illustrative)*.
+- **Compilation long form on a young Shorts channel got 7 views** (Bouncy Physics, 6:58) *(illustrative)*. This
+  originally cited our v15 as a second data point, but v15 reached 819 by day 2.3 (see *10-15 update*). Read it as
+  "compilations get nothing", not "long form gets nothing".
 - **Shorter on Bouncy Physics coincided with more views** (1:05-1:13 → 22-44s). It's confounded with channel age,
   and it doesn't change our rule of tuning for event count, not a target length.
 
 **Action:** `conv` (math convergence) is planned as an experiment-lane Short, `plans/videos/conv-001-ellipse-focus.md`.
+
+## 10-15 update
+
+Pull 2026-10-15 03:20Z: **32 subs · 17 videos · 16,082 views** (per-video sum; the channel endpoint lags at 14,816).
+Snapshot appended. ~48h since the 10-13 03:14Z pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-13 03:14Z | Like% |
+|---|---|---|---|---|---|---|
+| 17 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? (conv-002) | 8 min | 4 | new | — |
+| 16 | esc | The Exit Shrinks Every Round 😳 Can the Ball Still Escape? (esc-006) | 2.0d | **1,415** | new | 1.13% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | 2.3d | **819** | **+793** | 0.73% |
+| 14 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | 3.6d | 1,717 | +134 | 1.75% |
+| 13 | race | 12 Marbles, 1 Track: Who Wins the Grand Prix? | 5.0d | 838 | +403 | 0.36% |
+
+v1-v12 are flat (±3). v11 lost 2 views (52 → 50), the routine invalid-view cleanup.
+
+- **Long form isn't dead on arrival: v15 went 26 → 819 in 48h.** That reverses the 10-14 note that called v15 a
+  second "long form doesn't inherit a Shorts audience" data point. It was read at 7.5h, before any push arrived.
+  It's still one video and still judged on Studio, not API views. At 15:15 even a low avg % viewed adds real
+  watch hours, so day 7 (10-19) needs **watch time, avg % viewed, traffic source and subs gained** from Studio.
+- **Both 16:9 uploads have the same curve** *(lead, n=2)*. v13 and v15 had a near-zero first day, then a slow
+  climb that's still going (v13 ~200/day on days 3-5, v15 ~400/day on days 1-2). Every vertical Short instead
+  bursts in day 1 and stops by day 3. That fits YouTube serving 16:9 through browse/suggested, not the Shorts
+  feed. Both also have the channel's lowest current-era like% (0.36%, 0.73%), which fits a colder browse audience.
+  Studio's traffic-source panel would confirm it. If it holds, **don't read a 16:9 upload's day 1 as a verdict.**
+- **esc-006 (shrinking exit) landed in the band**: 1,415 at day 2, against v14's 1,580 at 1.3d and v4's 1,201 at
+  day 0. The rotating-gap `esc` arena is now **4 for 4** at ~1.4K or more (v4, v7, v14, v16). It's the proven
+  lane. Its like% (1.13%) is below v14's (1.75%), but like% falls with reach, so that's not a quality signal.
+- **v14 didn't fully stop**: +134 in 48h on day 2-3.6, after +3 in the 8h before. The tail is small, and it's
+  still the best like% of the current era.
+- **v17 (`conv-002`) is the first math-convergence upload**, the experiment-lane test of the MathCa lead. 4 views
+  at 8 min means nothing. The first read worth having is ~day 1 (10-16). Compare it with the ~1K Shorts band
+  and on like%, where MathCa's 1.2-1.9% is the reference.
+- **Subs 28 → 32 (+4) over ~2.8K new views (~0.14%).** That's the third pull in a row above the old ~0.1%, but
+  it's +4, so it stays a lead.
+- **Run rate recovered: ~1,380 views/day over the last 48h**, from ~120/day around 10-10/11 and above the ~800/day
+  post-revival average. That's two band-level Shorts plus a long-form climb. It's still ~1% of the 10M/90d Shorts bar.
+- **Day-7 reads:** v10 **1,082** (flat since day 3, recorded). v11 (50) and v12 (159) are due 10-16 and won't move,
+  so treat these as final.
 
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
@@ -431,8 +471,10 @@ No new pull of our own channel. Two channels launched in late September were add
 
 ## What would make this useful
 
-- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041) done; due v10 10-13, v11/v12 10-16, v13 10-17, v14 10-18, v15 10-19.** They
+- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041), v10 (1,082) done; due v11/v12 10-16, v13 10-17, v14 10-18, v15 10-19, v16 10-20, v17 10-22.** They
   can't be recovered if missed.
+- **Studio traffic source for v13 and v15** (Shorts feed vs browse/suggested), to test the 16:9 slow-climb lead.
+  Plus v15's watch time and avg % viewed at day 7.
 - **Studio real-time view for 10-03 → 10-04**, to settle whether the older videos really stopped or
   the public counter is lagging.
 - **Pull Avg % viewed + drop-off from Studio for v4, v5, v6 and v7.** v4 vs v5 (best vs worst) and

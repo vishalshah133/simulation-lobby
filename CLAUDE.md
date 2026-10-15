@@ -303,6 +303,12 @@ about retention, say it needs YouTube Studio; don't substitute like-rate as a pr
 The channel is small (2 videos, 26 views, dormant since May 2025). **Differences at this scale are
 noise.** Don't build format conclusions on single-digit view deltas.
 
+**Learnings feed strategy.** Whenever `KnowledgeBase/learnings.md` is updated, check whether the new finding
+changes the monetisation goal or the strategy. If it does, update `KnowledgeBase/channel-strategy.md` (and the
+*Next pick* notes in `PROJECTS.md`) in the same pass and tell the user what changed and why. Write it as a dated,
+tiered note (lead / validated, like `learnings.md`). Don't silently overwrite a decision the user made: propose
+the change, mark it *proposed*, and leave the decided text in place until they confirm.
+
 ## Working agreements
 
 - Read the relevant `KnowledgeBase/` doc before building a format; write findings back into it when

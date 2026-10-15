@@ -81,13 +81,15 @@ The API only knows current totals, so a row filled late reads high and misleads 
 
 | # | Date | Slug | Title | Length | Seed | Config | Views (7d) | Views (30d) | Avg % | Retro |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 2026-10-12 | terr | Which Color Takes the Board? 4-Team Multiply or Release | 15:15 | confirm (Unity console) | `TerritoryConfig` (terr-001; confirm) | _due 10-19_ (26 @ 7.5h) | _due 11-11_ | ? | — |
-| 14 | 2026-10-11 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | 1:56 | confirm | esc rotating-gap variant (which of esc-005..007? confirm) | _due 10-18_ (1,583 @ day 1.6) | _due 11-10_ | ? | — |
-| 13 | 2026-10-10 | race | 12 Marbles, 1 Track: Who Wins the Grand Prix? | 2:05 | confirm (Unity console) | `RaceConfig` (race-001) | _due 10-17_ (32 @ day 1.4) | _due 11-09_ | ? | — |
+| 17 | 2026-10-15 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? 🎯 | 1:15 | random (confirm from Unity console) | conv-002 (Ellipse Stretch) | _due 10-22_ (4 @ 8 min) | _due 11-14_ | ? | — |
+| 16 | 2026-10-13 | esc | The Exit Shrinks Every Round 😳 Can the Ball Still Escape? | 2:26 | random (confirm) | esc-006 shrinking exit | _due 10-20_ (1,415 @ day 2) | _due 11-12_ | ? | — |
+| 15 | 2026-10-12 | terr | Which Color Takes the Board? 4-Team Multiply or Release | 15:15 | confirm (Unity console) | `TerritoryConfig` (terr-001; confirm) | _due 10-19_ (819 @ day 2.3) | _due 11-11_ | ? | — |
+| 14 | 2026-10-11 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | 1:56 | confirm | esc rotating-gap variant (which of esc-005..007? confirm) | _due 10-18_ (1,717 @ day 3.6) | _due 11-10_ | ? | — |
+| 13 | 2026-10-10 | race | 12 Marbles, 1 Track: Who Wins the Grand Prix? | 2:05 | confirm (Unity console) | `RaceConfig` (race-001) | _due 10-17_ (838 @ day 5) | _due 11-09_ | ? | — |
 | 12 | 2026-10-09 | cric | West Indies Beat India in the Super Over! 😱 Marble Cricket | 1:34 | confirm | `CricketConfig_001` | _due 10-16_ (158 @ day 1.8) | _due 11-08_ | ? | — |
 | 11 | 2026-10-09 | cric | Who Wins Today? India vs West Indies Marble Super Over | 1:23 | random (confirm) | `CricketConfig_001` | _due 10-16_ (52 @ day 2.4) | _due 11-08_ | ? | — |
-| 10 | 2026-10-06 | impact | Dropping a 500KG Ball on a Cube Castle 😳 | 51s | confirm | (impact scene; confirm config) | _due 10-13_ | _due 11-05_ | ? | — |
-| 9 | 2026-10-06 | rom | How Many Marbles Reach the Bottom? | 40s | random (logged in Unity console; confirm) | `RomConfig_001` | _due 10-13_ (1,040 @ day 3) | _due 11-05_ | ? | — |
+| 10 | 2026-10-06 | impact | Dropping a 500KG Ball on a Cube Castle 😳 | 51s | confirm | (impact scene; confirm config) | 1,082 (flat since day 3) | _due 11-05_ | ? | — |
+| 9 | 2026-10-06 | rom | How Many Marbles Reach the Bottom? | 40s | random (logged in Unity console; confirm) | `RomConfig_001` | 1,041 (flat since day 3) | _due 11-05_ | ? | — |
 | 8 | 2026-10-04 | brk | Guess the Song 🎵 Can It Break All 5 Rings in 60 Seconds? | 1:06 | scan #1? (confirm) | `BreakerConfig_001` + Für Elise | **1,742** (day 6.9) | _due 11-03_ | ? | — |
 | 7 | 2026-10-03 | esc | Do You Know This Song? 🤔 Will the Ball Escape? | 1:19 | `1`? (scene default — confirm) | `EscapeConfig_003` + `Melodies/BaaBaaBlackSheep` | **1,649** | _due 11-02_ | ? | — |
 | 6 | 2026-10-01 | impact | 0% vs 100% Soft🔥Glass Capsule Squeezes Through Hole | 37s | `0` | `SoftSweep/SoftSweep_001` + `SoftDrop_000..100` | 1,188 (read day 8; flat since day 2) | _due 10-31_ | ? | — |
@@ -102,12 +104,14 @@ The API only knows current totals, so a row filled late reads high and misleads 
 > **Video 4 has no seed by design** — `SimulationRunner.randomizeSeedOnStart` was turned on for this
 > scene at the user's explicit request, so the published take cannot be re-rendered. Don't try to
 > backfill a "Seed" value for it later; there isn't one to recover.
-> **Day-7 snapshots:** v3-v8 recorded. Still due **10-13 (v9, v10), 10-16 (v11, v12), 10-17 (v13), 10-18 (v14), 10-19 (v15)**;
+> **Day-7 snapshots:** v3-v8 recorded. Still due **10-16 (v11, v12), 10-17 (v13), 10-18 (v14), 10-19 (v15), 10-20 (v16), 10-22 (v17)**;
 > can't be reconstructed later if missed (videos 1 and 2 already lost theirs).
 > **Video 5's and video 7's seeds are unconfirmed** — both scenes hold `seed: 1`, `randomizeSeedOnStart: 0`;
 > confirm those were the published takes (esc-003's seed table was never filled in).
 >
-> **Current totals, 2026-10-13 03:14Z:** v15 26 (7.5h, long-form) · v14 1,583 (day 1.6) · v13 435 · v12 159 · v11 52 · v10 1,082 · v9 1,041 · v8 1,743 · v7 1,656 · v6 1,189 · v5 246 · v4 3,160 · v3 899 · v2 33 · v1 18. Channel: **28 subs · 15 videos · 13,322 views**. **v14 (proven-shape `esc`) landed in the band, so the v11-v13 dip was the contest shape/topic, not the channel** — see `learnings.md` → *10-13 update*.
+> **Current totals, 2026-10-15 03:20Z:** v17 4 (8 min, `conv-002`) · v16 1,415 (day 2, esc-006) · v15 **819** (day 2.3, long-form) · v14 1,717 · v13 838 · v12 159 · v11 50 · v10 1,082 · v9 1,042 · v8 1,744 · v7 1,656 · v6 1,192 · v5 248 · v4 3,163 · v3 899 · v2 35 · v1 19. Channel: **32 subs · 17 videos · 16,082 views**. **Long form got a push (26 → 819 in 48h), and both 16:9 uploads climb slowly instead of bursting.** Rotating-gap `esc` is 4 for 4 in the band. See `learnings.md` → *10-15 update*.
+>
+> *Older, 2026-10-13 03:14Z:* v15 26 (7.5h, long-form) · v14 1,583 (day 1.6) · v13 435 · v12 159 · v11 52 · v10 1,082 · v9 1,041 · v8 1,743 · v7 1,656 · v6 1,189 · v5 246 · v4 3,160 · v3 899 · v2 33 · v1 18. Channel: **28 subs · 15 videos · 13,322 views**. **v14 (proven-shape `esc`) landed in the band, so the v11-v13 dip was the contest shape/topic, not the channel** — see `learnings.md` → *10-13 update*.
 >
 > *Older, 2026-10-11 12:31Z:* v13 32 (day 1.4) · v12 158 · v11 52 · v10 1,082 · v9 1,040 · v8 1,742 · v7 1,652 · v6 1,189 · v5 246 · v4 3,160 · v3 899 · v2 33 · v1 18. Channel: **23 subs · 13 videos · 11,303 views** (per-video sum). **The last three uploads (v11-v13) got 3-15% of the ~1K first push every Short since v6 had** — see `learnings.md` → *10-11 update*. v13 was planned as 16:9 long-form; whether it went up as a Short or a 16:9 video is unconfirmed (the API can't see aspect).
 >
@@ -152,8 +156,12 @@ Shorts route views bind; on the watch-hours route subs bind (4K hours is only ~7
 - **Shorts run on a 2:1 proven/experiment mix** ([channel-strategy → Shorts mix](KnowledgeBase/channel-strategy.md#shorts-mix-proven--experiment-decided-2026-10-13)).
   Next proven: **esc-006** (shrinking exit, built, config-only), then esc-007. Next experiment: **Multiply vs
   Escape** (mve-001, built 2026-10-13, awaiting first Play). `cric` stays paused.
-- **Long-form test is live:** v15 `terr` (15:15). Judge it at day 7 (10-19) on Studio watch time, avg %
-  viewed and subs, not on API views (26 at 7.5h is expected for a 28-sub channel).
+- **Long-form test is live:** v15 `terr` (15:15), 819 views by day 2.3 and still climbing. Judge it at day 7 (10-19)
+  on Studio watch time, avg % viewed, traffic source and subs, not on API views.
+- **esc-006 is up (v16) and in the band; conv-002 (v17) is the live experiment.** Read v17 at ~day 1.
+- **Proposed 10-15: long form may be the realistic route.** The watch-hour bar before 02-01 is ~2x away on v15's
+  pace, against ~100x for Shorts. Subs bind everywhere. Ship a second long upload soon, and decide at v15 day 7. See
+  [channel-strategy → 10-15 read](KnowledgeBase/channel-strategy.md#10-15-read-long-form-may-be-the-realistic-route-proposed-a-lead-from-one-video).
 
 ---
 

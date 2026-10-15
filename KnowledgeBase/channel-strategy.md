@@ -60,6 +60,29 @@ subs better is worth more than raw views. Long-form's sub rate is untested for u
 - **After 4 real long uploads:** if average view duration is under ~2 min or none gains a sub, the
   long-form format needs rework before more volume; if subs-per-view beats Shorts', long-form leads.
 
+### 10-15 read: long form may be the realistic route (proposed, a lead from one video)
+
+From `learnings.md` → *10-15 update*: v15 (`terr`, 15:15) went 26 → 819 views in 48h, and both 16:9 uploads
+climb slowly instead of bursting. Shorts sit at a ~1.4K-per-upload ceiling for the proven shape.
+
+- **The watch-hour route before 2027-02-01 is ~2x away, not ~100x.** 4,000 h in the 109 days left needs
+  ~730 long-form views/day at a 3-min average view, ~1,100/day at 2 min, ~2,200/day at 1 min. v15 alone did
+  ~400/day on days 1-2. Shorts need ~111K/day. **Assumptions:** avg view duration is unknown (Studio), v15's
+  curve may decay, and 4,000 h is the pre-Feb bar, which doubles to 8,000 h after. So it's a stretch goal
+  worth testing, not a plan.
+- **Subs are now the binding constraint on every route.** 1K by 02-01 needs ~9 subs/day, and we get ~2/day.
+  At ~0.14% that's ~690K views. **Subs gained per long video vs per Short** (Studio) is the number that decides
+  which track leads.
+- **Ship the second long-form upload soon.** n=1 can't separate "long form works" from "`terr` got lucky".
+  A config/theme swap of `terr`, or another one-arc 10-15 min video, is the cheapest replication.
+- **Shorts keep their job (reach, subs, a cheap floor), and they aren't the earnings engine.** Keep the 2:1
+  proven/experiment mix, but if capacity is short, cut Shorts before the weekly long upload.
+- **Judge 16:9 on day 7 or later, never day 1.** Both 16:9 uploads had a near-empty first day.
+
+**Decision point at v15 day 7 (10-19), from Studio:** if avg view duration is ≥ ~2.5 min and traffic is still
+coming from browse/suggested, make long-form the priority track and aim at 4,000 h before 02-01. If it's
+under ~1.5 min or the views have stopped, keep the current two-track balance.
+
 ## Audience and the pick mechanic
 
 The single highest-leverage habit: **make it trivially easy to pick a side in the first 3 seconds.**
