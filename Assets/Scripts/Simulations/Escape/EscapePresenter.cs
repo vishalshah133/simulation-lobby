@@ -43,8 +43,14 @@ namespace SimulationLobby.Simulations.Escape
         {
             if (_hud != null)
             {
+                // A ramped series states its rule instead of the generic question: a gap a few degrees
+                // narrower each round is invisible unless the viewer is told to look for it.
+                string explainer = _simulation != null && _simulation.Config != null
+                    ? _simulation.Config.RampExplainer()
+                    : null;
+
                 _hud.SetTitle(_title);
-                _hud.SetQuestion(_question);
+                _hud.SetQuestion(explainer ?? _question);
                 _hud.SetSides("WALL", "BALL");
             }
 
@@ -135,7 +141,9 @@ namespace SimulationLobby.Simulations.Escape
             }
 
             _hud.SetScore(_simulation.WallScore, _simulation.EscapeCount);
-            _hud.SetRound(_simulation.AttemptNumber, _simulation.AttemptTotal);
+            string status = RampStatus();
+            string round = $"ROUND {_simulation.AttemptNumber} / {_simulation.AttemptTotal}";
+            _hud.SetRoundLabel(string.IsNullOrEmpty(status) ? round : $"{round}  ·  {status}");
             _hud.SetCounter("BOUNCES", _simulation.BounceCount);
 
             // The result only shows during the beat between rounds — that pause exists so the viewer
@@ -162,6 +170,35 @@ namespace SimulationLobby.Simulations.Escape
             {
                 _hud.ShowResult(null, false);
             }
+        }
+
+        /// <summary>
+        /// The round line's suffix for a ramped series, in units a viewer can check by eye: how many balls
+        /// fit across the exit (live, so it counts down as the ball grows) and how long one lap of the exit
+        /// takes. Empty for a config without a ramp.
+        /// </summary>
+        string RampStatus()
+        {
+            EscapeConfig config = _simulation.Config;
+            if (config == null || (!config.HasGapRamp && !config.HasSpinRamp))
+            {
+                return string.Empty;
+            }
+
+            var parts = new System.Collections.Generic.List<string>(2);
+            if (config.HasGapRamp)
+            {
+                // Floored, so the line never claims a fit the ball doesn't have.
+                float fits = Mathf.Floor(_simulation.BallsAcrossExit * 10f) / 10f;
+                parts.Add(fits >= 1f ? $"EXIT FITS {fits:0.0} BALLS" : "TOO BIG TO FIT");
+            }
+
+            if (config.HasSpinRamp && _simulation.ExitLapSeconds > 0f)
+            {
+                parts.Add($"1 LAP EVERY {Mathf.RoundToInt(_simulation.ExitLapSeconds)}s");
+            }
+
+            return string.Join("  ·  ", parts);
         }
 
         /// <summary>Assigned by the scene builder.</summary>

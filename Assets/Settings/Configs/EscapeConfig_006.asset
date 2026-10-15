@@ -13,15 +13,20 @@ MonoBehaviour:
   m_Name: EscapeConfig_006
   m_EditorClassIdentifier: SimulationLobby.Simulations.Escape::SimulationLobby.Simulations.Escape.EscapeConfig
   fixedTimestep: 0.01
-  maxDurationSeconds: 215.6
-  intent: 'esc-006 The Exit Shrinks Every Round. v4''s rotating gap (20deg/s, speed 6-13, 7 rounds), but the gap narrows from 30deg on round 1 to 18deg on round 7 (finalGapDegrees). Early rounds favour the ball, late rounds the wall, so the score tightens as the series goes on. Even at 18deg the starting ball fits (chord ~0.31R vs ball ~0.17R).'
+  maxDurationSeconds: 243.6
+  intent: 'esc-006 The Exit Shrinks Every Round. v4''s rotating gap (20deg/s, speed
+    6-13, 7 rounds), exit narrows from 35deg on round 1 to 20deg on round 7. Playtests
+    2026-10-13: 30->18 favoured the wall, 45->20 made the ball too strong. Modelled
+    ball-escape odds 82% on round 1 to 31% on round 7 (~4.1 of 7); the model runs
+    about one win generous to the ball, so expect a near coin-flip 4-3 series. HUD
+    shows live how many balls fit across the exit.'
   initialSizeFractionMin: 0.07692308
   initialSizeFractionMax: 0.09090909
   randomizeSizePerAttempt: 0
   speedMin: 6
   speedMax: 13
   attemptCount: 7
-  maxAttemptSeconds: 30
+  maxAttemptSeconds: 34
   interAttemptSeconds: 0.8
   trappedMarginFraction: 0.1
   growth:
@@ -30,10 +35,10 @@ MonoBehaviour:
     startValue: 1
     maxValue: 6
     minValue: 0.1
-  gapDegrees: 30
+  gapDegrees: 35
   gapCenterDegrees: 90
   gapAngularSpeed: 20
   gapDirectionSeeded: 1
-  finalGapDegrees: 18
+  finalGapDegrees: 20
   finalGapAngularSpeed: 0
   nearMissGapWidths: 1

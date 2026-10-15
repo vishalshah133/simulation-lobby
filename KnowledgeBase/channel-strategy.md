@@ -236,6 +236,40 @@ is fragile to that kind going stale. Keep both in rotation.
 
 See `ideas-backlog.md`'s "New categories" section for working names and build-cost notes on both.
 
+## Shorts mix: proven + experiment (decided 2026-10-13)
+
+The user's standing rule: **every week of Shorts mixes tried-and-tested uploads with new experiments, and the
+experiments keep real room for creative ideas.** Proven shapes protect the ~1K floor. Experiments are how the
+next v4 gets found; reference data only shows what already worked for someone else.
+
+**Ratio: about 2 proven to 1 experiment.** Every third Short is an experiment, and there's at least one a week.
+If proven shapes start to fade (two in a row under the band), go to 1:1. A fading proven shape means it's time
+for something new.
+
+**Proven lane.** A shape counts as proven once it has 2+ uploads inside the ~1-1.7K band. Today that's the
+`esc` rotating gap (v4, v14, plus v7 with a song), and `brk`/`esc` with a song (v7, v8). `rom` and `impact` have one
+in-band upload each, so they're one result from joining. Proven uploads are config-only variants that change one
+knob. The `esc` rotating gap is the **control**: when an experiment stalls, the next proven upload tells us
+whether the channel or the experiment is at fault (that's how v14 diagnosed v11-v13).
+
+**Experiment lane.** A new mechanic, format, visual style, topic or hook. It doesn't need reference-channel
+evidence; an original idea is exactly what this slot is for. Reference-backed ideas fill it when nothing
+original is ready. Rules:
+1. **Cheap to build.** It should take 1-2 sessions, mostly composed from `Shared` blocks. If it needs a new
+   block, that block should be reusable afterwards. Built in batch, never on the day it's posted.
+2. **Keep the Shorts floor.** The run starts within 3s, there's a real way to lose (*Things to avoid*), and it
+   reads at 480px.
+3. **Change one axis where you can:** mechanic *or* topic *or* tension shape. `cric` changed shape and topic at
+   once, so its flop can't say which one failed. A bold experiment is fine, as long as we know what it's testing.
+4. **Write down what it tests before posting** (one line in the video plan), then judge it at day 7 against the band:
+   - **≥ ~1K:** make a second one. Two in the band moves it into the proven lane.
+   - **200-1K:** iterate once on the most likely weak point (hook, title, opening seconds), then decide.
+   - **< 200:** shelve it, write down why in `learnings.md`, and post a proven upload next as the control.
+5. **A flop costs one slot, not the channel.** v11-v13 flopped and v14 still landed in the band right after.
+
+**Current experiment slate** (details in `ideas-backlog.md` → *Experiment slate*): *Multiply vs Escape* (new),
+*Reach the Core* (reference-backed), *Glass Gauntlet* (3D, studio look).
+
 ## Hooks that reliably work
 
 - Countdown/odds shown before the start ("Red 12% · Blue 31%").

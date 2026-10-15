@@ -66,6 +66,9 @@ namespace SimulationLobby.Simulations.Escape
 
         public int AttemptTotal => _config != null ? _config.attemptCount : 0;
 
+        /// <summary>The run's config, for presentation that explains it. Read only.</summary>
+        public EscapeConfig Config => _config;
+
         /// <summary>Escapes so far — the ball's score.</summary>
         public int EscapeCount { get; private set; }
 
@@ -109,6 +112,26 @@ namespace SimulationLobby.Simulations.Escape
                 return limit <= 0f ? 0f : Mathf.Clamp01(_sizeTarget.WorldRadius * 2f / limit);
             }
         }
+
+        /// <summary>
+        /// How many balls of the current size fit across the exit, side by side. Falls as the ball grows
+        /// and as a ramp narrows the exit; under 1 the ball no longer fits. A unit viewers can see.
+        /// </summary>
+        public float BallsAcrossExit
+        {
+            get
+            {
+                if (_boundary == null || _sizeTarget == null || _sizeTarget.WorldRadius <= 0f)
+                {
+                    return 0f;
+                }
+
+                return _boundary.GapChordWidth / (_sizeTarget.WorldRadius * 2f);
+            }
+        }
+
+        /// <summary>Seconds for the exit to go once round the circle this round. 0 for a static exit.</summary>
+        public float ExitLapSeconds => Mathf.Abs(_gapAngularSpeed) > 0f ? 360f / Mathf.Abs(_gapAngularSpeed) : 0f;
 
         /// <summary>Current exit width in world units. Changes between rounds under a series ramp.</summary>
         public float GapChordWidth => _boundary != null ? _boundary.GapChordWidth : 0f;

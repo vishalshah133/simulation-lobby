@@ -119,6 +119,39 @@ namespace SimulationLobby.Simulations.Escape
                 : start;
         }
 
+        /// <summary>The exit's width changes across the series.</summary>
+        public bool HasGapRamp => finalGapDegrees > 0f && !Mathf.Approximately(finalGapDegrees, gapDegrees);
+
+        /// <summary>The exit's spin speed changes across the series.</summary>
+        public bool HasSpinRamp => finalGapAngularSpeed > 0f && gapAngularSpeed != 0f &&
+                                   !Mathf.Approximately(finalGapAngularSpeed, Mathf.Abs(gapAngularSpeed));
+
+        /// <summary>
+        /// One line telling the viewer what the series ramp does, since a few degrees narrower or a bit
+        /// faster each round is hard to see. Null when the config has no ramp.
+        /// </summary>
+        public string RampExplainer()
+        {
+            if (HasGapRamp && HasSpinRamp)
+            {
+                return "THE EXIT CHANGES EVERY ROUND";
+            }
+
+            if (HasGapRamp)
+            {
+                return finalGapDegrees < gapDegrees ? "THE EXIT SHRINKS EVERY ROUND" : "THE EXIT GROWS EVERY ROUND";
+            }
+
+            if (HasSpinRamp)
+            {
+                return finalGapAngularSpeed > Mathf.Abs(gapAngularSpeed)
+                    ? "THE EXIT SPINS FASTER EVERY ROUND"
+                    : "THE EXIT SPINS SLOWER EVERY ROUND";
+            }
+
+            return null;
+        }
+
         /// <summary>0 on the first attempt, 1 on the last.</summary>
         float SeriesProgress(int attemptIndex)
         {

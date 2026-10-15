@@ -31,6 +31,11 @@ namespace SimulationLobby.Shared
         [Tooltip("Where the gap sits, in degrees counter-clockwise from +X. 90 = top of the circle.")]
         [Range(0f, 360f)] public float gapCenterDegrees = 90f;
 
+        [Tooltip("Build every segment, including those inside the gap, and switch the gap ones off. " +
+                 "Lets a gap that changes width every few ticks (mve's widening exit) be applied with " +
+                 "RefreshGap instead of a full rebuild. Off: the gap has no segments at all (esc).")]
+        public bool keepGapSegments;
+
         [Header("Look")]
         [Tooltip("Square sprite used to draw each wall segment. Leave empty for colliders only.")]
         public Sprite wallSprite;
@@ -41,6 +46,7 @@ namespace SimulationLobby.Shared
         public int wallSortingOrder;
 
         readonly List<Transform> _segments = new List<Transform>();
+        readonly List<float> _segmentAngles = new List<float>();
 
         /// <summary>Arc width of the gap along the inner wall, in world units — what a ball must fit through.</summary>
         public float GapArcWidth => radius * gapDegrees * Mathf.Deg2Rad;
@@ -97,7 +103,8 @@ namespace SimulationLobby.Shared
             for (int i = 0; i < segmentCount; i++)
             {
                 float angle = i * segmentArc;
-                if (Mathf.Abs(Mathf.DeltaAngle(gapCenterDegrees, angle)) <= halfGap)
+                bool inGap = Mathf.Abs(Mathf.DeltaAngle(gapCenterDegrees, angle)) <= halfGap;
+                if (inGap && !keepGapSegments)
                 {
                     continue;
                 }
@@ -129,12 +136,58 @@ namespace SimulationLobby.Shared
                 }
 
                 _segments.Add(segment.transform);
+                _segmentAngles.Add(angle);
+                segment.SetActive(!inGap);
+            }
+        }
+
+        /// <summary>
+        /// Re-apply <see cref="gapDegrees"/> and <see cref="gapCenterDegrees"/> by switching segments on
+        /// and off, with no allocation. Needs <see cref="keepGapSegments"/>; without it the gap's
+        /// segments were never built, so this falls back to <see cref="Rebuild"/>.
+        /// </summary>
+        public void RefreshGap()
+        {
+            if (!keepGapSegments)
+            {
+                Rebuild();
+                return;
+            }
+
+            float halfGap = gapDegrees * 0.5f;
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                bool open = Mathf.Abs(Mathf.DeltaAngle(gapCenterDegrees, _segmentAngles[i])) <= halfGap;
+                GameObject segment = _segments[i].gameObject;
+                if (segment.activeSelf == open)
+                {
+                    segment.SetActive(!open);
+                }
+            }
+        }
+
+        /// <summary>Segments currently standing — what is left of the wall.</summary>
+        public int StandingSegmentCount
+        {
+            get
+            {
+                int standing = 0;
+                for (int i = 0; i < _segments.Count; i++)
+                {
+                    if (_segments[i].gameObject.activeSelf)
+                    {
+                        standing++;
+                    }
+                }
+
+                return standing;
             }
         }
 
         void ClearSegments()
         {
             _segments.Clear();
+            _segmentAngles.Clear();
 
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
