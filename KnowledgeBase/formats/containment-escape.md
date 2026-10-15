@@ -46,6 +46,12 @@ a monetized channel.
 
 Combining two escalations at once (grow + speed) shortens runs sharply. Start with one.
 
+**Series ramps (built 2026-10-11, esc-005..007):** a second kind of variation that leaves the
+per-bounce escalation alone and changes the *arena between rounds*: the gap narrows
+(`finalGapDegrees`) or spins faster (`finalGapAngularSpeed`) each round. These make the series harder
+as the score builds without stacking two per-bounce escalations, so they're not the trap above.
+Untested on viewers.
+
 ## Build notes
 
 - **Trivially cheap to build** compared to the other formats — one rigidbody, one boundary, one

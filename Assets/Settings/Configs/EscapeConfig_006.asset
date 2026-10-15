@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846a9ad4a2c3d4642b253c8625f38d04, type: 3}
+  m_Name: EscapeConfig_006
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Escape::SimulationLobby.Simulations.Escape.EscapeConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 243.6
+  intent: 'esc-006 The Exit Shrinks Every Round. v4''s rotating gap (20deg/s, speed
+    6-13, 7 rounds), exit narrows from 35deg on round 1 to 20deg on round 7. Playtests
+    2026-10-13: 30->18 favoured the wall, 45->20 made the ball too strong. Modelled
+    ball-escape odds 82% on round 1 to 31% on round 7 (~4.1 of 7); the model runs
+    about one win generous to the ball, so expect a near coin-flip 4-3 series. HUD
+    shows live how many balls fit across the exit.'
+  initialSizeFractionMin: 0.07692308
+  initialSizeFractionMax: 0.09090909
+  randomizeSizePerAttempt: 0
+  speedMin: 6
+  speedMax: 13
+  attemptCount: 7
+  maxAttemptSeconds: 34
+  interAttemptSeconds: 0.8
+  trappedMarginFraction: 0.1
+  growth:
+    mode: 1
+    magnitude: 1.035
+    startValue: 1
+    maxValue: 6
+    minValue: 0.1
+  gapDegrees: 35
+  gapCenterDegrees: 90
+  gapAngularSpeed: 20
+  gapDirectionSeeded: 1
+  finalGapDegrees: 20
+  finalGapAngularSpeed: 0
+  nearMissGapWidths: 1

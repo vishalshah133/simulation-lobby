@@ -2,7 +2,7 @@
 
 **Format:** `brk` · **Length:** ≤62s (60s clock + end beat) · **Aspect:** 9:16 @ 1080x1920 · **Status:** `built` (compiles 2026-10-04; scene not yet generated or playtested)
 **Brief:** `KnowledgeBase/formats/ring-breaker.md`
-**Scene:** `Assets/Scenes/Breaker_Rings_2D_Song.unity` (build: **Simulation Lobby ▸ Build Scene ▸ Breaker_Rings_2D_Song**)
+**Scene:** `Assets/Scenes/Breaker_Rings_2D_Song.unity` (build: **Simulation Lobby ▸ 2D Formats ▸ Ring Breaker (brk) ▸ Rings + Song**)
 **Config:** `Assets/Settings/Configs/BreakerConfig_001.asset` (created on first build) · **Melody:** `Settings/Melodies/FurElise.asset` (the full A section, 93 notes: theme, C-major middle passage, E/D♯ run-up, theme) · **Scan profile:** `Settings/Scans/SeedScan_BreakerConfig_001.asset` · **Seed:** TBD (from the scan)
 
 ## Premise
@@ -96,7 +96,7 @@ segments or touches (not speed) to rebalance from here.
 
 ## Test (user, in Unity)
 
-1. **Build Scene ▸ Breaker_Rings_2D_Song.** The console prints each ring's geometry.
+1. **2D Formats ▸ Ring Breaker (brk) ▸ Rings + Song.** The console prints each ring's geometry.
 2. Press **Play** once on seed 1 to judge the look and sound. Then **Seed Scan ▸ Add Scanner To
    Open Scene** and Play (200 seeds). The profile ranks the **closest finishes** first: wins with
    little time left, and losses on the last ring with most of it broken. The CSV's `won` column

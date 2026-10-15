@@ -43,3 +43,11 @@ a final section where position can still flip.
 
 - Ideal contender count for 9:16? Start at 8, test 12 and 16.
 - Do trails help or clutter at 60fps?
+
+## Obstacles (built 2026-10-09)
+
+Obstacle kinds are data on the track layout (`ObstacleKind`): pegs (pyramid, plinko), pinwheel, fork divider, bottleneck,
+chicane, bumps. They exist to create the catch-up geometry this brief asks for: a bottleneck compresses the pack, a fork
+splits it with unequal risk, spinners and pegs add chaos late enough to flip positions. Keep a gap beside any obstacle
+narrower than a marble so nothing can wedge there. Open: which kinds actually produce lead changes (read `lead_changes`
+across seeds before deciding).

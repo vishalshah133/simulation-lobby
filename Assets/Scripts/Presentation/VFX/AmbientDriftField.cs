@@ -40,6 +40,13 @@ namespace SimulationLobby.Presentation
         [Tooltip("Drift speed in units/second. Slow enough to read as ambience, not weather.")]
         [Range(0.01f, 1f)] public float driftSpeed = 0.14f;
 
+        [Tooltip("Steady current every mote rides on, units/second. (0, 0.3) rises like embers, " +
+                 "(0, -0.3) falls like snow. Zero = wander in place.")]
+        public Vector2 flow;
+
+        [Tooltip("Max spin, degrees/second, each way. Only visible on shaped motes (stars, diamonds).")]
+        [Range(0f, 180f)] public float spinSpeed;
+
         [Tooltip("Render order. Must be below the arena walls so nothing floats over the action.")]
         public int sortingOrder = -50;
 
@@ -104,6 +111,29 @@ namespace SimulationLobby.Presentation
             noise.scrollSpeed = 0.06f;
             noise.damping = true;
 
+            ParticleSystem.VelocityOverLifetimeModule velocity = system.velocityOverLifetime;
+            velocity.enabled = flow != Vector2.zero;
+            if (velocity.enabled)
+            {
+                velocity.space = ParticleSystemSimulationSpace.World;
+                velocity.x = flow.x;
+                velocity.y = flow.y;
+                velocity.z = 0f;
+            }
+
+            ParticleSystem.RotationOverLifetimeModule rotation = system.rotationOverLifetime;
+            rotation.enabled = spinSpeed > 0f;
+            if (rotation.enabled)
+            {
+                float radians = spinSpeed * Mathf.Deg2Rad;
+                rotation.z = new ParticleSystem.MinMaxCurve(-radians, radians);
+                main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            }
+            else
+            {
+                main.startRotation = 0f;
+            }
+
             var renderer = GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Billboard;
             renderer.sortingOrder = sortingOrder;
@@ -115,6 +145,12 @@ namespace SimulationLobby.Presentation
                 var material = new Material(Shader.Find("Sprites/Default"));
                 material.mainTexture = dotTexture;
                 renderer.sharedMaterial = material;
+            }
+
+            // In play mode Apply runs after the system has already started; Stop above left it idle.
+            if (Application.isPlaying)
+            {
+                system.Play(true);
             }
         }
     }

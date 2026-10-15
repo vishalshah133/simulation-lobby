@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2d7de3e6fdf37449b69e0674a886265, type: 3}
+  m_Name: CricketAudioKit
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Cricket::SimulationLobby.Simulations.Cricket.CricketAudioKit
+  cheerSmall: {fileID: 0}
+  cheerBig: {fileID: 8300000, guid: f1de1abd01e25f344a771e8e7ecce499, type: 3}
+  cheerRoar: {fileID: 0}
+  cheerFinal: {fileID: 0}
+  groan: {fileID: 8300000, guid: f74268b2b91890b40a0f54cd25c42ee7, type: 3}
+  applause: {fileID: 8300000, guid: 26964835a17f71d4782d0edd0b84ecbf, type: 3}
+  applauseSoft: {fileID: 8300000, guid: ae0cae461ae405c4ca4c6f3b853ea367, type: 3}
+  bat: {fileID: 8300000, guid: 36a62d6b964eeb7469cf4425ae08eaff, type: 3}
+  stumps: {fileID: 0}

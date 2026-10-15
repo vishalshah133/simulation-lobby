@@ -12,7 +12,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
     /// <summary>
     /// Builds the <c>esc</c> scenes from code: <c>Escape_Circle_2D</c> (esc-001) and
     /// <c>Escape_Circle_2D_Song</c> (esc-003, guess the song).
-    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ …</c>.
+    /// Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Escape (esc) ▸ …</c>.
     /// </summary>
     /// <remarks>
     /// Scene-as-code for the same reason seeds and configs are committed: a video must stay
@@ -45,9 +45,11 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             public string question = "WHO WILL WIN?";
             /// <summary>Optional. Set: the bounces play this song and the run ends on a reveal.</summary>
             public string melodyPath;
+            /// <summary>Each Play draws a fresh, logged seed (the house default since esc-002).</summary>
+            public bool randomizeSeed;
         }
 
-        [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D")]
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Static Gap", false, 101)]
         static void BuildOriginal()
         {
             Build(new Variant
@@ -63,7 +65,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
         /// esc-003: esc-002's rotating gap (our best video so far) over 7 rounds, with the bounces
         /// playing a public-domain song that carries on across rounds and is revealed at the end.
         /// </summary>
-        [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D_Song")]
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Static Gap + Song", false, 102)]
         static void BuildSong()
         {
             Build(new Variant
@@ -82,7 +84,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
         /// esc-004: esc-003 with a different song and nothing else changed, to test whether the song
         /// hook repeats or v7 was luck.
         /// </summary>
-        [MenuItem("Simulation Lobby/Build Scene/Escape_Circle_2D_Song_FurElise")]
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Static Gap + Fur Elise", false, 103)]
         static void BuildSongFurElise()
         {
             Build(new Variant
@@ -94,6 +96,67 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
                 title = "GUESS THE SONG",
                 question = "WILL IT ESCAPE?",
                 melodyPath = "Assets/Settings/Melodies/FurElise.asset"
+            });
+        }
+
+        /// <summary>
+        /// esc-002/005: v4's rotating gap. Scene shared by the rotating-gap configs; this one ships 005
+        /// (gap spin 22°/s), the take published as v14. esc-002 was a hand-duplicated scene file, which
+        /// is why it had no menu entry until 2026-10-13.
+        /// </summary>
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Rotating Gap", false, 104)]
+        static void BuildRotatingGap()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D_RotatingGap.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_005.asset",
+                configDefaults = c => RotatingGapDefaults(c, "esc-005 rotating gap 22deg/s, v4 replica."),
+                seed = 22222,
+                randomizeSeed = true
+            });
+        }
+
+        /// <summary>esc-006: the exit narrows from 30° on round 1 to 18° on round 7.</summary>
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Shrinking Exit", false, 105)]
+        static void BuildShrinkingExit()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D_ShrinkingExit.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_006.asset",
+                configDefaults = c =>
+                {
+                    RotatingGapDefaults(c, "esc-006 exit shrinks 35deg -> 20deg across 7 rounds.");
+                    c.gapAngularSpeed = 20f;
+                    c.gapDegrees = 35f;
+                    c.finalGapDegrees = 20f;
+                    c.maxAttemptSeconds = 34f;
+                    c.maxDurationSeconds = c.SeriesSeconds;
+                },
+                seed = 1,
+                question = "CAN IT STILL ESCAPE?",
+                randomizeSeed = true
+            });
+        }
+
+        /// <summary>esc-007: the gap's spin ramps from 12°/s on round 1 to 36°/s on round 7.</summary>
+        [MenuItem("Simulation Lobby/2D Formats/Escape (esc)/Faster Gap", false, 106)]
+        static void BuildFasterGap()
+        {
+            Build(new Variant
+            {
+                scenePath = "Assets/Scenes/Escape_Circle_2D_FasterGap.unity",
+                configPath = "Assets/Settings/Configs/EscapeConfig_007.asset",
+                configDefaults = c =>
+                {
+                    RotatingGapDefaults(c, "esc-007 gap spin ramps 12 -> 36deg/s across 7 rounds.");
+                    c.gapAngularSpeed = 12f;
+                    c.finalGapAngularSpeed = 36f;
+                },
+                seed = 1,
+                question = "CAN IT STILL ESCAPE?",
+                randomizeSeed = true
             });
         }
 
@@ -212,6 +275,11 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             runner.config = config;
             runner.seed = variant.seed;
             runner.autoStart = true;
+            runner.randomizeSeedOnStart = variant.randomizeSeed;
+
+            // A different look per take (theme + seeded variance), so back-to-back esc uploads don't
+            // look identical. Backdrop only: arena and ball colours stay tuned.
+            BackdropThemeLibrary.AddStyler(backdropObject, runner, camera, backdrop);
 
             // Private [SerializeField] wiring, done through SerializedObject so the fields stay private.
             var serialized = new SerializedObject(simulation);
@@ -293,7 +361,7 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
                 new ScoreboardCanvasBuilder.Labels
                 {
                     title = variant.title,
-                    question = variant.question,
+                    question = config.RampExplainer() ?? variant.question,
                     leftName = "WALL",
                     rightName = "BALL",
                     round = $"ROUND 1 / {config.attemptCount}",
@@ -370,6 +438,18 @@ namespace SimulationLobby.Simulations.Escape.EditorTools
             Esc003Defaults(config);
             config.intent = "esc-004 guess the song: esc-003 tuning unchanged, melody swapped to Fur Elise " +
                             "(35 notes). Tests whether the song hook repeats.";
+        }
+
+        /// <summary>v4's tuning (esc-002): rotating gap, speed 6-13, no song. Only used if the asset is missing.</summary>
+        static void RotatingGapDefaults(EscapeConfig config, string intent)
+        {
+            Esc001Defaults(config);
+            config.speedMin = 6f;
+            config.speedMax = 13f;
+            config.gapAngularSpeed = 22f;
+            config.gapDirectionSeeded = true;
+            config.maxDurationSeconds = config.SeriesSeconds;
+            config.intent = intent;
         }
 
         static PhysicsMaterial2D EnsureBouncyMaterial()

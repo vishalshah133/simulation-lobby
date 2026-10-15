@@ -81,6 +81,17 @@ namespace SimulationLobby.Simulations.Escape
                  "|gapAngularSpeed|. Off uses gapAngularSpeed's sign literally for every attempt.")]
         public bool gapDirectionSeeded = true;
 
+        [Header("Series ramp — the series gets harder as the score builds")]
+        [Tooltip("Gap width on the last round, degrees. 0 = every round uses gapDegrees. Otherwise the " +
+                 "gap goes from gapDegrees on round 1 to this on the last round, in equal steps, so " +
+                 "later rounds are visibly harder. Draws nothing from the RNG, so seeds still replay.")]
+        [Range(0f, 90f)] public float finalGapDegrees;
+
+        [Tooltip("Gap rotation speed on the last round, deg/s (magnitude; direction is still seeded). " +
+                 "0 = every round uses |gapAngularSpeed|. Needs gapAngularSpeed != 0. Draws nothing " +
+                 "from the RNG, so seeds still replay.")]
+        [Min(0f)] public float finalGapAngularSpeed;
+
         [Header("Near misses — what makes the run watchable")]
         [Tooltip("A bounce this close to the gap edge (in gap widths) counts as a near miss.")]
         [Range(0.1f, 3f)] public float nearMissGapWidths = 1f;
@@ -90,6 +101,62 @@ namespace SimulationLobby.Simulations.Escape
         /// usually far shorter, since attempts end the moment the ball escapes or gets too big.
         /// </summary>
         public float SeriesSeconds => attemptCount * (maxAttemptSeconds + interAttemptSeconds);
+
+        /// <summary>Gap width for a 0-based attempt, after the series ramp.</summary>
+        public float GapDegreesForAttempt(int attemptIndex)
+        {
+            return finalGapDegrees > 0f
+                ? Mathf.Lerp(gapDegrees, finalGapDegrees, SeriesProgress(attemptIndex))
+                : gapDegrees;
+        }
+
+        /// <summary>Gap rotation speed magnitude for a 0-based attempt, after the series ramp.</summary>
+        public float GapAngularSpeedForAttempt(int attemptIndex)
+        {
+            float start = Mathf.Abs(gapAngularSpeed);
+            return finalGapAngularSpeed > 0f
+                ? Mathf.Lerp(start, finalGapAngularSpeed, SeriesProgress(attemptIndex))
+                : start;
+        }
+
+        /// <summary>The exit's width changes across the series.</summary>
+        public bool HasGapRamp => finalGapDegrees > 0f && !Mathf.Approximately(finalGapDegrees, gapDegrees);
+
+        /// <summary>The exit's spin speed changes across the series.</summary>
+        public bool HasSpinRamp => finalGapAngularSpeed > 0f && gapAngularSpeed != 0f &&
+                                   !Mathf.Approximately(finalGapAngularSpeed, Mathf.Abs(gapAngularSpeed));
+
+        /// <summary>
+        /// One line telling the viewer what the series ramp does, since a few degrees narrower or a bit
+        /// faster each round is hard to see. Null when the config has no ramp.
+        /// </summary>
+        public string RampExplainer()
+        {
+            if (HasGapRamp && HasSpinRamp)
+            {
+                return "THE EXIT CHANGES EVERY ROUND";
+            }
+
+            if (HasGapRamp)
+            {
+                return finalGapDegrees < gapDegrees ? "THE EXIT SHRINKS EVERY ROUND" : "THE EXIT GROWS EVERY ROUND";
+            }
+
+            if (HasSpinRamp)
+            {
+                return finalGapAngularSpeed > Mathf.Abs(gapAngularSpeed)
+                    ? "THE EXIT SPINS FASTER EVERY ROUND"
+                    : "THE EXIT SPINS SLOWER EVERY ROUND";
+            }
+
+            return null;
+        }
+
+        /// <summary>0 on the first attempt, 1 on the last.</summary>
+        float SeriesProgress(int attemptIndex)
+        {
+            return attemptCount <= 1 ? 0f : Mathf.Clamp01(attemptIndex / (float)(attemptCount - 1));
+        }
 
         /// <summary>
         /// Derived from the series rather than from <c>maxDurationSeconds</c>. The run's cap and the
@@ -138,6 +205,18 @@ namespace SimulationLobby.Simulations.Escape
             if (speedMin > speedMax)
             {
                 error = "speedMin must not exceed speedMax.";
+                return false;
+            }
+
+            if (finalGapDegrees > 0f && finalGapDegrees < 2f)
+            {
+                error = "finalGapDegrees must be 0 (off) or at least 2.";
+                return false;
+            }
+
+            if (finalGapAngularSpeed > 0f && gapAngularSpeed == 0f)
+            {
+                error = "finalGapAngularSpeed ramps a rotating gap, so gapAngularSpeed must be nonzero.";
                 return false;
             }
 

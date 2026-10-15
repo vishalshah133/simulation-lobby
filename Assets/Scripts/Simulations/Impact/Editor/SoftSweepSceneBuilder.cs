@@ -13,11 +13,11 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
     /// <summary>
     /// Builds <c>Assets/Scenes/Impact_SoftSweep_3D.unity</c> — impact-003, "0% vs 100% Soft": an amber
     /// glass capsule dropped onto a piano-black plinth five times, from 0% to 100% soft.
-    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ Impact_SoftSweep_3D</c>.
+    /// Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Impact (impact) ▸ Soft Sweep</c>.
     /// </summary>
     /// <remarks>
     /// Re-running replaces the scene but never the config or material assets, so tuning survives a
-    /// rebuild. <c>Reset Config ▸ Soft Sweep</c> puts the configs back to the plan's baseline.
+    /// rebuild. <c>3D Formats ▸ Impact (impact) ▸ Reset Config</c> puts the configs back to the plan's baseline.
     /// </remarks>
     static class SoftSweepSceneBuilder
     {
@@ -30,7 +30,7 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
         /// <summary>Cognac amber — the video's one hue (plans/videos/impact-003-soft-sweep.md).</summary>
         static readonly Color Hue = new Color(0.93f, 0.5f, 0.17f, 1f);
 
-        [MenuItem("Simulation Lobby/Reset Config/Soft Sweep (tuning baseline)")]
+        [MenuItem("Simulation Lobby/3D Formats/Impact (impact)/Reset Config (tuning baseline)", false, 262)]
         static void ResetConfigs()
         {
             SweepConfig sweep = EnsureConfigs(out List<SoftDropConfig> takes);
@@ -46,7 +46,7 @@ namespace SimulationLobby.Simulations.Impact.EditorTools
             Debug.Log($"[impact] Reset {ConfigFolder} to the tuning baseline.", sweep);
         }
 
-        [MenuItem("Simulation Lobby/Build Scene/Impact_SoftSweep_3D")]
+        [MenuItem("Simulation Lobby/3D Formats/Impact (impact)/Soft Sweep", false, 241)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

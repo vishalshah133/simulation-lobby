@@ -1,0 +1,10 @@
+Source of each clip (original file names). Confirm each licence allows monetised YouTube use,
+and add any attribution the licence requires to the video description.
+
+cheer_big.mp3      dragon-studio-crowd-cheer-406646.mp3
+applause.mp3       driken5482-crowd-applause-236697.mp3
+applause_soft.mp3  freesound_community-short-applause-96213.mp3
+bat.mp3            u_2gr5jjyhmh-cricket-ball-hitting-bet-and-crowd-people-199962.mp3   (bat hit with a crowd in it)
+groan.mp3          universfield-crowd-disappointment-reaction-352718.mp3
+
+Still missing: cheer_small, cheer_roar, cheer_final (they fall back to cheer_big / applause).

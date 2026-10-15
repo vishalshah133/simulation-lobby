@@ -12,9 +12,9 @@ namespace SimulationLobby.Capture.EditorTools
     /// </summary>
     static class SeedScanMenu
     {
-        const string Root = "Simulation Lobby/Seed Scan/";
+        const string Root = "Simulation Lobby/Tools/Seed Scan/";
 
-        [MenuItem(Root + "Add Scanner To Open Scene")]
+        [MenuItem(Root + "Add Scanner To Open Scene", false, 911)]
         static void AddScanner()
         {
             SimulationRunner runner = Object.FindAnyObjectByType<SimulationRunner>();
@@ -44,7 +44,7 @@ namespace SimulationLobby.Capture.EditorTools
                 scanner);
         }
 
-        [MenuItem(Root + "Turn Scanner Off In Open Scene")]
+        [MenuItem(Root + "Turn Scanner Off In Open Scene", false, 912)]
         static void DisableScanner()
         {
             SeedScanner scanner = Object.FindAnyObjectByType<SeedScanner>();

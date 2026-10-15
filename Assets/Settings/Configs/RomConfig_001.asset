@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60948b803aac58742a4746498d78493c, type: 3}
+  m_Name: RomConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.ReleaseOrMultiply::SimulationLobby.Simulations.ReleaseOrMultiply.RomConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'rom-001: 4 lanes x 6 rows (x2..x100, +n, /2, x0), 8 marbles dropped 0.9s
+    apart, 400-body cap, seeded lane order every run, random seed per Play.'
+  startMarbles: 8
+  dropIntervalSeconds: 0.9
+  dropSpread: 0.6
+  rows:
+  - gates:
+    - kind: 0
+      value: 2
+    - kind: 1
+      value: 3
+    - kind: 2
+      value: 2
+    - kind: 0
+      value: 2
+  - gates:
+    - kind: 0
+      value: 3
+    - kind: 0
+      value: 2
+    - kind: 1
+      value: 5
+    - kind: 2
+      value: 2
+  - gates:
+    - kind: 0
+      value: 2
+    - kind: 0
+      value: 3
+    - kind: 2
+      value: 2
+    - kind: 1
+      value: 8
+  - gates:
+    - kind: 0
+      value: 5
+    - kind: 0
+      value: 2
+    - kind: 2
+      value: 2
+    - kind: 0
+      value: 3
+  - gates:
+    - kind: 0
+      value: 10
+    - kind: 0
+      value: 3
+    - kind: 2
+      value: 2
+    - kind: 1
+      value: 20
+  - gates:
+    - kind: 0
+      value: 100
+    - kind: 3
+      value: 0
+    - kind: 0
+      value: 10
+    - kind: 3
+      value: 0
+  shuffleGatesPerRun: 1
+  countCap: 1000000000000
+  maxBodies: 400
+  maxClonesPerGate: 24
+  marbleRadius: 0.13
+  marbleBounciness: 0.45
+  gravityScale: 0.4
+  linearDamping: 0.1
+  maxFallSpeed: 6.5
+  stuckSeconds: 1.2
+  laneWidth: 2.2
+  rowPitch: 2.1
+  gateThickness: 0.55
+  firstGateY: 4.9
+  spawnY: 6.5
+  pegLinesPerRow: 2
+  pegRadius: 0.12
+  pegSpacing: 1.1
+  finishHoldSeconds: 3

@@ -7,7 +7,7 @@ namespace SimulationLobby.Core.EditorTools
 {
     /// <summary>
     /// Proves the deterministic core in isolation, with no scene, no physics and no format built yet.
-    /// Menu: <c>Simulation Lobby ▸ Verify Deterministic Core</c>.
+    /// Menu: <c>Simulation Lobby ▸ Tools ▸ Verify Deterministic Core</c>.
     /// </summary>
     /// <remarks>
     /// This covers the part of determinism that is ours: seeded RNG, tick counting, result
@@ -16,7 +16,7 @@ namespace SimulationLobby.Core.EditorTools
     /// </remarks>
     static class CoreSelfCheck
     {
-        [MenuItem("Simulation Lobby/Verify Deterministic Core")]
+        [MenuItem("Simulation Lobby/Tools/Verify Deterministic Core", false, 901)]
         static void Run()
         {
             var log = new StringBuilder("Deterministic core self-check\n");

@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54decbcf9066b834f87e3e671684b14e, type: 3}
+  m_Name: EllipseFocusConfig_002
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Convergence::SimulationLobby.Simulations.Convergence.EllipseFocusConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 60.950005
+  intent: 'conv-002 ellipse stretch. One repeated question (how many balls from red
+    hit blue?), nine rounds, one visible change each: move red (miss), put it back,
+    stretch the ellipse taller (still all hit), stretch it again while the dots stay
+    put (miss), squash it wide, nearly a line, a circle, then 600 balls. Only the
+    foci work. Seed is cosmetic only.'
+  ballCount: 120
+  ballRadius: 0.09
+  meetRadius: 0.25
+  meetFraction: 0.95
+  verdictWindowSeconds: 0.06
+  firstHoldSeconds: 1.5
+  preLaunchHoldSeconds: 1
+  resultHoldSeconds: 1.5
+  transitionSeconds: 1.5
+  endCardSeconds: 3
+  holdCaption: GUESS?
+  counterLabel: HIT BLUE
+  title: THE MAGIC POINT
+  question: HOW MANY BALLS FROM RED HIT BLUE?
+  endCard: ONLY THE FOCUS WORKS. EVEN WHEN YOU STRETCH IT.
+  maxAngleOffsetDegrees: 1
+  rounds:
+  - info:
+      caption: WATCH BLUE
+      result: ALL {n}. AT THE SAME TIME.
+      expected: 0
+      runSeconds: 2.08
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: NOW MOVE RED A LITTLE...
+      result: ONLY {n} HIT.
+      expected: 1
+      runSeconds: 6
+      trailSeconds: 1.5
+      ballCount: 0
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0.7, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: PUT IT BACK...
+      result: ALL {n} AGAIN.
+      expected: 0
+      runSeconds: 2.08
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: STRETCH IT TALLER...
+      result: STILL ALL {n}!
+      expected: 0
+      runSeconds: 2.38
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 3
+    halfHeight: 5.75
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: STRETCH AGAIN... BUT THE DOTS STAY
+      result: ONLY {n} HIT.
+      expected: 1
+      runSeconds: 2.45
+      trailSeconds: 0.6
+      ballCount: 0
+    halfWidth: 2
+    halfHeight: 5.75
+    startOffset: {x: 0, y: -0.48561046}
+    targetOffset: {x: 0, y: 0.48561046}
+    speed: 5
+  - info:
+      caption: SQUASH IT WIDE...
+      result: ALL {n}. SIDEWAYS TOO.
+      expected: 0
+      runSeconds: 1.92
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 4.6
+    halfHeight: 2.6
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: ALMOST A LINE...
+      result: STILL ALL {n}!
+      expected: 0
+      runSeconds: 2.38
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 1
+    halfHeight: 5.75
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: MAKE IT A CIRCLE...
+      result: ALL {n} BACK TO THE MIDDLE.
+      expected: 0
+      runSeconds: 1.58
+      trailSeconds: 0.4
+      ballCount: 0
+    halfWidth: 3.75
+    halfHeight: 3.75
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: NOW 600 BALLS...
+      result: ALL {n}!
+      expected: 0
+      runSeconds: 2.08
+      trailSeconds: 0
+      ballCount: 600
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 5

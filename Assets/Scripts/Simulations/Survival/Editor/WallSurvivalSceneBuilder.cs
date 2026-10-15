@@ -11,7 +11,7 @@ namespace SimulationLobby.Simulations.Survival.EditorTools
 {
     /// <summary>
     /// Builds <c>Assets/Scenes/Survival_WallVsBall_3D.unity</c> from code.
-    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ Survival_WallVsBall_3D</c>.
+    /// Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Survival (surv) ▸ Wall vs Ball</c>.
     /// </summary>
     /// <remarks>
     /// Scene-as-code for the same reason <c>EscapeSceneBuilder</c> is — a video must stay
@@ -26,7 +26,7 @@ namespace SimulationLobby.Simulations.Survival.EditorTools
 
         /// <summary>
         /// Re-applies the tuning baseline to the existing config asset, discarding hand-tuning.
-        /// Menu: <c>Simulation Lobby ▸ Reset Config ▸ Wall Survival (tuning baseline)</c>.
+        /// Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Survival (surv) ▸ Reset Config (tuning baseline)</c>.
         /// </summary>
         /// <remarks>
         /// Needed because the scene builder deliberately never overwrites an existing config — it
@@ -34,7 +34,7 @@ namespace SimulationLobby.Simulations.Survival.EditorTools
         /// changed baseline short of deleting the asset, which also loses its GUID and unwires every
         /// scene pointing at it.
         /// </remarks>
-        [MenuItem("Simulation Lobby/Reset Config/Wall Survival (tuning baseline)")]
+        [MenuItem("Simulation Lobby/3D Formats/Survival (surv)/Reset Config (tuning baseline)", false, 252)]
         static void ResetConfig()
         {
             var config = AssetDatabase.LoadAssetAtPath<WallSurvivalConfig>(ConfigPath);
@@ -51,7 +51,7 @@ namespace SimulationLobby.Simulations.Survival.EditorTools
             EditorGUIUtility.PingObject(config);
         }
 
-        [MenuItem("Simulation Lobby/Build Scene/Survival_WallVsBall_3D")]
+        [MenuItem("Simulation Lobby/3D Formats/Survival (surv)/Wall vs Ball", false, 231)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

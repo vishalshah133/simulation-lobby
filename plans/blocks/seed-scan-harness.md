@@ -1,10 +1,10 @@
 # Block: Seed-Scan Harness
 
-**Status:** `built` (2026-10-04, compiles; first in-Unity run pending) · **Layer:** `Assets/Scripts/Capture/` · **Used by:** every video
+**Status:** `built` (2026-10-04, compiles; first in-Unity run pending) · **Opt-in only since 2026-10-05**: seeds are random by default and no video plan needs a scan (CLAUDE.md, *Working agreements*) · **Layer:** `Assets/Scripts/Capture/` · **Used by:** every video
 
 ## Use it
 
-1. Open the scene. **Simulation Lobby ▸ Seed Scan ▸ Add Scanner To Open Scene**. That adds a
+1. Open the scene. **Simulation Lobby ▸ Tools ▸ Seed Scan ▸ Add Scanner To Open Scene**. That adds a
    `SeedScanner` to the `SimulationRunner` and picks the profile named after the runner's config
    (`SeedScan_<ConfigName>`), or the one selected in the Project window.
 2. **Play.** Audio is muted and the scan runs in slices so the editor stays responsive. The console
@@ -15,7 +15,7 @@
    `SimulationRunner.seed`, and Play. The `[SimulationRunner]` line must match the scan's exactly.
    Record the seed in the video plan and in `PROJECTS.md`.
 
-A new video only needs a new profile asset (`Create ▸ Simulation Lobby ▸ Seed Scan Profile`, in
+A new video only needs a new profile asset (`Create ▸ Simulation Lobby ▸ Tools ▸ Seed Scan Profile`, in
 `Assets/Settings/Scans/`). Requirements and weights name the format's `RunResult` metrics; `duration`
 and `finished` always exist, and one `*` sums a family (`attempt_*_bounces`).
 

@@ -3,7 +3,7 @@
 **Status:** `built` (code) / verification partial · **Layer:** `Assets/Scripts/Core/` · **Used by:** every format, every video
 
 > Built 2026-09-27. Files and the per-file roles are listed in `Assets/Scripts/README.md`.
-> Self-check: **Simulation Lobby ▸ Verify Deterministic Core** (needs no scene, no physics).
+> Self-check: **Simulation Lobby ▸ Tools ▸ Verify Deterministic Core** (needs no scene, no physics).
 > The frame-rate and resolution criteria below stay open until `esc-001` gives us a real scene.
 
 The foundation that makes a run reproducible from a seed. Build once, change rarely — a change here

@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SimulationLobby.Simulations.Breaker.EditorTools
 {
     /// <summary>
-    /// Builds the <c>brk</c> scene from code. Menu: <c>Simulation Lobby ▸ Build Scene ▸ Breaker_Rings_2D_Song</c>.
+    /// Builds the <c>brk</c> scene from code. Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Ring Breaker (brk) ▸ Rings + Song</c>.
     /// Ring geometry comes from the config, so after changing ring count/size/segments, rebuild.
     /// </summary>
     static class BreakerSceneBuilder
@@ -37,7 +37,7 @@ namespace SimulationLobby.Simulations.Breaker.EditorTools
             new Color(0.3f, 0.6f, 1f),      // blue
         };
 
-        [MenuItem("Simulation Lobby/Build Scene/Breaker_Rings_2D_Song")]
+        [MenuItem("Simulation Lobby/2D Formats/Ring Breaker (brk)/Rings + Song", false, 111)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -238,7 +238,7 @@ namespace SimulationLobby.Simulations.Breaker.EditorTools
             }
 
             log.Append($"  top speed {config.MaxSpeed:0.0} vs safe {ConstantSpeed2D.MaxSafeSpeed(config.fixedTimestep, config.ringThickness):0.0}. " +
-                       "Press Play to run seed 1, or scan (Simulation Lobby ▸ Seed Scan).");
+                       "Press Play to run seed 1, or scan (Simulation Lobby ▸ Tools ▸ Seed Scan).");
             Debug.Log(log.ToString());
         }
 

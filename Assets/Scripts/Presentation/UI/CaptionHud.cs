@@ -40,7 +40,12 @@ namespace SimulationLobby.Presentation
                 return;
             }
 
-            _captionText.text = text ?? string.Empty;
+            text = text ?? string.Empty;
+            if (_captionText.text != text)
+            {
+                _captionText.text = text;
+            }
+
             if (punch)
             {
                 _punchLeft = punchSeconds;
@@ -49,17 +54,21 @@ namespace SimulationLobby.Presentation
 
         public void SetSubline(string text)
         {
-            if (_sublineText != null)
+            // TMP rebuilds its mesh on every assignment, even an identical string, and callers push
+            // this every frame -- so only write when it changed.
+            text = text ?? string.Empty;
+            if (_sublineText != null && _sublineText.text != text)
             {
-                _sublineText.text = text ?? string.Empty;
+                _sublineText.text = text;
             }
         }
 
         public void SetFooter(string text)
         {
-            if (_footerText != null)
+            text = text ?? string.Empty;
+            if (_footerText != null && _footerText.text != text)
             {
-                _footerText.text = text ?? string.Empty;
+                _footerText.text = text;
             }
         }
 

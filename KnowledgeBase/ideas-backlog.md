@@ -72,6 +72,39 @@ actually being built, per this file's own rule.
   2D particle/fluid layer. Its own format slug if built
 - `esc` — **A 30-45s cut** of an existing `esc` config, to test length against the 2:05 originals
 
+## Experiment slate (2026-10-13) — fills the experiment lane in `channel-strategy.md` → *Shorts mix*
+
+Ranked. Each one tests a single new thing, and the reuse notes are what keep it cheap.
+
+1. **Multiply vs Escape** (new, no reference) `[built]` mve-001, 2026-10-13, slug `mve`. One ball sits in the rotating-gap circle. **Every wall bounce
+   clones it**, and any ball through the gap is gone for good. The question: *will the circle fill up before
+   they all get out?* Two live counters (INSIDE / ESCAPED), and the swarm sweeps the gap like a tide. Tests:
+   **a new mechanic on the proven threshold shape** (the shape stays, only the mechanic changes). Reuse:
+   `CircularBoundary2D` + rotating gap, `BodyPool2D` hard cap (the count carries the number past the body cap,
+   as in `rom`), `CountFormat`, bounce audio. Needs: a new scene and its own small simulation. It's *not* a
+   flag on `esc` (see CLAUDE.md on flags). How it loses: the inside count hits a cap ("the circle is full").
+2. **Reach the Core** (reference-backed, CodeCrafted #1 at 25.7M). This is `brk` inverted: the ball starts
+   outside nested rotating rings and has to break its way *in* to the centre. Tests: an inverted direction on a
+   proven arena. Reuse: `SegmentedRing2D`, `ShatterBurst2D`, song mode. How it loses: a clock or a hit budget.
+3. **Glass Gauntlet** (3D, studio look). One chrome ball rolls through a corridor of 50 glass panes, each one
+   a bit thicker. *How many can it break?* Tests: whether 3D glass and the shatter sound can pull the band in
+   a threshold shape (v5 was 3D threshold, but without the studio look). Reuse: studio-look kit, `CollisionDetector3D`,
+   procedural glass break, slow-mo director, camera rig. How it loses: the ball stops.
+
+## From MathCa + Bouncy Physics (2026-10-14, see `reference-channels.md`)
+
+- **Math inevitability / convergence** (working name `conv`, new category). Many identical glowing bodies
+  start at different points, and a known mathematical fact makes them meet, sync or close up: cycloid
+  (tautochrone) balls arriving together, ellipse-focus rebounds, a pendulum wave lining up, the golden-angle
+  spiral. Title shape: **"Will they all ___?"**. Reference: MathCa, 12.2M / 902K / 474K in its first 2 weeks,
+  1.2-1.9% likes (highest of any channel pulled). Its explainer-only topics flopped. Cheap: deterministic and
+  analytic, 30s, no tuning table. Good fit for the experiment lane. Promote to `formats/` once building.
+- **Hidden-shape reveal** (an `esc`/`evolve` hybrid). The escalation draws or carves a picture and the viewer
+  guesses what it is ("Ball SHRINKS, wall GROWS. Can you guess the SHAPE?"). Reference: Bouncy Physics,
+  25.5K / 18.2K, a weak signal from a 128-sub channel.
+- `brk` — **themed target**: break a heart / star / egg outline instead of plain rings. Config-level. Bouncy
+  Physics, 3-4.6K each (weak).
+
 ## Experiments / untested
 
 - Viewer-voted path: pinned comment decides the next video's gate layout

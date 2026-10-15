@@ -2,7 +2,7 @@
 
 **Format:** `esc` · **Length:** ~2 min (7 rounds) · **Aspect:** 9:16 @ 1080x1920 · **Status:** `built` (code compiles 2026-10-03; scene not yet generated or playtested)
 **Brief:** `KnowledgeBase/formats/containment-escape.md`
-**Scene:** `Assets/Scenes/Escape_Circle_2D_Song.unity` (build in-editor: **Simulation Lobby ▸ Build Scene ▸ Escape_Circle_2D_Song**)
+**Scene:** `Assets/Scenes/Escape_Circle_2D_Song.unity` (build in-editor: **Simulation Lobby ▸ 2D Formats ▸ Escape (esc) ▸ Static Gap + Song**)
 **Config:** `Assets/Settings/Configs/EscapeConfig_003.asset` (created on first build) · **Melody:** `Assets/Settings/Melodies/BaaBaaBlackSheep.asset` · **Seed:** TBD (starts at `1`, see below)
 
 ## Premise
@@ -78,7 +78,7 @@ second scene the same way.
 Published 2026-10-03 as v7, most likely with the scene default `seed: 1` (unconfirmed, see
 `PROJECTS.md`). These criteria are now encoded in
 `Assets/Settings/Scans/SeedScan_EscapeConfig_003.asset`; for a re-render or a sequel, scan
-(**Simulation Lobby ▸ Seed Scan**) instead of picking by hand. A good seed:
+(**Simulation Lobby ▸ Tools ▸ Seed Scan**) instead of picking by hand. A good seed:
 
 1. **≥ 53 total bounces**, so the whole song plays at least once before the reveal
 2. At least one escape **and** one trap, so the score isn't a shutout

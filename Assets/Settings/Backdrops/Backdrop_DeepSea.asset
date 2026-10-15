@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18855587dcad3924a9a9fe89d345f372, type: 3}
+  m_Name: Backdrop_DeepSea
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.BackdropTheme
+  displayName: Deep Sea
+  background: {r: 0.015, g: 0.05, b: 0.06, a: 1}
+  moteTint: {r: 0.3, g: 1, b: 0.8, a: 1}
+  moteAlpha: 0.15
+  moteSize: {x: 0.08, y: 0.25}
+  moteCount: 60
+  driftSpeed: 0.14
+  flow: {x: 0, y: 0.12}
+  spinSpeed: 0
+  moteTexture: {fileID: 2800000, guid: 46e8745b19e66ea478f8d28c0fa8717b, type: 3}

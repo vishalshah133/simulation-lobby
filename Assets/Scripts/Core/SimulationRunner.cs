@@ -82,6 +82,14 @@ namespace SimulationLobby.Core
             if (autoStart)
             {
                 int startSeed = randomizeSeedOnStart ? GenerateUnsavedSeed() : seed;
+                if (randomizeSeedOnStart)
+                {
+                    // Logged up front, not only in the end-of-run summary, so a take worth keeping can
+                    // be re-rendered: copy this into `seed`, untick randomize, Play.
+                    Debug.Log($"[SimulationRunner] Random seed {startSeed}. To re-render this exact take: " +
+                              "set Seed to this value and untick Randomize Seed On Start.", this);
+                }
+
                 Begin(startSeed);
             }
         }

@@ -26,6 +26,10 @@ namespace SimulationLobby.Presentation
         [SerializeField] TMP_Text _rightLabel;
         [SerializeField] TMP_Text _rightScore;
 
+        [Tooltip("Root of the versus row (labels, scores and the vs). Optional: set by the builder so a " +
+                 "format with no two-sided contest can hide it.")]
+        [SerializeField] GameObject _scoreRow;
+
         [Header("Bottom panel — round result and counter")]
         [SerializeField] TMP_Text _roundText;
         [SerializeField] TMP_Text _counterText;
@@ -49,6 +53,21 @@ namespace SimulationLobby.Presentation
             _roundText = round;
             _counterText = counter;
             _resultText = result;
+        }
+
+        /// <summary>Additive wiring for <see cref="SetScoreVisible"/>; the builder calls it after <see cref="Bind"/>.</summary>
+        public void BindScoreRow(GameObject scoreRow)
+        {
+            _scoreRow = scoreRow;
+        }
+
+        /// <summary>Show or hide the whole versus row. For formats with no two sides to root for.</summary>
+        public void SetScoreVisible(bool visible)
+        {
+            if (_scoreRow != null && _scoreRow.activeSelf != visible)
+            {
+                _scoreRow.SetActive(visible);
+            }
         }
 
         /// <summary>The matchup headline, e.g. "WALL VS BALL". Set once.</summary>
@@ -161,6 +180,21 @@ namespace SimulationLobby.Presentation
             _resultText.color = string.IsNullOrEmpty(text)
                 ? neutralColor
                 : success ? successColor : failureColor;
+        }
+
+        /// <summary>
+        /// Put a neutral line in the result slot: a caption or instruction rather than an outcome.
+        /// Pass null to clear it.
+        /// </summary>
+        public void ShowNeutral(string text)
+        {
+            if (_resultText == null)
+            {
+                return;
+            }
+
+            _resultText.text = text ?? string.Empty;
+            _resultText.color = neutralColor;
         }
     }
 }
