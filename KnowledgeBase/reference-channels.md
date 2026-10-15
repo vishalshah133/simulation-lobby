@@ -354,3 +354,88 @@ end around 2024-09.
 - The 35–63 min runtimes matter for the watch-hours route: one 13K-view video at that length banks far more hours than a Short.
 - Its titles and thumbnails are unoptimised, which is the gap we can compete on.
 - Not verified: search-wide genre volume. Our `yt.py` has no search command.
+
+---
+
+## @MathCarlooo ("MathCa") and @BouncyPhysics: two brand-new Shorts channels (data pulled 2026-10-14)
+
+Both channels were **created in the last week of September 2026**, so every number below is about 2 weeks of
+history. Both post 2-3 Shorts a day. Small samples, very young channels: read this as early signal, not proof.
+
+### MathCa: math and physics "inevitability" Shorts
+
+| Measure | Value |
+|---|---|
+| Created | 2026-09-29 |
+| Subs / uploads / views | **12,100 / 35 / 13.0M** |
+| Best | *Will they all hit the same point?* (2026-10-05), **12.2M** in 9 days, 1.55% likes |
+| Next | *Will this pattern ever close?* 902K; *Can two mirrors catch them all?* 474K; then 4 at 100-180K |
+| Median (top 30) | 32.8K. Median of the last 15 uploads: **69.8K**, so the channel is still rising |
+| Length | 21-46s, almost all **31-34s** |
+| Like-rate | **1.0-2.0%**, mostly 1.2-1.9%. That's 2-4x what the bouncing-ball and marble channels get |
+| Titles | One template: **"Will they all ___?"** / "Can ___ ever ___?" / "Why do ___?". Short, a question every time, an emoji now and then, hashtags `#maths #physics #geometry` |
+
+Topics (from titles; we can't watch through the API, so the mechanics are *inferred*): many glowing balls
+released together with a guess about whether they **converge, sync up or close the loop**. Likely the
+tautochrone/cycloid ("arrive at once", "reach the bottom together"), ellipse foci and mirrors ("two mirrors
+catch them all", "still meet if I stretch it"), pendulum waves ("line up again"), the golden angle (sunflower 137.5°,
+"will this pattern ever close"), plus explainers (Klein bottle, 4D cube, Möbius strip, Collatz, Galton board,
+the colliding-blocks π count).
+
+**What it shows:**
+1. **The "will they all…?" convergence shapes win.** The six best videos are all *many bodies, one prediction,
+   and a satisfying certain answer*. The pure explainers (*What is a Klein bottle?* 11.6K, *4D cube* 13.5K,
+   *Ising model* 5.2K) sit at the bottom. So the hook is the payoff of seeing a theorem happen, not the maths lesson.
+2. **Its earliest uploads used our own titles and did badly.** *"Splitting vs exponential. Who breaks out
+   first?"* (10.3K) and *"Accelerating vs exponential"* (8.0K) are `mve`/`esc`-shaped. It switched to the
+   convergence shape on day 3 and the views followed. That's one channel, and the hit probably drove much of it.
+3. **One hit is 94% of its views.** Without the 12.2M video it's a 2-week-old channel with a ~70K recent
+   median. That's still well above the ~1-30K of the 2D bouncing channels in the same window.
+4. **Its like-rate is the standout.** It holds 1.2-1.9% across the catalogue. Like-rate barely depends on age,
+   so it's the cleanest quality signal here. The audience rates these higher than ours.
+
+### Bouncy Physics: our own genre, launched the same week
+
+| Measure | Value |
+|---|---|
+| Created | 2026-09-30 |
+| Subs / uploads / views | **128 / 29 / 124K** |
+| Best | *Ball SHRINKS, wall GROWS. Can you guess the SHAPE?* 25.5K (and a 18.2K first version) |
+| Next | *Every try starts FASTER. Can the ball reach the center?* 16.0K; *1 SEXTILLION in 70 bounces* 14.3K; *Every bounce = 1 new ball. When will the ring BREAK?* 8.9K |
+| Median | 3.0K (all), 4.6K (last 15) |
+| Length | Started at 1:04-1:13 (Oct 2-5, ~1.3K each). Moved to **22-44s** (Oct 6 on) and views went up. The confound: the channel was also 4 days older |
+| Like-rate | 0.4-2.2%, mostly ~1.0-1.4% |
+| Long form | One 6:58 compilation (*I Shattered 16,714 Pieces of Glass in 7 Simulations*): **7 views** |
+| Titles | Statement in CAPS plus a question plus an emoji: "Every X = Y. When will Z?", "Can one ball ___ a [shape]?" |
+
+Practically a mirror of our 2D lane: grow/shrink, reach the centre, sextillion counter, clone-per-bounce ring
+break, glass that heals, shatter-a-shape (star, heart, egg), jelly merge-fill, melon slicing, string weaving,
+a colour drain. **Nearly every one is already in our backlog or built**, which is a check on our
+idea list more than a source of new ones. It also shows how crowded the lane is: a near-identical channel launched
+the same week, and its 3K median sits at the low end of the genre band.
+
+**What we take from Bouncy Physics:**
+- **The "guess the shape" reveal** (its #1 and #2): the sim carves or draws a hidden picture and the viewer
+  guesses it. *Hidden picture* (string weaving), *constellation appears* and *what flower is it* are the same
+  move. This is new to us, see below.
+- **Themed targets for `brk`**: "Can one ball break a heart / star / egg?" is `brk` with the outer shape
+  swapped for a recognisable icon. That's a config-level change, not a new format.
+- A second data point that a **compilation long-form on a young Shorts channel gets nothing** (7 views). It's the
+  same lesson as `two-track-strategy`: long form needs its own audience and isn't a re-upload of Shorts.
+
+### Does it find new genres? Yes, two (one strong, one weak)
+
+1. **Math inevitability / convergence** (MathCa). *New, and the strongest signal in this pull.* Many identical
+   bodies start from different points, and a mathematical fact says they'll meet, sync or close up. The title asks
+   whether they will. The tension isn't competition (`race`), escalation (`esc`) or open-ended emergence
+   (`evolve`, CodeCrafted). It's **a prediction with a known and surprising answer**. Our engine fits it well:
+   deterministic, no seed variance needed, 30s, high-contrast glowing bodies on dark ground. It's the
+   like-rate leader of every channel we've pulled.
+2. **Hidden-shape reveal** (Bouncy Physics). *New as a hook, but small evidence (25K best, 128 subs).* An
+   escalation loop (shrink/grow, weaving, packing) whose payoff is a picture the viewer has to guess. It
+   merges `esc` mechanics with the `evolve` curiosity gap, plus a "guess" call to action that invites comments.
+
+**What we don't take:** MathCa's explainer topics (Klein bottle, 4D cube). They're its weakest videos, and they're
+an education channel's job, not a lobby's. **Unverified:** retention (owner-only). Whether the 12.2M hit was the
+topic or the luck of the algorithm: one hit on a 2-week-old channel can't tell those apart. And the specific
+mechanics behind each title, which come from title wording and haven't been watched.

@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54decbcf9066b834f87e3e671684b14e, type: 3}
+  m_Name: EllipseFocusConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Convergence::SimulationLobby.Simulations.Convergence.EllipseFocusConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 24.36
+  intent: 'conv-001 ellipse focus. One question (120 balls from red: how many hit
+    blue?), two visible dots, one visible twist. Start on the focus: all hit. Slide
+    red 0.7 sideways: only a handful hit. Slide it back: all hit again. Only the
+    focus works. The seed is cosmetic only: colours and firing-angle jitter vary,
+    the maths is exact.'
+  ballCount: 120
+  ballRadius: 0.09
+  meetRadius: 0.25
+  meetFraction: 0.95
+  verdictWindowSeconds: 0.06
+  firstHoldSeconds: 1.5
+  preLaunchHoldSeconds: 0.6
+  resultHoldSeconds: 1.5
+  transitionSeconds: 1.5
+  endCardSeconds: 3
+  counterLabel: HIT BLUE
+  title: THE MAGIC POINT
+  question: 120 BALLS FROM RED. HOW MANY HIT BLUE?
+  endCard: ONLY THIS POINT WORKS. IT'S CALLED A FOCUS.
+  maxAngleOffsetDegrees: 1
+  rounds:
+  - info:
+      caption: WATCH BLUE
+      result: ALL {n}. AT THE SAME TIME.
+      expected: 0
+      runSeconds: 2.08
+      trailSeconds: 0.4
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0, y: 0}
+    speed: 5
+  - info:
+      caption: NOW MOVE RED A LITTLE...
+      result: ONLY {n} HIT.
+      expected: 1
+      runSeconds: 7
+      trailSeconds: 1.5
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0.7, y: 0}
+    speed: 5
+  - info:
+      caption: PUT IT BACK...
+      result: ALL {n} AGAIN.
+      expected: 0
+      runSeconds: 2.08
+      trailSeconds: 0.4
+    halfWidth: 3.75
+    halfHeight: 5
+    startOffset: {x: 0, y: 0}
+    speed: 5

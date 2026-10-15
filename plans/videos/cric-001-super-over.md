@@ -19,7 +19,7 @@ shot. Who wins the super over?
 ## Video-specific work
 
 `CricketConfig`, `CricketTeamDef`, `CricketMatch`, `CricketSimulation`, `CricketPresenter`,
-`CricketSceneBuilder`. Build: **Simulation Lobby > Build Scene > Cricket_SuperOver_2D**. Teams: swap
+`CricketSceneBuilder`. Build: **Simulation Lobby ▸ 2D Formats ▸ Cricket (cric) ▸ Super Over**. Teams: swap
 `teamA` / `teamB` on `CricketConfig_001` (no rebuild).
 
 ### Config + tuning targets

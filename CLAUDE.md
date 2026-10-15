@@ -122,10 +122,14 @@ and have everything else still compile? If not, something leaked.
   in simulation code; it breaks reproducibility.
 - Two aspect targets: **9:16 @ 1080x1920** (Shorts) and **16:9 @ 1920x1080** (long form).
   Anything that must be read on screen gets checked at both.
-- **Shorts can run up to 3 minutes** (the old 60s cap is gone). Don't compress a format to fit 60s —
-  length should be whatever keeps the footage tense. For escalation formats this means tuning for
-  *event count* first (bounces, near-misses, rounds) and total length second: bounces are the content,
-  and starving a round of them to hit an obsolete limit trades away the whole appeal.
+- **Editor menu layout.** Every `[MenuItem]` goes under `Simulation Lobby/2D Formats/<Format> (<slug>)/`,
+  `Simulation Lobby/3D Formats/<Format> (<slug>)/` or `Simulation Lobby/Tools/`. Use readable item names
+  (`Rotating Gap`, `Ellipse Stretch (conv-002)`), not scene file names; the builder logs the scene path. Pass a
+  priority: builds first (2D at 1xx, 3D at 2xx, consecutive within a format), then that format's tools (reset,
+  asset helpers) 20+ higher, so Unity draws a separator. Tools sit at 9xx. Docs write paths with `▸`.
+- **Length targets are in *Content guidelines* below** (Shorts 1-2 min, long form well past that). Within
+  that band, length is whatever keeps the footage tense. For escalation formats, tune for *event count*
+  first (bounces, near-misses, rounds) and total length second: bounces are the content.
 
 ## 3D scenes and "settled" completion conditions
 
@@ -192,6 +196,61 @@ same scene.
   lives in `Presentation` and stays format-agnostic ("left side", "right side", "a question"); a thin
   binder in the format pushes values into it, because `Presentation` must never reference a format.
 
+## Content guidelines
+
+Every video is judged by one thing: **can a viewer who swiped in 2 seconds ago, sound off, follow it?**
+
+- **Length.** **Shorts: 1-2 minutes.** Shorter than 1 min means the idea needs more rounds, variants or
+  escalation, not a faster cut. **Long form: substantially longer**, well past 3 min (our first, `terr`, is
+  15 min). It's built around one long arc with several acts, not a Short stretched out or a compilation
+  (compilations on young channels get nothing: `KnowledgeBase/learnings.md`).
+- **Narrative and plot come first.** The viewer must always know what they're watching for, what just changed
+  and why the result happened. Follow the *Story legibility* rules in `KnowledgeBase/learnings.md`:
+  - The question names things that are visible from frame one.
+  - Every cause happens on screen (animated, big enough at 480px, before/after visible).
+  - One question per video. Rounds repeat or escalate it; they never add a new question.
+  - Show only the number that is the answer. A live counter never contradicts the result.
+  - Close with the one-line *why* when the format is a curiosity.
+- **Storyboard before code.** Every plan opens with the storyboard table and cold-viewer checklist from
+  `plans/TEMPLATE.md`. Read it as a stranger before building.
+- **Shorts structure:** hook question in the first second, a guess or tension beat before each payoff, and a
+  payoff every 5-10 s. **Long form:** a stated stake up front, acts that raise it, a midpoint twist, and
+  recurring characters or teams to follow.
+
+## Publishing metadata (title, description, tags)
+
+When a video is ready, or whenever asked for its title or description, give **copy-paste code blocks**
+without being asked twice. The user pastes them straight into YouTube Studio.
+
+- **Standalone.** Write as if this is the only video that exists. Never reference other videos, earlier
+  versions or internal names ("same question", "part 2 of", slugs like `conv-002`, "v2").
+- **Verify lengths with a script** (`python -c "print(len(...))"`) before handing over. Don't estimate.
+
+**Shorts**
+1. **Title**, max 100 chars, hashtags included. A question naming what's on screen, a hook word in CAPS at
+   most once, one emoji at most, and ending in 2-3 hashtags, `#shorts` last
+   (e.g. `... Do They STILL All Hit Blue? 🎯 #physics #math #shorts`).
+2. **Description**, under 500 chars, hashtags included:
+   - Line 1 restates the hook in plain words, without spoiling the twist.
+   - Then 1-2 sentences of *why* (real search terms: the concept's proper name).
+   - Then a comment prompt ("How many did you guess right? 👇").
+   - Then 5-8 hashtags; the first 3 show above the title, so put the most relevant first.
+3. **Tags** (the Studio Tags field), comma-separated, under 500 chars. Lead with the concept's search
+   terms and misspellings, then genre terms (`physics simulation`, `satisfying`), and end with `simulation lobby`.
+
+**Long form**
+1. **Title**, max 100 chars, keeping the hook in the first ~60 (that's what shows in browse). **No hashtags** in the
+   title and no `#shorts`. A stake or a contest ("Which Color Takes the Board?") beats a label.
+2. **Description**, up to ~1,500 chars:
+   - The first 2 lines are the hook (shown above "more").
+   - A short paragraph on what happens, without spoiling the ending.
+   - **Chapters** (`0:00 Intro`, ... from the plan's beat times).
+   - A comment prompt.
+   - 3-5 hashtags at the end.
+3. **Tags**, comma-separated, under 500 chars. Same rules as for Shorts.
+
+Also give a **pinned comment** suggestion. Remind the user to record the logged seed in the video's plan.
+
 ## Content formats (shorthand used in commits and docs)
 
 | Slug | Format | Typical length |
@@ -206,6 +265,8 @@ same scene.
 | `impact` | Single-event spectacle — one thing meets another, once (`idea`; rigid scatter proved too short) | Short |
 | `terr` | Territory — four colours, cannons fed by multiply/release Plinko boards, last colour standing (`building`, 3D) | Long |
 | `cric` | Cricket match on a multiply/release board, two international teams, wagon-wheel shots (`built`, first sport, experiment) | Short |
+| `mve` | Multiply vs Escape — every wall bounce clones the ball, every escape widens the exit; fill up or empty out (`built`, experiment) | Short |
+| `conv` | Math convergence — many balls, one "will they all meet?" prediction with a certain, surprising answer (`built`, experiment, new genre) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 

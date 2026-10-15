@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace SimulationLobby.Simulations.ReleaseOrMultiply.EditorTools
 {
     /// <summary>
-    /// Builds the <c>rom</c> scene from code. Menu: <c>Simulation Lobby ▸ Build Scene ▸ Release_Or_Multiply_2D</c>.
+    /// Builds the <c>rom</c> scene from code. Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Release or Multiply (rom) ▸ Board</c>.
     /// Layout comes from the config, so after changing rows, lanes, spacing or marble size, rebuild.
     /// </summary>
     static class RomSceneBuilder
@@ -25,7 +25,7 @@ namespace SimulationLobby.Simulations.ReleaseOrMultiply.EditorTools
         // Same 9:16 framing as esc and brk: half-height 9.6 gives a 10.8-wide frame.
         const float OrthographicSize = 9.6f;
 
-        [MenuItem("Simulation Lobby/Build Scene/Release_Or_Multiply_2D")]
+        [MenuItem("Simulation Lobby/2D Formats/Release or Multiply (rom)/Board", false, 131)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

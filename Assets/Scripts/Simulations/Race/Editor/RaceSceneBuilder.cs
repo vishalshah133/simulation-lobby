@@ -14,7 +14,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
     /// <summary>
     /// Builds <c>Assets/Scenes/Race_GrandPrix_3D.unity</c>: a field of jewel-coloured glass marbles racing
     /// down a piano-black lacquer course with brass rails, on a pale polished studio floor. 16:9, for long form.
-    /// Menu: <c>Simulation Lobby ▸ Build Scene ▸ Race_GrandPrix_3D</c>.
+    /// Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Race (race) ▸ Grand Prix</c>.
     /// </summary>
     /// <remarks>
     /// Everything is generated from primitives and swept meshes, so there are no model files to import.
@@ -33,7 +33,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         /// <summary>Champagne brass: the video's one metal, echoed in the key light and the backdrop halo.</summary>
         static readonly Color Hue = new Color(0.93f, 0.71f, 0.38f, 1f);
 
-        [MenuItem("Simulation Lobby/Reset Config/Race Track Layout (default course)")]
+        [MenuItem("Simulation Lobby/3D Formats/Race (race)/Reset Track Layout (default course)", false, 222)]
         static void ResetLayout()
         {
             Directory.CreateDirectory(ConfigFolder);
@@ -44,7 +44,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             Debug.Log($"[race] Reset {LayoutPath} to the default course ({layout.sections.Length} sections, {layout.obstacles.Length} obstacles).", layout);
         }
 
-        [MenuItem("Simulation Lobby/Build Scene/Race_GrandPrix_3D")]
+        [MenuItem("Simulation Lobby/3D Formats/Race (race)/Grand Prix", false, 201)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

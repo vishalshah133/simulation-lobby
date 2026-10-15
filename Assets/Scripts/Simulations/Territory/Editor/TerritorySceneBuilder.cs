@@ -11,7 +11,7 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
     /// <summary>
     /// Builds <c>Assets/Scenes/Territory_MultiplyRelease_3D.unity</c>: a flat tile grid and four team-coloured
     /// Plinko boards flush on one charcoal table, a physical drum on a stand behind it, on a floor of raised
-    /// purple slabs, bright and toy-like (Look v3: portrait grid, low close camera). 16:9, long form. Menu: <c>Simulation Lobby ▸ Build Scene ▸ Territory_MultiplyRelease_3D</c>.
+    /// purple slabs, bright and toy-like (Look v3: portrait grid, low close camera). 16:9, long form. Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Territory (terr) ▸ Multiply or Release</c>.
     /// </summary>
     /// <remarks>
     /// Every dimension comes from <see cref="TerritoryConfig"/>, so changing the grid or board geometry means
@@ -27,7 +27,7 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
         const string ConfigPath = ConfigFolder + "/TerritoryConfig_001.asset";
         const float Aspect = 16f / 9f;
 
-        [MenuItem("Simulation Lobby/Build Scene/Territory_MultiplyRelease_3D")]
+        [MenuItem("Simulation Lobby/3D Formats/Territory (terr)/Multiply or Release", false, 211)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

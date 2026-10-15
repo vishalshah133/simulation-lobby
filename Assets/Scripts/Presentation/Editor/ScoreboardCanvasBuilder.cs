@@ -111,6 +111,7 @@ namespace SimulationLobby.Presentation.EditorTools
                 new Color(0.85f, 0.87f, 0.95f, 1f), FontStyles.Bold);
 
             hud.Bind(title, question, leftLabel, leftScore, rightLabel, rightScore, round, counter, result);
+            hud.BindScoreRow(versusRow.gameObject);
             return hud;
         }
 

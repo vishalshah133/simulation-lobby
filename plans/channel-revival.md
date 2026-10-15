@@ -198,7 +198,7 @@ Ordered. Keep this list short — a long queue means nothing is actually next.
    Shorts really stop, or is the public counter lagging?), Avg % viewed + drop-off for v4–v7, and
    confirm v5's and v7's seeds were `1`. Then write the first retros into `KnowledgeBase/retros/`.
 2. **Day-7 snapshots:** 10-06 (v4), 10-07 (v5), 10-08 (v6), 10-10 (v7). v3 done (892).
-3. **First real seed scan** on `Escape_Circle_2D_Song`: **Simulation Lobby ▸ Seed Scan ▸ Add Scanner
+3. **First real seed scan** on `Escape_Circle_2D_Song`: **Simulation Lobby ▸ Tools ▸ Seed Scan ▸ Add Scanner
    To Open Scene**, Play, read the console. Then the acceptance test: turn the scanner off, Play the
    #1 seed fresh, and its `[SimulationRunner]` line must match the scan's exactly.
 

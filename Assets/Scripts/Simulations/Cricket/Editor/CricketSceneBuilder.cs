@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace SimulationLobby.Simulations.Cricket.EditorTools
 {
     /// <summary>
-    /// Builds the <c>cric</c> scene from code. Menu: <c>Simulation Lobby ▸ Build Scene ▸ Cricket_SuperOver_2D</c>.
+    /// Builds the <c>cric</c> scene from code. Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Cricket (cric) ▸ Super Over</c>.
     /// Layout comes from the config, so after changing rows, lanes, spacing or ball size, rebuild.
     /// Teams are assets: change <c>teamA</c> / <c>teamB</c> on the config and press Play; no rebuild needed.
     /// </summary>
@@ -51,7 +51,7 @@ namespace SimulationLobby.Simulations.Cricket.EditorTools
             ("AFGHANISTAN", "AFG", new Color(0.1f, 0.35f, 0.75f), new Color(0.85f, 0.15f, 0.2f)),
         };
 
-        [MenuItem("Simulation Lobby/Cricket/Create Team Assets")]
+        [MenuItem("Simulation Lobby/2D Formats/Cricket (cric)/Create Team Assets", false, 172)]
         static void CreateTeams()
         {
             EnsureTeams();
@@ -59,14 +59,14 @@ namespace SimulationLobby.Simulations.Cricket.EditorTools
             Debug.Log($"[cric] {Teams.Length} team assets are in {TeamFolder}. Drag any two onto a CricketConfig's Team A / Team B.");
         }
 
-        [MenuItem("Simulation Lobby/Cricket/Fill Audio Kit")]
+        [MenuItem("Simulation Lobby/2D Formats/Cricket (cric)/Fill Audio Kit", false, 173)]
         static void FillKitMenu()
         {
             EnsureKit();
             AssetDatabase.SaveAssets();
         }
 
-        [MenuItem("Simulation Lobby/Build Scene/Cricket_SuperOver_2D")]
+        [MenuItem("Simulation Lobby/2D Formats/Cricket (cric)/Super Over", false, 151)]
         static void Build()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

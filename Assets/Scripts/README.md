@@ -39,7 +39,7 @@ folder and have everything else still compile? If not, something leaked.
 | `RunResult.cs` | Outcome data, JSON-serializable. No wall-clock, no frame count, by design. |
 | `RunRecorder.cs` | Builds a `RunResult` as the run progresses; owns the tick counter. |
 | `DeterminismVerifier.cs` | Runs a seed twice and compares. The regression check after touching `Core`/`Shared`. |
-| `Editor/CoreSelfCheck.cs` | Menu: **Simulation Lobby ▸ Verify Deterministic Core**. Proves the above with no scene and no physics. |
+| `Editor/CoreSelfCheck.cs` | Menu: **Simulation Lobby ▸ Tools ▸ Verify Deterministic Core**. Proves the above with no scene and no physics. |
 
 ## Writing a format
 

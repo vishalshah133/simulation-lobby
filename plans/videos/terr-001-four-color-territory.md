@@ -38,7 +38,7 @@ Deletion test: delete `Simulations/Territory` and everything else still compiles
 
 ### Scene (`Assets/Scenes/Territory_MultiplyRelease_3D.unity`, built by menu)
 
-**Simulation Lobby ▸ Build Scene ▸ Territory_MultiplyRelease_3D** (`TerritorySceneBuilder`). Rebuilding replaces
+**Simulation Lobby ▸ 3D Formats ▸ Territory (terr) ▸ Multiply or Release** (`TerritorySceneBuilder`). Rebuilding replaces
 the scene. It never overwrites `Assets/Settings/Configs/Territory/TerritoryConfig_001.asset` once that exists.
 
 World layout (metres; Y up; the camera looks toward +Z from the front, elevated):

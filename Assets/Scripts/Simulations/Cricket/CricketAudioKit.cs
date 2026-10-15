@@ -9,7 +9,7 @@ namespace SimulationLobby.Simulations.Cricket
     /// </summary>
     /// <remarks>
     /// Drop royalty-free clips into <c>Assets/Audio/Cricket/</c> named as below and run
-    /// <b>Simulation Lobby ▸ Cricket ▸ Fill Audio Kit</b> (the scene builder also does it), or drag clips
+    /// <b>Simulation Lobby ▸ 2D Formats ▸ Cricket (cric) ▸ Fill Audio Kit</b> (the scene builder also does it), or drag clips
     /// into the slots by hand. Check each clip's licence allows monetised YouTube use before publishing.
     /// </remarks>
     [CreateAssetMenu(

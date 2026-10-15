@@ -7,6 +7,21 @@
 
 One sentence. It's usually also the title.
 
+## Storyboard (write before any code)
+
+| Beat | On screen | Caption / counter |
+|---|---|---|
+| Hook | | |
+| ... | | |
+| Payoff | | |
+
+Read it as a cold viewer with the sound off (`learnings.md` → *Story legibility*):
+- [ ] The question names things that are **visible from the first frame**
+- [ ] Every change that causes the result **happens on screen** (animated, big enough at 480px, with a before/after)
+- [ ] Every beat changes the answer or raises the stakes. Cut the ones that don't
+- [ ] The only number shown is the answer (no tallies unless there are two real sides)
+- [ ] The ending says *why* in one line when the format is a curiosity
+
 ## Blocks used
 
 `BUILD` = first implementation, this video pays the cost. `REUSE` = already exists, just verify.

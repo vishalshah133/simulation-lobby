@@ -166,6 +166,22 @@ namespace SimulationLobby.Presentation.EditorTools
         }
 
         /// <summary>
+        /// The same annulus as <see cref="Ring"/>, as a one-world-unit sprite asset, for SpriteRenderers
+        /// (a start marker, a burst ring). A saved asset, so a scene keeps the reference after reload.
+        /// </summary>
+        public static Sprite RingSprite()
+        {
+            const int size = 256;
+            float radius = size * 0.5f;
+            return EnsureSprite("RingSprite_256.png", size, (x, y) =>
+            {
+                float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(radius, radius)) / radius;
+                float band = 1f - Mathf.Abs(d - 0.9f) / 0.08f;
+                return Mathf.Clamp01(band);
+            });
+        }
+
+        /// <summary>
         /// White rounded rectangle, 9-sliced (border 24 px of 64). Use Image.Type.Sliced; the corner
         /// radius then stays 24 sprite pixels (scaled by Image.pixelsPerUnitMultiplier) at any size.
         /// </summary>

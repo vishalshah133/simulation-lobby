@@ -3,7 +3,7 @@
 **Format:** `impact` (parameter-sweep variant) · **Length:** ~19s · **Aspect:** 9:16 @ 1080x1920
 · **Status:** `building` (code built and verified headless 2026-09-30, awaiting first playtest)
 **Brief:** `KnowledgeBase/formats/impact.md` · **Reference:** RenderZen, `KnowledgeBase/reference-channels.md`
-**Scene:** `Assets/Scenes/Impact_SoftSweep_3D.unity`, built in-editor via **Simulation Lobby ▸ Build Scene ▸ Impact_SoftSweep_3D**
+**Scene:** `Assets/Scenes/Impact_SoftSweep_3D.unity`, built in-editor via **Simulation Lobby ▸ 3D Formats ▸ Impact (impact) ▸ Soft Sweep**
 **Config:** `Assets/Settings/Configs/SoftSweep/SoftSweep_001` (sweep) + `SoftDrop_000/025/050/075/100` (takes) · **Seed:** `0`
 
 ## Premise
@@ -106,7 +106,7 @@ Per [material-contact-audio](../blocks/material-contact-audio.md), plus:
 
 ## First playtest checklist (user)
 
-1. Run **Simulation Lobby ▸ Build Scene ▸ Impact_SoftSweep_3D**, then Play.
+1. Run **Simulation Lobby ▸ 3D Formats ▸ Impact (impact) ▸ Soft Sweep**, then Play.
 2. **Look:** Does the glass read as glass (refraction + rim), or does it fall back to plain transparent
    Lit? A Console warning names the shader if it failed. Is chrome/lacquer reflecting the softboxes?
 3. **Sound:** Do the clink, squelch, creak and wobble sound like materials, and are the takes

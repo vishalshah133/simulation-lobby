@@ -2,7 +2,7 @@
 
 **Format:** `esc` · **Length:** ~1:20 (7 rounds, same as v7) · **Aspect:** 9:16 @ 1080x1920 · **Status:** `shelved` 2026-10-04: the user moved the song to a ring-breaker format, [brk-001](brk-001-ring-breaker-fur-elise.md). The scene variant and scan profile stay usable.
 **Brief:** `KnowledgeBase/formats/containment-escape.md` · **Parent:** [esc-003](esc-003-guess-the-song.md). Everything not listed here is identical to it.
-**Scene:** `Assets/Scenes/Escape_Circle_2D_Song_FurElise.unity` (build: **Simulation Lobby ▸ Build Scene ▸ Escape_Circle_2D_Song_FurElise**)
+**Scene:** `Assets/Scenes/Escape_Circle_2D_Song_FurElise.unity` (build: **Simulation Lobby ▸ 2D Formats ▸ Escape (esc) ▸ Static Gap + Fur Elise**)
 **Config:** `Assets/Settings/Configs/EscapeConfig_004.asset` (created on first build) · **Melody:** `Assets/Settings/Melodies/FurElise.asset` · **Scan profile:** `Assets/Settings/Scans/SeedScan_EscapeConfig_004.asset` · **Seed:** TBD (from the scan)
 
 ## Premise
@@ -43,7 +43,7 @@ so the reveal's played-out line lands on the tonic.
 
 ## Test (user, in Unity)
 
-1. **Build Scene ▸ Escape_Circle_2D_Song_FurElise.**
+1. **2D Formats ▸ Escape (esc) ▸ Static Gap + Fur Elise.**
 2. **Seed Scan ▸ Add Scanner To Open Scene**, then Play. The console shows the top 10 and
    `Scans/Escape_Circle_2D_Song_FurElise_EscapeConfig_004_1-500.csv`.
 3. Choose a seed from the top 10 (don't just take #1 if a lower one *looks* better). Then

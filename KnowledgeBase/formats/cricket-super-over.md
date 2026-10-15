@@ -32,7 +32,7 @@ cricket sims perform (see *Evidence*).
 - **Match:** default is a **super over**: 6 balls and 2 wickets per side. Overs, balls per over and
   wickets are config. The chase ends the instant side B passes the target. A tie is a tie.
 - **Teams:** `CricketTeamDef` assets (name, 3 letters, two colours; nothing else). Ten sides are made by
-  **Simulation Lobby > Cricket > Create Team Assets**. Assign any two to a config's Team A (bats first) and
+  **Simulation Lobby ▸ 2D Formats ▸ Cricket (cric) ▸ Create Team Assets**. Assign any two to a config's Team A (bats first) and
   Team B. Country names and plain colours only: no crests, kits or player names.
 - **Random by default:** lane order per delivery, drop point and shot angle are seeded; the scene
   randomizes the seed each Play (logged).
@@ -46,7 +46,7 @@ cricket sims perform (see *Evidence*).
 A synthesized crowd (filtered noise, then a formant choir) sounded wrong twice, so **crowd sounds are
 recorded clips**: a `CricketAudioKit` asset with a slot per moment (cheer_small / big / roar / final, groan,
 applause, applause_soft). Drop royalty-free files in `Assets/Audio/Cricket/` named as the README there says,
-then **Simulation Lobby > Cricket > Fill Audio Kit** (the scene builder does it too). An empty slot is silent,
+then **Simulation Lobby ▸ 2D Formats ▸ Cricket (cric) ▸ Fill Audio Kit** (the scene builder does it too). An empty slot is silent,
 never a fake. Bat and stumps stay procedural (`ProceduralCrowd`, short tonal knocks) unless the kit overrides
 them. This is a deliberate exception to the procedural-audio house style, for the crowd only. **Keep each
 clip's licence note beside it and confirm monetised-YouTube use is allowed.**

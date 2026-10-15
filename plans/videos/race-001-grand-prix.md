@@ -29,7 +29,7 @@ with a seeded starting angle, so they vary by seed and replay from it. Track 269
 
 ## Build
 
-Menu: **Simulation Lobby > Build Scene > Race_GrandPrix_3D**. Re-running replaces the scene, never the config, layout or materials.
+Menu: **Simulation Lobby ▸ 3D Formats ▸ Race (race) ▸ Grand Prix**. Re-running replaces the scene, never the config, layout or materials.
 The console prints track length, drop, a rough race-time model and a warning if the layout passes through itself.
 
 ## Checklist (first playtest)

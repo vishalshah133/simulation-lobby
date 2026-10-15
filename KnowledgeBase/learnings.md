@@ -1,6 +1,6 @@
 # Learnings — video vs stats
 
-Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-12 19:13Z** (see *10-13 update*).
+Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-13 03:14Z** (see *10-13 update* → *03:14Z pull*).
 The first table and channel line below are the 10-06 16:51Z pull; the trajectory table keeps the earlier pulls. Public data only: no
 retention/drop-off (needs OAuth + Analytics API, not set up).
 
@@ -307,6 +307,95 @@ lags at 11,386). Snapshot appended.
 - **The rotating-gap `esc` is now 2 for 2 above the median** (v4 3,160, v14 1,580 at 1.3d), plus v7 (same arena +
   song) at 1,655. It's the channel's most reliable shape. Reuse it as the control whenever a new format stalls.
 
+### 10-13 03:14Z pull
+
+**28 subs · 15 videos · 13,322 views** (per-video sum). Snapshot appended. Only ~8h after the previous pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-12 19:13Z | Like% |
+|---|---|---|---|---|---|---|
+| 15 | terr | Which Color Takes the Board? 4-Team Multiply or Release (15:15, long-form) | 7.5h | 26 | new | 3.8% (1) |
+| 14 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | 1.6d | 1,583 | +3 | 1.64% |
+| 13 | race | 12 Marbles, 1 Track: Who Wins the Grand Prix? | 3.0d | 435 | +72 | 0.23% |
+
+- **v15 is the first real long-form upload** (`terr`, 15:15, 16:9). 26 views at 7.5h is what a 28-sub channel
+  gets with no Shorts feed behind it, so don't read it as a format verdict. Long-form is judged on Studio
+  watch time, avg % viewed and subs per video, not on API views. First useful read: day 7 (10-19).
+- **v14 stopped almost at once: +3 in 8h at day 1.6.** The burst came in day 1 and finished. That's quicker than
+  v7/v8, which crept on for days, and fits the "push, then stop" shape. It still sits inside the band, so the
+  10-13 conclusion holds.
+- **v13 (`race`) is still climbing slowly (+72 in 8h, ~200/day).** It's the only current-era video with a
+  late, sustained climb rather than a day-1 burst. That fits either browse/suggested traffic for a 16:9 upload
+  or a delayed Shorts test. Studio's traffic source would settle it. Like% keeps falling (1 like on 435).
+- **Subs 27 → 28.** +5 since 10-12 morning. Still a lead, not a rate.
+
+## Story legibility: from the conv-001 first cut (2026-10-14)
+
+The user played the first `conv-001` build and found it **"not very comprehensible, difficult to understand"**,
+and its twist "not visible". This is our own review, not audience data, but the failures were structural, so
+they apply to every format. **A video's story must be understandable with the sound off, by someone who swiped in
+2 seconds ago.**
+
+What went wrong, and the rule each failure gives:
+
+1. **The question didn't say where to look.** "Will they all meet again?" with the target hidden (kept hidden "for
+   the surprise") meant the payoff happened somewhere nobody was watching.
+   → **Make the question concrete and point at visible things.** Name the objects on screen ("from RED, how many
+   hit BLUE?"), and show every object the question mentions from the first frame. A surprise comes from the
+   *outcome*, never from hiding what to watch.
+2. **The twist was invisible.** The start moved 0.19 units (4% of the arena), cut between rounds with no
+   before/after, so the miss read as a glitch.
+   → **A cause must be seen happening.** Animate the change on screen (a slide, not a cut), make it big enough to
+   see at 480px, and mark the *correct* spot (a ghost) **only while the thing is off it**. Fade it out before the payoff. A
+   ghost that shows when nothing is wrong, or that outlives the move, reads as a second copy (user feedback, 2026-10-15). If a viewer can't point to *what changed*, the result has no meaning.
+3. **Too many rounds that each needed explaining.** Circle → focus → stretch → offset: four ideas in 40s, two of
+   which (circle, stretch) added nothing the viewer needed.
+   → **One question, one reveal, one twist.** Cut every beat that doesn't change the answer. Escalation formats
+   get many rounds because each round is the *same* question with a higher number; a prediction format doesn't.
+4. **Bookkeeping competed with the picture.** A MEET vs MISS score and "ROUND n / N" made viewers track a tally.
+   → **Show only the number that is the answer** (`HIT BLUE 120 / 120`). Add a versus score only when there are
+   genuinely two sides to root for. (This narrows the "always frame as two named sides" UI habit.)
+5. **The idea was never named.** The trick (a focus) was implied, not told.
+   → **End with the one-line reason** ("ONLY THIS POINT WORKS. IT'S CALLED A FOCUS."). A curiosity format owes the
+   viewer the answer. MathCa's titles ask the question; the video still has to land the reason.
+
+6. **A live counter must never contradict the result** (found modelling conv-002, before it shipped). Off-focus
+   balls bunch near blue *later* (58 at once), after a first pass that hit only 11. A live counter would show 58
+   and then caption "ONLY 11 HIT".
+   → **Define the answer once** (here: most balls at blue at once during the first pass), **lock the counter at
+   the verdict**, and show the result line at that moment. Visuals after that are decoration, not data.
+
+**Process lesson:** the first plan was checked for *maths* (the Python model was right) but not for *story*.
+Before building any new format, write the storyboard as a table of beat / what's on screen / caption, and read it
+as a cold viewer: for each beat, can they say what they're watching for and why it matters? Do this in the plan,
+before code.
+
+## 10-14 update: reference pull (MathCa, Bouncy Physics)
+
+No new pull of our own channel. Two channels launched in late September were added to `reference-channels.md`
+(data 2026-10-14). Both are about 2 weeks old, so every claim below is a **lead**, not validated.
+
+- **Math convergence is the strongest new-genre signal yet** *(lead, one channel)*. MathCa reached 12.1K subs and
+  13.0M views in 15 days. Its top six are all one shape: many bodies, one "will they all ___?" prediction, and a
+  certain mathematical answer (they meet, sync up or close the loop). Its pure explainers (Klein bottle, 4D cube,
+  Ising) are its worst at 5-13K. **The payoff is seeing a theorem happen, not being taught it.**
+- **That audience rates it higher** *(lead)*. MathCa holds a 1.2-1.9% like-rate across its catalogue. That's
+  2-4x the bouncing-ball and marble channels, and above our 0.5-1.7%. Like-rate barely depends on age, so this
+  is the cleanest cross-channel quality signal we have. One hit (12.2M) is 94% of its views, though, so its
+  *reach* can't be separated from algorithm luck.
+- **Our mechanic shapes did badly on MathCa** *(illustrative)*. Its first uploads, *"Splitting vs exponential.
+  Who breaks out first?"* (10.3K) and *"Accelerating vs exponential"* (8.0K), are `mve`/`esc`-shaped. It switched
+  shape on day 3 and grew. So that audience didn't come for escalation, it came for convergence.
+- **Our 2D lane is crowded** *(illustrative)*. Bouncy Physics launched the same week with nearly our backlog:
+  grow/shrink, reach the centre, sextillion, clone-per-bounce, shatter a shape. It sits at a 3K median and 128 subs.
+  A new rival in the same shape is a reason to put experiment-lane slots into new shapes, not more variants.
+- **Hidden-shape reveal** ("can you guess the shape?") was Bouncy Physics' #1 and #2 (25.5K, 18.2K) *(weak lead)*.
+- **Compilation long form on a young Shorts channel got 7 views** (Bouncy Physics, 6:58). This is a second data
+  point after our own v15 that long form doesn't inherit a Shorts audience *(illustrative)*.
+- **Shorter on Bouncy Physics coincided with more views** (1:05-1:13 → 22-44s). It's confounded with channel age,
+  and it doesn't change our rule of tuning for event count, not a target length.
+
+**Action:** `conv` (math convergence) is planned as an experiment-lane Short, `plans/videos/conv-001-ellipse-focus.md`.
+
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
 - **Every older video went flat on the same day (10-03 → 10-04)**, including v4, which had been
@@ -342,7 +431,7 @@ lags at 11,386). Snapshot appended.
 
 ## What would make this useful
 
-- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041) done; due v10 10-13, v11/v12 10-16, v13 10-17, v14 10-18.** They
+- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041) done; due v10 10-13, v11/v12 10-16, v13 10-17, v14 10-18, v15 10-19.** They
   can't be recovered if missed.
 - **Studio real-time view for 10-03 → 10-04**, to settle whether the older videos really stopped or
   the public counter is lagging.
