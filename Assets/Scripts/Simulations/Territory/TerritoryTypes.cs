@@ -65,7 +65,36 @@ namespace SimulationLobby.Simulations.Territory
         BoostStarted,
 
         /// <summary>A team's boost ran out (not raised on elimination; the boost is just cleared).</summary>
-        BoostEnded
+        BoostEnded,
+
+        // ---- terr-002 power faces (appended so earlier values do not shift) ----
+
+        /// <summary>A BOOM (CannonStrike) face resolved. team = the cannon that is down; other = the spinning team (== team when it hit itself); after = down ticks.</summary>
+        CannonDestroyed,
+
+        /// <summary>A downed cannon is back and fires again. Not raised on elimination (the timer is just cleared).</summary>
+        CannonRepaired,
+
+        /// <summary>A RAIN face resolved and drops were scheduled. slot = drops scheduled (0 = fizzled, no target cells); after = the last drop's land tick.</summary>
+        RainStarted,
+
+        /// <summary>One rain drop landed and painted. slot = grid cell index of the splash centre; after = cells changed.</summary>
+        RainDropLanded,
+
+        /// <summary>The team's last scheduled drop has landed (or its rain was cancelled by elimination: other = 1).</summary>
+        RainEnded,
+
+        /// <summary>The multiplier ramp stepped (config.multiplierRampSeconds). slot = the bonus now added to every multiplier (1 = ×2 reads ×3).</summary>
+        MultipliersRaised,
+
+        /// <summary>Knock-out reward (config.knockoutReward): team took the eliminated team's bank. slot = the eliminated team; other = 1 if a free spin was queued; before/after = the taker's bank.</summary>
+        KnockoutReward,
+
+        /// <summary>Two teams left (config.showdownPlateRadiusCells): base plates grew and SPIN lanes stay open. slot = plate cells claimed.</summary>
+        ShowdownStarted,
+
+        /// <summary>Heavy shots began (config.heavyShotsAfterSeconds): every cell a ball paints splashes. slot = splash radius.</summary>
+        HeavyShotsStarted
     }
 
     /// <summary>What a spin-reel face does. Economy faces use <c>SpinFace.effect</c>; the others are territory-specific.</summary>
@@ -84,7 +113,49 @@ namespace SimulationLobby.Simulations.Territory
         SelfDestruct = 3,
 
         /// <summary>Timed boost: for config.boostSeconds the team's Multiply slots use value as the factor instead of their own. Appended so earlier values do not shift.</summary>
-        Boost = 4
+        Boost = 4,
+
+        /// <summary>terr-002 "BOOM": a cannon (picked by config.cannonStrikeTarget) is down for config.cannonDownSeconds. It holds fire; queued ammo and pending bombs wait for the repair.</summary>
+        CannonStrike = 5,
+
+        /// <summary>terr-002 "RAIN": config.rainDrops drops of the team's colour fall over config.rainSeconds on cells it does not own, never near a cannon.</summary>
+        Rain = 6
+    }
+
+    /// <summary>Who a CannonStrike face knocks out.</summary>
+    public enum CannonStrikeTarget
+    {
+        /// <summary>The live enemy with the most tiles (ties go to the lower index). The default: it pulls the leader back.</summary>
+        Leader = 0,
+
+        /// <summary>A seeded live enemy (spin stream).</summary>
+        RandomEnemy = 1,
+
+        /// <summary>The spinning team's own cannon (a penalty face, like terr-001's self destruct).</summary>
+        Self = 2
+    }
+
+    /// <summary>
+    /// One scheduled rain drop. Written once when a RAIN face resolves (append-only list), so presentation can start
+    /// the fall animation before <see cref="landTick"/>, the tick on which the simulation paints the splash.
+    /// </summary>
+    public readonly struct RainDrop
+    {
+        public readonly int team;
+
+        /// <summary>Grid cell index of the splash centre.</summary>
+        public readonly int cell;
+
+        public readonly int scheduledTick;
+        public readonly int landTick;
+
+        public RainDrop(int team, int cell, int scheduledTick, int landTick)
+        {
+            this.team = team;
+            this.cell = cell;
+            this.scheduledTick = scheduledTick;
+            this.landTick = landTick;
+        }
     }
 
     /// <summary>One thing that happened, stamped with its tick. The list is append-only.</summary>

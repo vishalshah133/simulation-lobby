@@ -48,5 +48,25 @@ namespace SimulationLobby.Simulations.Territory
 
         [Tooltip("Visual of the lane gate. The presenter hides and pops it; never the collider.")]
         public Renderer laneGateRenderer;
+
+        // ---- terr-002 (all optional; terr-001 scenes leave them empty) ----
+
+        [Tooltip("The cannon's root (base disc + pivot). The presenter animates the knock-out and repair under it.")]
+        public Transform cannonRoot;
+
+        [Tooltip("Barrel, cap and muzzle renderers: scorched by the presenter while the cannon is down (property block).")]
+        public Renderer[] cannonTintRenderers;
+
+        [Tooltip("Upright world-space TMP above the cannon, facing the camera: the down countdown (\"10\"). Empty text when up.")]
+        public TMP_Text downText;
+
+        [Tooltip("World-space TMP decal: the team name painted on the board above the bank number. Null when the theme has none.")]
+        public TMP_Text nameText;
+
+        [Tooltip("The flag on its pole by the cannon. Null when the theme has no flags.")]
+        public Transform flagRoot;
+
+        [Tooltip("The base plate disc and rim (the knock-out target). Scaled in X/Z by the presenter when the showdown grows the plates.")]
+        public Transform basePlate;
     }
 }

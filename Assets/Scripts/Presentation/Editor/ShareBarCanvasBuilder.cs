@@ -38,6 +38,15 @@ namespace SimulationLobby.Presentation.EditorTools
             return BuildInternal(parent, segments, border, labelSize, gap, true);
         }
 
+        /// <summary>Framed variant with a custom frame colour (a themed HUD).</summary>
+        public static ShareBarHud BuildFramed(RectTransform parent, int segments, Color frameColor, float border = 12f,
+            float gap = 6f, float labelSize = 54f)
+        {
+            ShareBarHud hud = BuildInternal(parent, segments, border, labelSize, gap, true);
+            hud.GetComponent<Image>().color = frameColor;
+            return hud;
+        }
+
         static ShareBarHud BuildInternal(RectTransform parent, int segments, float border, float labelSize,
             float gap, bool rounded)
         {

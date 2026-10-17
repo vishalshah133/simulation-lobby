@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9707ef4d3664a78aba4f45f3254af1c, type: 3}
+  m_Name: LavaRunConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Survival::SimulationLobby.Simulations.Survival.LavaRun.LavaRunConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 900
+  intent: 'surv-002: four colours multiply down a volcano ahead of the lava; the
+    smallest colour is out at each door; survivors cross a railless bridge onto a
+    sinking island. Tune for lead changes and a 10-12 min run.'
+  teams:
+  - name: RED
+    color: {r: 0.93, g: 0.16, b: 0.16, a: 1}
+    shortName: 
+  - name: BLUE
+    color: {r: 0.12, g: 0.45, b: 0.98, a: 1}
+    shortName: 
+  - name: GREEN
+    color: {r: 0.15, g: 0.85, b: 0.3, a: 1}
+    shortName: 
+  - name: YELLOW
+    color: {r: 1, g: 0.88, b: 0.1, a: 1}
+    shortName: 
+  startMarblesPerTeam: 5
+  maxLivePerTeam: 0
+  poolPrewarmPerTeam: 150
+  penJitter: 0.15
+  penStackHeight: 0.25
+  trackPreviewSeconds: 20
+  preLaunchHoldSeconds: 5
+  penSettleSeconds: 2.5
+  penGateOpenSeconds: 0.5
+  eruptionDelaySeconds:
+  - 8
+  - 5
+  - 4
+  stageResultHoldSeconds: 3
+  trapdoorOpenSeconds: 0.6
+  dropSeconds: 1.4
+  payoffHoldSeconds: 20
+  maxRunSeconds: 780
+  lavaStartDistance: -3
+  lavaSpeedStart:
+  - 1.6
+  - 2.2
+  - 2.6
+  lavaSpeedEnd:
+  - 2.2
+  - 3
+  - 3.4
+  lavaRampSeconds:
+  - 100
+  - 100
+  - 60
+  lavaMaxGapStart:
+  - 25
+  - 20
+  - 15
+  lavaMaxGapEnd:
+  - 6
+  - 4
+  - 3
+  lavaCatchUpGain: 0.6
+  lavaMaxSpeed: 12
+  lavaKillMargin: 0.15
+  progressWindowBack: 10
+  progressWindowForward: 60
+  eliminates: 010100
+  doorCloseSeconds: 0.8
+  earlyCloseDelaySeconds: 1.5
+  cloneBackOffset: 0.6
+  cloneSpacing: 0.3
+  cloneLateralJitter: 0.05
+  cloneLateralSpeed: 0.15
+  ringSinkIntervalStart: 18
+  ringSinkIntervalEnd: 10
+  ringTrembleSeconds: 1.5
+  ringTrembleAmplitude: 0.03
+  ringSinkSeconds: 2.5
+  ringSinkDepth: 4
+  sweeperDegreesStart: 20
+  sweeperDegreesEnd: 70
+  sweeperRampSeconds: 120
+  slowdownBelow: 6
+  finaleSlowdown: 0.5

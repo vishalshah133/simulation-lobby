@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace SimulationLobby.Simulations.Race
+namespace SimulationLobby.Shared.Tracks
 {
+    [MovedFrom(true, "SimulationLobby.Simulations.Race", "SimulationLobby.Simulations.Race", "TrackSectionKind")]
     public enum TrackSectionKind
     {
         /// <summary>A straight chute. Width can ease to <see cref="TrackSection.widthEnd"/> (a pinch or a flare).</summary>
@@ -14,6 +16,7 @@ namespace SimulationLobby.Simulations.Race
 
     /// <summary>One piece of track, laid end to end from the previous one.</summary>
     [Serializable]
+    [MovedFrom(true, "SimulationLobby.Simulations.Race", "SimulationLobby.Simulations.Race", "TrackSection")]
     public struct TrackSection
     {
         public string label;
@@ -36,8 +39,15 @@ namespace SimulationLobby.Simulations.Race
 
         [Tooltip("Track width at the end of this section, in metres. 0 keeps the current width.")]
         public float widthEnd;
+
+        [Tooltip("Rail height in metres for this section. 0 uses the layout's default rail height.")]
+        public float railHeight;
+
+        [Tooltip("No rails on this section: a bare floor you can fall off (a bridge). Overrides railHeight.")]
+        public bool railless;
     }
 
+    [MovedFrom(true, "SimulationLobby.Simulations.Race", "SimulationLobby.Simulations.Race", "ObstacleKind")]
     public enum ObstacleKind
     {
         /// <summary>Triangle of pegs, apex upstream: each row one peg wider. count = rows, spacing = peg gap, size = peg radius.</summary>
@@ -59,7 +69,10 @@ namespace SimulationLobby.Simulations.Race
         Chicane = 5,
 
         /// <summary>Low rounded humps across the track that make marbles hop. count = humps, spacing = distance between them, size = hump height in metres (0.03 default; 0.06 stops a marble dead).</summary>
-        Bumps = 6
+        Bumps = 6,
+
+        /// <summary>Two guide walls close in from the rails and stop at a gap, concentrating the pack on the centre line (no re-opening). length = taper length, size = exit gap width.</summary>
+        Funnel = 7
     }
 
     /// <summary>
@@ -68,6 +81,7 @@ namespace SimulationLobby.Simulations.Race
     /// <see cref="ObstacleKind"/>; the unused ones are ignored.
     /// </summary>
     [Serializable]
+    [MovedFrom(true, "SimulationLobby.Simulations.Race", "SimulationLobby.Simulations.Race", "TrackObstacle")]
     public struct TrackObstacle
     {
         public string label;
@@ -97,8 +111,9 @@ namespace SimulationLobby.Simulations.Race
     /// builder sweeps this into meshes, colliders and a centreline path. Editing it means rebuilding the
     /// scene, since the meshes are baked.
     /// </summary>
-    [CreateAssetMenu(fileName = "RaceTrackLayout", menuName = "Simulation Lobby/Configs/Race Track Layout", order = 31)]
-    public sealed class RaceTrackLayout : ScriptableObject
+    [CreateAssetMenu(fileName = "TrackLayout", menuName = "Simulation Lobby/Configs/Track Layout", order = 31)]
+    [MovedFrom(true, "SimulationLobby.Simulations.Race", "SimulationLobby.Simulations.Race", "RaceTrackLayout")]
+    public sealed class TrackLayout : ScriptableObject
     {
         /// <summary>Bump when the default course changes shape. The scene builder upgrades older assets.</summary>
         public const int CurrentVersion = 3;
@@ -114,13 +129,42 @@ namespace SimulationLobby.Simulations.Race
         [Tooltip("Metres before the end of the course where the finish line is drawn. The sections after it are the run-out.")]
         [Min(1f)] public float runOutLength = 8f;
 
+        [Tooltip("Rail height in metres for sections that do not set their own. 0 or less means 0.34.")]
+        public float defaultRailHeight = 0.34f;
+
         public TrackSection[] sections = DefaultSections();
         public TrackObstacle[] obstacles = DefaultObstacles();
+
+        /// <summary>Rail height used when neither the section nor the layout sets one.</summary>
+        public const float FallbackRailHeight = 0.34f;
+
+        /// <summary>The rail height in force on a section: 0 when railless, else its override, else the layout default.</summary>
+        public float RailHeightFor(int sectionIndex)
+        {
+            if (sectionIndex < 0 || sectionIndex >= sections.Length)
+            {
+                return defaultRailHeight > 0f ? defaultRailHeight : FallbackRailHeight;
+            }
+
+            TrackSection section = sections[sectionIndex];
+            if (section.railless)
+            {
+                return 0f;
+            }
+
+            if (section.railHeight > 0f)
+            {
+                return section.railHeight;
+            }
+
+            return defaultRailHeight > 0f ? defaultRailHeight : FallbackRailHeight;
+        }
 
         [ContextMenu("Reset To Default Course")]
         public void ResetToDefault()
         {
             startWidth = 1.6f;
+            defaultRailHeight = FallbackRailHeight;
             gateDistance = 4.4f;
             runOutLength = 8f;
             sections = DefaultSections();

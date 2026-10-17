@@ -43,6 +43,9 @@ tight 40s Shorts version, or a slow-escalation long form.
 - **Wall vs Ball** (**built**, first `surv` video): one wall of blocks takes escalating hits until
   nothing stands. Hook: guess how many hits. The blocks are the "contenders" and the survivor
   counter is blocks standing. Full brief: [survival-wall.md](survival-wall.md).
+- **Lava Run** (`planned`, surv-002, long form): four colours race down a volcano through ×2 gates while a lava
+  front chases them; smallest colour out per stage, a railless bridge twist, a sinking-island finale.
+  Plan: [surv-002](../../plans/videos/surv-002-lava-run.md).
 - Shrinking arena (battle-royale ring).
 - Rising water/lava.
 - Hazards that spawn faster over time.

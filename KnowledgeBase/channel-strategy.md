@@ -14,6 +14,14 @@ What makes this category work on YouTube:
 
 ## The goal: monetization
 
+> **Status 2026-10-16.** The goal is **ad earnings via YPP** (user, 2026-10-11). The text directly below still
+> describes the original Shorts-path target, and two route changes are still *proposed*, not decided:
+> *Rethink 2026-10-11* (long form is the earnings engine, stop letting the Feb-1 Shorts date drive builds) and the
+> *10-15 read* (the 4,000 h watch-hour route may be the realistic way in). Both wait on v15's day-7 Studio numbers
+> (10-19). Decided since: the two-track plan (10-09), the Shorts 2:1 mix (10-13), and the MIKAN long-form
+> changes (10-16: 10-12 min, numbered series, survival + proliferation next). **Proposed 10-17:** hold the long-form
+> priority call until v18's day 7 (10-22), since the replication stalled, and pause country theming (*10-17 read*).
+
 **Get into the YouTube Partner Program through the Shorts path: 1,000 subscribers + 10M Shorts
 views in the trailing 90 days.** For new applicants that becomes **20M on 2027-02-01**, so the
 practical target is the 90 days before then. Math and current gap: `plans/channel-revival.md`.
@@ -79,9 +87,38 @@ climb slowly instead of bursting. Shorts sit at a ~1.4K-per-upload ceiling for t
   proven/experiment mix, but if capacity is short, cut Shorts before the weekly long upload.
 - **Judge 16:9 on day 7 or later, never day 1.** Both 16:9 uploads had a near-empty first day.
 
+**10-16 refinement (proposed, lead).** v15's daily views fell ~400 → ~240 between pulls. At that decay it ends
+near ~1.5K, and on its own it won't sustain the ~730/day the 4,000 h route needs. The route only works if each
+long upload adds its own climb on top: roughly one long video every 3-4 days at v15's level, *or* a longer
+average view. That points at **cadence and avg view duration**, not at abandoning the track. The decision point
+below is unchanged; add v18's day-3 curve (10-18) to it. Whatever Studio's *Suggested videos* list shows for v15
+and v18 should pick the next long-form subject: make the video that sits naturally beside the ones suggesting us.
+
+**10-16, from MIKAN (decided 2026-10-16 by the user; evidence is a lead, one creator).** `reference-channels.md` → *MIKAN*. A 3M-sub channel posting
+only 16:9 marble long form still averages millions per upload in 2026, so Track B's audience exists. Two changes to
+Track B, leaving the decided 1-2/week cadence in place:
+- **Target 10-12 min, not 15-20.** 6 of the 7 MIKAN 20M+ hits since 2024 run 10-11 min (the 7th is 5:41). Ours are 15:15 and 20:22. It's also
+  cheaper per upload, which helps the 3-4-day cadence the watch-hour math needs.
+- **Run long form as named, numbered series** (`terr` first: *Which Country Takes the Board? #2*), and build
+  **survival + proliferation** (multiply while a hazard thins the field) as the next long-form format.
+
 **Decision point at v15 day 7 (10-19), from Studio:** if avg view duration is ≥ ~2.5 min and traffic is still
 coming from browse/suggested, make long-form the priority track and aim at 4,000 h before 02-01. If it's
 under ~1.5 min or the views have stopped, keep the current two-track balance.
+
+**10-17 read (proposed, leads only, `learnings.md` → *10-17 update*).** Two changes to how the 10-19 decision gets
+made. Neither touches the decided cadence or the MIKAN changes.
+- **The long-form case is weaker than it looked on 10-15.** The replication (v18, `terr-002`) has 28 views at day 2.3,
+  against v15's 819 at the same age. "Long form works" now rests on one video, not a trend. Don't make long form the
+  priority track on v15's Studio numbers alone. Wait for v18's day 7 (10-22) and v19's day 3 (10-20). Keep the
+  two-track balance until then.
+- **Pause country / national-team theming.** It's on every upload, Short or long, that got no push (v11, v12, v18),
+  and on nothing that did. It's confounded (length, title, sport), so it's a lead. Pausing it costs nothing,
+  because colours work. That means **no `terr` #2 with countries**: the numbered `terr` series continues with colour
+  teams. `cric` was already paused. v19 (Lava Run, colours, long) is the test that splits theme from long-form reach.
+- **The 16:9 drip is the mechanism the watch-hour route needs**, and it held: v13 is accelerating on day 7 (+457),
+  and v15 is decaying slower than the 10-16 projection. This supports *several long uploads stacking their drips*
+  over *one long upload carrying the route*, which is what the 10-16 refinement already said.
 
 ## Audience and the pick mechanic
 
@@ -95,7 +132,7 @@ Ask for the pick explicitly on screen and in the pinned comment. "Comment your c
 
 | | Shorts | Long form |
 |---|---|---|
-| Length | **by format, see below**: 10–20s for 3D spectacle loops, 45–75s for 2D story sims | 8–20 min |
+| Length | **by format, see below**: 10–20s for 3D spectacle loops, 45–75s for 2D story sims | **10–12 min target** (decided 2026-10-16, from MIKAN); longer only for a numbered elimination special |
 | Aspect | 9:16 1080x1920 | 16:9 1920x1080 |
 | Job | Discovery + subscribe; the YPP qualifying route | Watch time + session depth; higher earnings once in YPP |
 | Best formats | `esc`, `rom`, short `race`, `surv`, `impact` | `wars`, `elim`, tournament `race` |

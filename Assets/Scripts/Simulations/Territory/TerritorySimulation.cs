@@ -51,11 +51,18 @@ namespace SimulationLobby.Simulations.Territory
         int[] _spinFaceCounts;
         bool[] _protected;
         Func<int, bool> _isProtected;
+        int[][] _plateCells;   // per team: grid indices of the base plate (the target an enemy ball must reach)
+        readonly List<int> _plateScratch = new List<int>();
+        bool _showdown;
+        bool _heavyShots;
         int[] _pendingBombs;
         bool[] _shotIsBomb;
         int _bombsExploded;
         int _linesPainted;
         int _selfDestructs;
+        int _cannonStrikes;
+        int _rainDropsLanded;
+        int _cellsRained;
         int _slotLogEveryTicks;
         bool _gravitySaved;
         Vector3 _savedGravity;
@@ -66,6 +73,11 @@ namespace SimulationLobby.Simulations.Territory
         long[] _queued;
         int[] _boostTicksLeft;
         int[] _boostFactor;
+        int[] _cannonDownLeft;
+        int[] _cannonDownTotal;
+        int[] _rainPending;
+        bool[] _rainClear;
+        Func<int, bool> _isRainProtected;
 
         GridBall[] _shots = new GridBall[0];
         int _shotsPerTeam;
@@ -87,6 +99,7 @@ namespace SimulationLobby.Simulations.Territory
         int _battleTicks;
         int _endTicks;
         int _escalationLevel;
+        int _multiplierBonus;
         int _winner = -1;
         bool _decidedOnTiles;
         bool _failed;
@@ -136,6 +149,18 @@ namespace SimulationLobby.Simulations.Territory
         public int AliveTeams => _aliveTeams;
 
         public int EscalationLevel => _escalationLevel;
+
+        /// <summary>Added to every multiplier when it is applied (board slots, spinner faces, boosts). Steps up with the multiplier ramp.</summary>
+        public int MultiplierBonus => _multiplierBonus;
+
+        /// <summary>Two teams left and config.showdownPlateRadiusCells set: plates grown, SPIN lanes open.</summary>
+        public bool IsShowdown => _showdown;
+
+        /// <summary>Every cell a normal ball paints splashes (config.heavyShotsAfterSeconds reached).</summary>
+        public bool HeavyShotsActive => _heavyShots;
+
+        /// <summary>Cannon sweep and fire-rate factor: 1 + config.cannonSpeedupPerElimination per team eliminated so far.</summary>
+        public float CannonSpeedup => 1f + _config.cannonSpeedupPerElimination * _eliminationOrder.Count;
         public int LeadChanges => _leadChanges;
         public long PeakBank => _peakBank;
         public int TotalReleases => _totalReleases;
@@ -200,6 +225,9 @@ namespace SimulationLobby.Simulations.Territory
             _battleTicks = 0;
             _endTicks = 0;
             _escalationLevel = 0;
+            _multiplierBonus = 0;
+            _showdown = false;
+            _heavyShots = false;
             _winner = -1;
             _decidedOnTiles = false;
             _leader = -1;
@@ -231,6 +259,11 @@ namespace SimulationLobby.Simulations.Territory
             _bombsExploded = 0;
             _linesPainted = 0;
             _selfDestructs = 0;
+            _cannonStrikes = 0;
+            _rainDropsLanded = 0;
+            _cellsRained = 0;
+            _rainDrops.Clear();
+            _rainActive.Clear();
             _slotHits = new int[_config.boardSlots.Length];
             _spinFaceCounts = new int[_config.spinFaces.Length];
             _slotLogEveryTicks = Mathf.Max(1, Mathf.RoundToInt(60f / _dt));
@@ -285,7 +318,36 @@ namespace SimulationLobby.Simulations.Territory
                 }
             }
 
+            // Base plates: the cells an enemy ball must paint to knock a team out. Protected too, so only a ball can reach them.
+            _plateCells = new int[teamCount][];
+            for (int i = 0; i < teamCount; i++)
+            {
+                SetPlate(i, _config.basePlateRadiusCells, -1);
+            }
+
             _isProtected = index => _protected[index];
+
+            // Rain clearance zone: within rainCannonClearance (Chebyshev) of any team's base cell, eliminated or not.
+            _rainClear = new bool[_grid.CellCount];
+            int clearance = Mathf.Max(1, _config.rainCannonClearance);
+            for (int i = 0; i < teamCount; i++)
+            {
+                Vector2Int bc = _config.BaseCell(i);
+                for (int dy = -clearance; dy <= clearance; dy++)
+                {
+                    for (int dx = -clearance; dx <= clearance; dx++)
+                    {
+                        int px = bc.x + dx;
+                        int py = bc.y + dy;
+                        if (_grid.InBounds(px, py))
+                        {
+                            _rainClear[_grid.Index(px, py)] = true;
+                        }
+                    }
+                }
+            }
+
+            _isRainProtected = index => _protected[index] || _rainClear[index];
 
             _banks = new CountBank[teamCount];
             _gateOpen = new bool[teamCount];
@@ -307,6 +369,9 @@ namespace SimulationLobby.Simulations.Territory
             _queued = new long[teamCount];
             _boostTicksLeft = new int[teamCount];
             _boostFactor = new int[teamCount];
+            _cannonDownLeft = new int[teamCount];
+            _cannonDownTotal = new int[teamCount];
+            _rainPending = new int[teamCount];
             _liveShots = new int[teamCount];
             _dropRandom = new SeededRandom[teamCount];
 
@@ -372,7 +437,7 @@ namespace SimulationLobby.Simulations.Territory
         /// <summary>Seconds until the team's gate next changes state (open to closed or closed to open).</summary>
         public float LaneGateSecondsToToggle(int team)
         {
-            if (_config == null || _dt <= 0f || _rigs == null || team < 0 || team >= _rigs.Length)
+            if (_config == null || _dt <= 0f || _rigs == null || team < 0 || team >= _rigs.Length || _showdown)
             {
                 return 0f;
             }
@@ -388,7 +453,9 @@ namespace SimulationLobby.Simulations.Territory
         void GateTicks(out int closedTicks, out int cycleTicks)
         {
             closedTicks = Mathf.Max(1, Mathf.RoundToInt(_config.laneGateClosedSeconds / _dt));
-            int openTicks = Mathf.Max(1, Mathf.RoundToInt(_config.laneGateOpenSeconds / _dt));
+            // Progression: each elimination so far widens the open window, so the endgame spins more often.
+            float openSeconds = _config.laneGateOpenSeconds + _config.laneGateOpenPerElimination * _eliminationOrder.Count;
+            int openTicks = Mathf.Max(1, Mathf.RoundToInt(openSeconds / _dt));
             cycleTicks = closedTicks + openTicks;
         }
 
@@ -416,7 +483,9 @@ namespace SimulationLobby.Simulations.Territory
                 }
 
                 // A firing team's board is locked: the gate stays closed whatever the cycle says.
-                bool open = Phase != TerritoryPhase.Hold && _queued[t] <= 0 && GatePhaseTicks(t, cycleTicks) >= closedTicks;
+                // In the final showdown the lane stays open (still closed while that team fires).
+                bool open = Phase != TerritoryPhase.Hold && _queued[t] <= 0 &&
+                            (_showdown || GatePhaseTicks(t, cycleTicks) >= closedTicks);
                 if (open != _gateOpen[t])
                 {
                     _gateOpen[t] = open;
@@ -469,15 +538,19 @@ namespace SimulationLobby.Simulations.Territory
             }
 
             TickBoosts();
+            TickCannons();
             DropBalls(fixedDelta);           // 2
             ProcessSlots(tick);              // 3
             RecoverBalls(tick);              // 4
             StepSpinner(tick);               // 5
+            LandRain(tick);
             Fire(fixedDelta, tick);          // 6
             MoveShots(fixedDelta, tick);     // 7
             UpdateTeamStats();
             CheckEliminations(tick);         // 8
+            UpdateProgression(tick);
             Escalate(tick);                  // 9
+            RampMultipliers();
             CheckEnd(tick);                  // 10
 
             if (_battleTicks % 600 == 0)
@@ -712,7 +785,7 @@ namespace SimulationLobby.Simulations.Territory
             switch (effect.kind)
             {
                 case SlotEffectKind.Multiply:
-                    bank.Multiply(effect.value);
+                    bank.Multiply(effect.value + _multiplierBonus);   // the ramp lifts every ×n, boosted slots included
                     NoteBank(team);
                     AutoReleaseIfMaxed(team);
                     break;
@@ -919,6 +992,12 @@ namespace SimulationLobby.Simulations.Territory
                     case SpinFaceKind.SelfDestruct:
                         DoSelfDestruct(team, face.value > 0 ? face.value : _config.selfDestructRadius, tick);
                         break;
+                    case SpinFaceKind.CannonStrike:
+                        DoCannonStrike(team, face.value > 0 ? face.value : _config.cannonDownSeconds, tick);
+                        break;
+                    case SpinFaceKind.Rain:
+                        DoRain(team, face.value > 0 ? face.value : _config.rainDrops, tick);
+                        break;
                     default:
                         ApplyEffect(team, face.effect, tick);
                         break;
@@ -966,6 +1045,224 @@ namespace SimulationLobby.Simulations.Territory
         {
             return _boostTicksLeft != null && team >= 0 && team < _boostTicksLeft.Length
                 ? _boostTicksLeft[team] * _dt : 0f;
+        }
+
+        // ------------------------------------------------------------------ terr-002: cannon strike + rain (contract; see plans/videos/terr-002)
+
+        readonly List<RainDrop> _rainDrops = new List<RainDrop>();
+
+        /// <summary>The runner's current tick (the tick the last Tick ran). Presentation times rain falls against it.</summary>
+        public int CurrentTick => _recorder != null ? _recorder.CurrentTick : 0;
+
+        /// <summary>Seconds per simulation tick (the config's fixed timestep).</summary>
+        public float TickSeconds => _dt;
+
+        /// <summary>Every rain drop ever scheduled, append-only, in schedule order. A drop whose team was eliminated before its landTick never paints.</summary>
+        public IReadOnlyList<RainDrop> RainDrops => _rainDrops;
+
+        /// <summary>True while the team's cannon is down from a BOOM (CannonStrike) face.</summary>
+        public bool IsCannonDown(int team)
+        {
+            return _cannonDownLeft != null && team >= 0 && team < _cannonDownLeft.Length && _cannonDownLeft[team] > 0;
+        }
+
+        /// <summary>Seconds until the downed cannon is repaired (0 when it is up).</summary>
+        public float CannonDownSecondsLeft(int team)
+        {
+            return IsCannonDown(team) ? _cannonDownLeft[team] * _dt : 0f;
+        }
+
+        /// <summary>Remaining down time as a fraction of the full down time: 1 just struck, 0 repaired.</summary>
+        public float CannonDownFraction(int team)
+        {
+            return IsCannonDown(team) ? _cannonDownLeft[team] / (float)Math.Max(1, _cannonDownTotal[team]) : 0f;
+        }
+
+        /// <summary>True from RainStarted until the team's last drop lands (RainEnded).</summary>
+        public bool IsRaining(int team)
+        {
+            return _rainPending != null && team >= 0 && team < _rainPending.Length && _rainPending[team] > 0;
+        }
+
+        readonly List<int> _rainActive = new List<int>();   // indices into _rainDrops not yet landed or cancelled, schedule order
+        readonly List<int> _rainCandidates = new List<int>();
+        readonly List<int> _strikeCandidates = new List<int>();
+
+        /// <summary>
+        /// BOOM: picks the target per config, then (re)starts its down timer. No live target means the face
+        /// fizzles with no event. A strike on a cannon that is already down restarts the full timer.
+        /// </summary>
+        void DoCannonStrike(int spinner, float seconds, int tick)
+        {
+            int target = -1;
+            if (_config.cannonStrikeTarget == CannonStrikeTarget.Self)
+            {
+                target = spinner;
+            }
+            else
+            {
+                _strikeCandidates.Clear();
+                for (int t = 0; t < _teams.Count; t++)
+                {
+                    if (t != spinner && !_teams[t].Eliminated)
+                    {
+                        _strikeCandidates.Add(t);
+                    }
+                }
+
+                if (_strikeCandidates.Count > 0)
+                {
+                    if (_config.cannonStrikeTarget == CannonStrikeTarget.RandomEnemy)
+                    {
+                        target = _strikeCandidates[_spinRandom.NextInt(_strikeCandidates.Count)];
+                    }
+                    else
+                    {
+                        // Leader: most tiles right now, ties to the lower index (strict > keeps the first).
+                        int bestTiles = -1;
+                        for (int i = 0; i < _strikeCandidates.Count; i++)
+                        {
+                            int tiles = _grid.CountOf(_strikeCandidates[i]);
+                            if (tiles > bestTiles)
+                            {
+                                bestTiles = tiles;
+                                target = _strikeCandidates[i];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (target < 0)
+            {
+                return;
+            }
+
+            int downTicks = Math.Max(1, Mathf.CeilToInt(seconds / _dt));
+            _cannonDownLeft[target] = downTicks;
+            _cannonDownTotal[target] = downTicks;
+            _cannonStrikes++;
+            Emit(TerritoryEventKind.CannonDestroyed, target, 0, spinner, 0, downTicks);
+            _recorder.LogEvent("cannon_destroyed", target);
+        }
+
+        void TickCannons()
+        {
+            for (int t = 0; t < _cannonDownLeft.Length; t++)
+            {
+                if (_cannonDownLeft[t] > 0 && --_cannonDownLeft[t] == 0)
+                {
+                    Emit(TerritoryEventKind.CannonRepaired, t, 0, 0, 0, 0);
+                    _recorder.LogEvent("cannon_repaired", t);
+                }
+            }
+        }
+
+        /// <summary>
+        /// RAIN: samples up to the requested count of cells without replacement (partial Fisher-Yates on the
+        /// spin stream) from cells the team does not own and that sit outside the cannon clearance zone, and
+        /// schedules one drop per cell, evenly spread over rainSeconds after rainLeadSeconds.
+        /// </summary>
+        void DoRain(int team, int requested, int tick)
+        {
+            _rainCandidates.Clear();
+            for (int i = 0; i < _grid.CellCount; i++)
+            {
+                if (_grid.GetOwner(i) != team && !_rainClear[i])
+                {
+                    _rainCandidates.Add(i);
+                }
+            }
+
+            int n = Math.Min(Math.Max(0, requested), _rainCandidates.Count);
+            if (n == 0)
+            {
+                Emit(TerritoryEventKind.RainStarted, team, 0, 0, 0, tick);
+                _recorder.LogEvent("rain", 0);
+                return;
+            }
+
+            int leadTicks = Mathf.RoundToInt(_config.rainLeadSeconds / _dt);
+            int rainTicks = Mathf.RoundToInt(_config.rainSeconds / _dt);
+            int span = Math.Max(1, n - 1);
+            int last = tick;
+            for (int i = 0; i < n; i++)
+            {
+                int j = i + _spinRandom.NextInt(_rainCandidates.Count - i);
+                int cell = _rainCandidates[j];
+                _rainCandidates[j] = _rainCandidates[i];
+                _rainCandidates[i] = cell;
+
+                int land = Math.Max(tick + 1, tick + leadTicks + (int)((long)i * rainTicks / span));
+                _rainActive.Add(_rainDrops.Count);
+                _rainDrops.Add(new RainDrop(team, cell, tick, land));
+                last = land;
+            }
+
+            _rainPending[team] += n;
+            Emit(TerritoryEventKind.RainStarted, team, n, 0, 0, last);
+            _recorder.LogEvent("rain", n);
+        }
+
+        /// <summary>Paints the drops whose land tick is this tick, in schedule order, and closes a team's rain after its last drop.</summary>
+        void LandRain(int tick)
+        {
+            if (_rainActive.Count == 0)
+            {
+                return;
+            }
+
+            int keep = 0;
+            for (int a = 0; a < _rainActive.Count; a++)
+            {
+                int index = _rainActive[a];
+                RainDrop drop = _rainDrops[index];
+                if (drop.landTick != tick)
+                {
+                    _rainActive[keep++] = index;
+                    continue;
+                }
+
+                if (_teams[drop.team].Eliminated)
+                {
+                    continue;   // cancelled (normally already removed by CheckEliminations)
+                }
+
+                _grid.Coords(drop.cell, out int cx, out int cy);
+                int changed = GridPainter.PaintDisc(_grid, cx, cy, _config.rainSplashRadius, drop.team, tick, _isRainProtected);
+                _rainDropsLanded++;
+                _cellsRained += changed;
+                Emit(TerritoryEventKind.RainDropLanded, drop.team, drop.cell, 0, 0, changed);
+                if (--_rainPending[drop.team] == 0)
+                {
+                    Emit(TerritoryEventKind.RainEnded, drop.team, 0, 0, 0, 0);
+                }
+            }
+
+            _rainActive.RemoveRange(keep, _rainActive.Count - keep);
+        }
+
+        /// <summary>Elimination: clears the down timer (no Repaired event) and cancels the team's unlanded rain.</summary>
+        void ClearTerr002State(int team)
+        {
+            _cannonDownLeft[team] = 0;
+            _cannonDownTotal[team] = 0;
+            if (_rainPending[team] > 0)
+            {
+                int keep = 0;
+                for (int a = 0; a < _rainActive.Count; a++)
+                {
+                    int index = _rainActive[a];
+                    if (_rainDrops[index].team != team)
+                    {
+                        _rainActive[keep++] = index;
+                    }
+                }
+
+                _rainActive.RemoveRange(keep, _rainActive.Count - keep);
+                _rainPending[team] = 0;
+                Emit(TerritoryEventKind.RainEnded, team, 0, 1, 0, 0);
+            }
         }
 
         /// <summary>
@@ -1101,15 +1398,16 @@ namespace SimulationLobby.Simulations.Territory
         void Fire(float dt, int tick)
         {
             float speed = _config.shotSpeedCellsPerSecond;
+            float speedup = CannonSpeedup;
             for (int t = 0; t < _teams.Count; t++)
             {
                 TerritoryTeam team = _teams[t];
-                if (team.Eliminated)
+                if (team.Eliminated || _cannonDownLeft[t] > 0)
                 {
-                    continue;
+                    continue;   // a downed cannon holds fire: aim frozen, ammo and pending bombs wait
                 }
 
-                _aims[t].Step(dt);
+                _aims[t].Step(dt * speedup);   // progression: faster sweep per elimination
                 team.AimDegrees = _aims[t].angle;
 
                 // Idle time carries at most one tick of credit, so the first shot after a release is
@@ -1137,7 +1435,7 @@ namespace SimulationLobby.Simulations.Territory
                     continue;
                 }
 
-                _fireTimer[t] += _config.fireIntervalSeconds;
+                _fireTimer[t] += _config.fireIntervalSeconds / speedup;
 
                 // A pending bomb goes before normal ammo, health 1, and does not consume ammo.
                 int health;
@@ -1194,6 +1492,14 @@ namespace SimulationLobby.Simulations.Territory
                     _shots[i].alive = false;
                     _bombsExploded++;
                     Emit(TerritoryEventKind.BombExploded, owner, _grid.Index(cx, cy), 0, 0, changed);
+                }
+                else if (painted > 0 && _heavyShots)
+                {
+                    // Heavy shot: the hit splashes. Centred on the ball's own-side cell next to the hit, like a bomb, so
+                    // radius 1 covers the hit cell and its neighbours. Plates stay protected: only the ball itself kills.
+                    int cx = Mathf.Clamp((int)Mathf.Floor(_shots[i].position.x), 0, _grid.Width - 1);
+                    int cy = Mathf.Clamp((int)Mathf.Floor(_shots[i].position.y), 0, _grid.Height - 1);
+                    GridPainter.PaintDisc(_grid, cx, cy, _config.heavyShotRadius, _shots[i].owner, tick, _isProtected);
                 }
 
                 if (_shots[i].alive && _shots[i].age > _config.shotMaxLifetimeSeconds)
@@ -1262,7 +1568,14 @@ namespace SimulationLobby.Simulations.Territory
                     continue;
                 }
 
-                int owner = _grid.GetOwner(team.baseCell.x, team.baseCell.y);
+                // Out when an enemy has painted any cell of the base plate (terr-001: the plate is the base cell alone).
+                int owner = t;
+                int[] plate = _plateCells[t];
+                for (int c = 0; c < plate.Length && owner == t; c++)
+                {
+                    owner = _grid.GetOwner(plate[c]);
+                }
+
                 if (owner == t && team.Tiles > 0)
                 {
                     continue;
@@ -1281,12 +1594,103 @@ namespace SimulationLobby.Simulations.Territory
                     Emit(TerritoryEventKind.BoostEnded, t, 0, 0, 0, 0);
                 }
 
+                ClearTerr002State(t);
                 _spinQueue.RemoveAll(x => x == t);
 
                 Emit(TerritoryEventKind.Eliminated, t, 0, owner, 0, 0);
                 _recorder.LogEvent("eliminated_" + team.name, owner);
                 _recorder.SetMetric("eliminated_" + team.name + "_tick", tick);
+                RewardKnockout(owner, t);
             }
+        }
+
+        /// <summary>Progression: the team that reached the plate takes the loser's bank and a free spin.</summary>
+        void RewardKnockout(int taker, int loser)
+        {
+            if (!_config.knockoutReward || taker < 0 || taker >= _teams.Count || taker == loser || _teams[taker].Eliminated)
+            {
+                return;
+            }
+
+            CountBank bank = _banks[taker];
+            long before = bank.Value;
+            long loot = _banks[loser].Drain(0);
+            _teams[loser].Bank = _banks[loser].Value;
+            bank.Add(loot);
+            NoteBank(taker);
+            long after = bank.Value;
+
+            int queuedBefore = _spinQueue.Count;
+            EnqueueSpin(taker);
+            int spin = _spinQueue.Count > queuedBefore ? 1 : 0;
+
+            Emit(TerritoryEventKind.KnockoutReward, taker, loser, spin, before, after);
+            _recorder.LogEvent("knockout_reward", loot);
+            AutoReleaseIfMaxed(taker);
+        }
+
+        /// <summary>Per-tick progression switches: the final showdown at two teams left, and heavy shots after a set time.</summary>
+        void UpdateProgression(int tick)
+        {
+            if (!_showdown && _config.showdownPlateRadiusCells > 0f && _teams.Count > 2 && _aliveTeams == 2)
+            {
+                _showdown = true;
+                int claimed = 0;
+                for (int t = 0; t < _teams.Count; t++)
+                {
+                    if (!_teams[t].Eliminated)
+                    {
+                        claimed += SetPlate(t, Mathf.Max(_config.showdownPlateRadiusCells, _config.basePlateRadiusCells), tick);
+                    }
+                }
+
+                Emit(TerritoryEventKind.ShowdownStarted, 0, claimed, 0, 0, 0);
+                _recorder.LogEvent("showdown", claimed);
+            }
+
+            if (!_heavyShots && _config.heavyShotsAfterSeconds > 0f && ElapsedSeconds >= _config.heavyShotsAfterSeconds)
+            {
+                _heavyShots = true;
+                Emit(TerritoryEventKind.HeavyShotsStarted, 0, _config.heavyShotRadius, 0, 0, 0);
+                _recorder.LogEvent("heavy_shots", _config.heavyShotRadius);
+            }
+        }
+
+        /// <summary>
+        /// (Re)builds the team's base plate at <paramref name="radiusCells"/> and protects its cells. With
+        /// <paramref name="claimTick"/> &gt;= 0 the plate also claims every cell under it for the team (the showdown
+        /// growth must not knock anyone out by landing on enemy ground). Returns the cells claimed.
+        /// </summary>
+        int SetPlate(int team, float radiusCells, int claimTick)
+        {
+            _plateScratch.Clear();
+            int claimed = 0;
+            Vector2Int bc = _config.BaseCell(team);
+            int reach = Mathf.CeilToInt(radiusCells);
+            for (int dy = -reach; dy <= reach; dy++)
+            {
+                for (int dx = -reach; dx <= reach; dx++)
+                {
+                    int px = bc.x + dx;
+                    int py = bc.y + dy;
+                    if (!_grid.InBounds(px, py) || !_config.OnBasePlate(team, px, py, radiusCells))
+                    {
+                        continue;
+                    }
+
+                    int index = _grid.Index(px, py);
+                    _plateScratch.Add(index);
+                    _protected[index] = true;
+                    if (claimTick >= 0 && _grid.GetOwner(index) != team)
+                    {
+                        _grid.SetOwner(px, py, team, claimTick);
+                        claimed++;
+                    }
+                }
+            }
+
+            _plateCells[team] = _plateScratch.ToArray();
+            return claimed;
         }
 
         void KillShots(int team)
@@ -1305,6 +1709,25 @@ namespace SimulationLobby.Simulations.Territory
         }
 
         // ------------------------------------------------------------------ 9. escalation
+
+        /// <summary>Every multiplierRampSeconds of battle, every multiplier gains multiplierRampStep (0 seconds = off).</summary>
+        void RampMultipliers()
+        {
+            if (_config.multiplierRampSeconds <= 0f)
+            {
+                return;
+            }
+
+            int level = _multiplierBonus / Math.Max(1, _config.multiplierRampStep);
+            if (ElapsedSeconds < (level + 1) * _config.multiplierRampSeconds)
+            {
+                return;
+            }
+
+            _multiplierBonus += Math.Max(1, _config.multiplierRampStep);
+            Emit(TerritoryEventKind.MultipliersRaised, 0, _multiplierBonus, 0, 0, 0);
+            _recorder.LogEvent("multipliers_raised", _multiplierBonus);
+        }
 
         void Escalate(int tick)
         {
@@ -1501,10 +1924,14 @@ namespace SimulationLobby.Simulations.Territory
             _recorder.SetMetric("total_releases", _totalReleases);
             _recorder.SetMetric("eliminations", _eliminationOrder.Count);
             _recorder.SetMetric("escalation_level", _escalationLevel);
+            _recorder.SetMetric("multiplier_bonus", _multiplierBonus);
             _recorder.SetMetric("balls_recovered", _ballsRecovered);
             _recorder.SetMetric("bombs_exploded", _bombsExploded);
             _recorder.SetMetric("lines_painted", _linesPainted);
             _recorder.SetMetric("self_destructs", _selfDestructs);
+            _recorder.SetMetric("cannon_strikes", _cannonStrikes);
+            _recorder.SetMetric("rain_drops_landed", _rainDropsLanded);
+            _recorder.SetMetric("cells_rained", _cellsRained);
             _recorder.SetMetric("battle_seconds", ElapsedSeconds);
             _recorder.SetMetric("winner", _winner);
             _recorder.SetMetric("decided_on_tiles", _decidedOnTiles ? 1f : 0f);

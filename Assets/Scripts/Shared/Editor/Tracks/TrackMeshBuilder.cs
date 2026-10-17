@@ -1,17 +1,18 @@
 using System.Collections.Generic;
+using SimulationLobby.Shared.Tracks;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SimulationLobby.Simulations.Race.EditorTools
+namespace SimulationLobby.Shared.EditorTools
 {
     /// <summary>
-    /// Sweeps a <see cref="RaceTrackLayout"/> into geometry: samples the centreline section by section
+    /// Sweeps a <see cref="TrackLayout"/> into geometry: samples the centreline section by section
     /// (position, travel direction, banked frame, width), then extrudes a U-shaped channel along it.
     /// Editor-time only: the scene stores the finished meshes, so nothing here runs in a build.
     /// </summary>
-    static class TrackMeshBuilder
+    public static class TrackMeshBuilder
     {
-        public const float RailHeight = 0.34f;
+        public const float RailHeight = TrackLayout.FallbackRailHeight;
         public const float RailThickness = 0.09f;
         public const float FloorThickness = 0.12f;
 
@@ -35,11 +36,14 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             public float distance;
 
             public int section;
+
+            /// <summary>Rail height at this sample; 0 on a railless section.</summary>
+            public float railHeight;
         }
 
         // ------------------------------------------------------------------ sampling
 
-        public static List<Sample> SampleCentreline(RaceTrackLayout layout, Vector3 start)
+        public static List<Sample> SampleCentreline(TrackLayout layout, Vector3 start)
         {
             var samples = new List<Sample>(2048);
             Vector3 position = start;
@@ -50,6 +54,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             for (int k = 0; k < layout.sections.Length; k++)
             {
                 TrackSection section = layout.sections[k];
+                float railHere = layout.RailHeightFor(k);
                 float slope = section.slopeDegrees * Mathf.Deg2Rad;
                 float widthStart = width;
                 float widthTarget = section.widthEnd > 0f ? section.widthEnd : width;
@@ -72,7 +77,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
 
                 if (k == 0)
                 {
-                    samples.Add(MakeSample(position, Heading(yaw, slope), 0f, width, distance, k));
+                    samples.Add(MakeSample(position, Heading(yaw, slope), 0f, width, distance, k, railHere));
                 }
 
                 for (int i = 1; i <= steps; i++)
@@ -107,7 +112,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                     float currentWidth = Mathf.Lerp(widthStart, widthTarget, Mathf.SmoothStep(0f, 1f, t));
 
                     samples.Add(MakeSample(position, Heading(yaw, slope), bankRadians * bankWeight, currentWidth,
-                        distance, k));
+                        distance, k, railHere));
                 }
 
                 width = widthTarget;
@@ -122,7 +127,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                 .normalized;
         }
 
-        static Sample MakeSample(Vector3 position, Vector3 forward, float bank, float width, float distance, int section)
+        static Sample MakeSample(Vector3 position, Vector3 forward, float bank, float width, float distance, int section, float railHeight)
         {
             Vector3 flatRight = Vector3.Cross(Vector3.up, forward).normalized;
             Vector3 flatUp = Vector3.Cross(forward, flatRight);
@@ -138,7 +143,8 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                 up = flatUp * cos - flatRight * sin,
                 width = width,
                 distance = distance,
-                section = section
+                section = section,
+                railHeight = railHeight
             };
         }
 
@@ -182,7 +188,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             for (int i = 0; i < samples.Count; i++)
             {
                 Sample s = samples[i];
-                Vector2[] profile = Profile(s.width);
+                Vector2[] profile = Profile(s.width, s.railHeight);
                 float perimeter = 0f;
                 for (int e = 0; e < edgeCount; e++)
                 {
@@ -213,11 +219,18 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                     int c = ringB + e * 2 + 1;
                     int d = ringB + e * 2;
                     bool isTrim = e == 2 || e == 6;
+
+                    // A railless ring collapses the inner rail walls (edges 3 and 5) to nothing: no mesh, no collider.
+                    if ((e == 3 || e == 5) && samples[i].railHeight <= 0.001f && samples[i + 1].railHeight <= 0.001f)
+                    {
+                        continue;
+                    }
+
                     AddQuad(isTrim ? trim : body, vertices, normals[a], a, b, c, d);
                 }
             }
 
-            var mesh = new Mesh { name = "RaceTrackBody", indexFormat = IndexFormat.UInt32 };
+            var mesh = new Mesh { name = "TrackBody", indexFormat = IndexFormat.UInt32 };
             mesh.SetVertices(vertices);
             mesh.SetNormals(normals);
             mesh.SetUVs(0, uvs);
@@ -266,7 +279,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                 }
             }
 
-            var mesh = new Mesh { name = "RaceTrackInlay", indexFormat = IndexFormat.UInt32 };
+            var mesh = new Mesh { name = "TrackInlay", indexFormat = IndexFormat.UInt32 };
             mesh.SetVertices(vertices);
             mesh.SetNormals(normals);
             mesh.SetTriangles(triangles, 0);
@@ -275,11 +288,10 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         }
 
         /// <summary>U-channel, counter-clockwise: outer bottom, outer right, right rail top, inner right, floor, inner left, left rail top, outer left.</summary>
-        static Vector2[] Profile(float width)
+        static Vector2[] Profile(float width, float rail)
         {
             float h = width * 0.5f;
             const float t = RailThickness;
-            const float rail = RailHeight;
             const float d = FloorThickness;
             return new[]
             {
@@ -318,7 +330,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         // ------------------------------------------------------------------ checks
 
         /// <summary>
-        /// Rough race time from rolling-sphere physics (5/7 g sin slope, some friction loss). Good enough to
+        /// Rough run time from rolling-sphere physics (5/7 g sin slope, some friction loss). Good enough to
         /// tell a 30 second track from a 90 second one before opening Unity.
         /// </summary>
         public static float EstimateSeconds(List<Sample> samples, float untilDistance)

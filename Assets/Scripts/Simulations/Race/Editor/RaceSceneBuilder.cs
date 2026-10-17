@@ -4,6 +4,8 @@ using SimulationLobby.Core;
 using SimulationLobby.Presentation;
 using SimulationLobby.Presentation.EditorTools;
 using SimulationLobby.Shared;
+using SimulationLobby.Shared.EditorTools;
+using SimulationLobby.Shared.Tracks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -37,7 +39,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         static void ResetLayout()
         {
             Directory.CreateDirectory(ConfigFolder);
-            RaceTrackLayout layout = EnsureLayout();
+            TrackLayout layout = EnsureLayout();
             layout.ResetToDefault();
             EditorUtility.SetDirty(layout);
             AssetDatabase.SaveAssets();
@@ -55,7 +57,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
 
             Directory.CreateDirectory(ConfigFolder);
             Directory.CreateDirectory(MaterialFolder);
-            RaceTrackLayout layout = EnsureLayout();
+            TrackLayout layout = EnsureLayout();
             RaceConfig config = EnsureConfig(layout);
             PhysicsMaterial marblePhysics = EnsurePhysicsMaterial("RaceMarble", 0.3f, 0.35f, PhysicsMaterialCombine.Average, 0.32f);
             PhysicsMaterial trackPhysics = EnsurePhysicsMaterial("RaceTrack", 0.32f, 0.4f, PhysicsMaterialCombine.Average, 0.25f);
@@ -461,52 +463,36 @@ namespace SimulationLobby.Simulations.Race.EditorTools
 
         // ------------------------------------------------------------------ assets
 
-        /// <summary>
-        /// Saves a generated mesh as a brand-new asset, deleting any earlier file at the same path first.
-        /// <c>StudioSetBuilder.SaveMesh</c> overwrites the existing asset in place, which is fine for a mesh
-        /// that never changes shape. The course changes shape whenever the layout does, and an in-place
-        /// overwrite left the editor drawing the previous build's mesh while physics and the obstacles used
-        /// the new one: pegs and marbles hovered over a track that was no longer where it was drawn.
-        /// </summary>
+        /// <summary>Delete-then-create mesh save, from <c>Shared.Editor</c> (see the stale-mesh note in CLAUDE.md).</summary>
         static Mesh SaveMeshFresh(Mesh mesh, string name)
         {
-            string folder = $"{StudioSetBuilder.Folder}/Meshes";
-            Directory.CreateDirectory(folder);
-            string path = $"{folder}/{name}.asset";
-            if (AssetDatabase.LoadAssetAtPath<Mesh>(path) != null)
-            {
-                AssetDatabase.DeleteAsset(path);
-            }
-
-            mesh.name = name;
-            AssetDatabase.CreateAsset(mesh, path);
-            return AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            return TrackMeshAssets.SaveMeshFresh(mesh, name, $"{StudioSetBuilder.Folder}/Meshes");
         }
 
-        static RaceTrackLayout EnsureLayout()
+        static TrackLayout EnsureLayout()
         {
-            var existing = AssetDatabase.LoadAssetAtPath<RaceTrackLayout>(LayoutPath);
+            var existing = AssetDatabase.LoadAssetAtPath<TrackLayout>(LayoutPath);
             if (existing != null)
             {
                 // A layout saved before obstacles existed is rebuilt from the current default once. After
                 // that its version matches and any hand edits are left alone.
-                if (existing.version < RaceTrackLayout.CurrentVersion)
+                if (existing.version < TrackLayout.CurrentVersion)
                 {
                     existing.ResetToDefault();
                     EditorUtility.SetDirty(existing);
-                    Debug.Log($"[race] Upgraded {LayoutPath} to course version {RaceTrackLayout.CurrentVersion} (obstacles added).", existing);
+                    Debug.Log($"[race] Upgraded {LayoutPath} to course version {TrackLayout.CurrentVersion} (obstacles added).", existing);
                 }
 
                 return existing;
             }
 
-            var layout = ScriptableObject.CreateInstance<RaceTrackLayout>();
-            layout.version = RaceTrackLayout.CurrentVersion;
+            var layout = ScriptableObject.CreateInstance<TrackLayout>();
+            layout.version = TrackLayout.CurrentVersion;
             AssetDatabase.CreateAsset(layout, LayoutPath);
             return layout;
         }
 
-        static RaceConfig EnsureConfig(RaceTrackLayout layout)
+        static RaceConfig EnsureConfig(TrackLayout layout)
         {
             var config = AssetDatabase.LoadAssetAtPath<RaceConfig>(ConfigPath);
             if (config == null)

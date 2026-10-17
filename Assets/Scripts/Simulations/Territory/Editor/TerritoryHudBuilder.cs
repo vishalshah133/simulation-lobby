@@ -33,23 +33,28 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             public WorldLabelLayer labels;
         }
 
-        public static Hud Build(Camera camera, TerritoryTeamDef[] teams)
+        /// <summary>Builds the HUD in the <paramref name="theme"/>'s colours and text (the classic theme gives the terr-001 HUD).</summary>
+        public static Hud Build(Camera camera, TerritoryTeamDef[] teams, TerritoryTheme theme)
         {
-            CaptionHud caption = CaptionCanvasBuilder.Build(
-                "WHICH COLOUR TAKES THE BOARD?",
-                "×2 doubles it  ·  R fires it all  ·  lose your cannon, you're out",
-                "Pick your colour before it starts.",
-                CaptionCanvasBuilder.Style.Dark);
+            var style = new CaptionCanvasBuilder.Style
+            {
+                caption = theme.captionColor,
+                subline = theme.sublineColor,
+                footer = theme.footerColor,
+                halo = false
+            };
+            CaptionHud caption = CaptionCanvasBuilder.Build(theme.question, theme.rules, theme.prompt, style);
             var canvasRect = (RectTransform)caption.transform;
             LayoutCaption(canvasRect);
 
-            ShareBarHud shareBar = ShareBarCanvasBuilder.BuildFramed(canvasRect, 4);
+            ShareBarHud shareBar = ShareBarCanvasBuilder.BuildFramed(canvasRect, 4, theme.shareBarFrame);
+            shareBar.showNames = theme.shareBarShowNames;
             var shareColors = new Color[4];
             var shareNames = new string[4];
             for (int i = 0; i < 4; i++)
             {
                 shareColors[i] = teams[i].color;
-                shareNames[i] = teams[i].name;
+                shareNames[i] = teams[i].Short;
             }
 
             shareBar.Configure(4, shareColors, shareNames);

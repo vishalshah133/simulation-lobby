@@ -3,6 +3,7 @@
     "rootNamespace": "SimulationLobby.Presentation",
     "references": [
         "SimulationLobby.Core",
+        "SimulationLobby.Shared",
         "UnityEngine.UI",
         "Unity.TextMeshPro"
     ],

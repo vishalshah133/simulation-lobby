@@ -31,6 +31,23 @@ format slug it would use. Mark `[built]` / `[published]` / `[dead]` as they move
 - `wars` — Conversion vs destruction A/B, same seed, side by side
 - `surv` — Escalating hazard gauntlet, 15 min, survivor counter throughout
 
+### From MIKAN (2026-10-16, see `reference-channels.md` → *MIKAN*)
+
+- **Survival + proliferation race** (new long-form format, **next long-form pick**) `[built]` [surv-002 Lava Run](../plans/videos/surv-002-lava-run.md). Colour teams run a 3D course;
+  ×2 gates multiply marbles while a hazard (lava rising behind, a crusher, a rolling boulder, a tsunami) thins them.
+  Last colour with marbles alive wins. Reuses `rom`/`mve` multiply gates, `BodyPool3D`, the `race` course builder and
+  `terr` team colours; only the hazard is new. 10-12 min, one arc in acts (calm → hazard starts → hazard speeds up →
+  last survivors). Reference: MIKAN *Escape from Me* (28M), *Roller Coaster - Survival Worm Race* (115M).
+- `terr` — **Numbered series**: *Which Country Takes the Board? #2*, rotating country line-ups. Cut to 10-12 min.
+- `elim` — **Team elimination series**, numbered: 8 colour teams, a different course per round, the losing team out
+  each round. MIKAN's longest-running series (53 titles). Needs `elim` built.
+- `terr`/`wars` — **Core destruction**: each team defends a core, attacks the others'. Same shape as `terr`
+  (cannon tile = core); a pure-physics variant without the Plinko economy is the cheaper cousin.
+- `race` — **Survival roller coaster**: marbles on a looping coaster track, the ones flung off are out. MIKAN's
+  biggest single title shape (115M, also MIKAN 3D's 14.5M *Abstract World* coaster). Short (2 min, 16:9) or long.
+- **Factory** (`[parked]`, too costly per video): a physics assembly line that "builds" something. MIKAN's
+  biggest hits (84-115M), but hand-authored stations and no seedable contest. Revisit once long form is proven.
+
 ## New categories — from adjacent-channel research (2026-09-29, see `reference-channels.md`)
 
 No format slug exists yet for any of these — each is a genuinely different tension mechanism from

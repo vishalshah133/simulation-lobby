@@ -12,11 +12,18 @@ namespace SimulationLobby.Simulations.Territory
         public string name;
         public Color color;
 
-        public TerritoryTeamDef(string name, Color color)
+        [Tooltip("Optional short name for tight spots (share bar label): IND, AUS. Empty uses name.")]
+        public string shortName;
+
+        public TerritoryTeamDef(string name, Color color, string shortName = null)
         {
             this.name = name;
             this.color = color;
+            this.shortName = shortName;
         }
+
+        /// <summary>shortName, or name when it is empty.</summary>
+        public string Short => string.IsNullOrEmpty(shortName) ? name : shortName;
     }
 
     /// <summary>One face on the spin reel.</summary>
@@ -60,6 +67,8 @@ namespace SimulationLobby.Simulations.Territory
                     case SpinFaceKind.PlusLine: return "+LINE";
                     case SpinFaceKind.SelfDestruct: return "BOOM";
                     case SpinFaceKind.Boost: return "×" + value;
+                    case SpinFaceKind.CannonStrike: return "BOOM";
+                    case SpinFaceKind.Rain: return "RAIN";
                     default: return effect.kind == SlotEffectKind.Release ? "FIRE" : effect.Label;
                 }
             }
@@ -151,6 +160,9 @@ namespace SimulationLobby.Simulations.Territory
         [Tooltip("Seconds the lane gate is gone per cycle, the window in which balls can reach SPIN.")]
         [Min(0.1f)] public float laneGateOpenSeconds = 1f;
 
+        [Tooltip("Progression: seconds added to every lane gate's open window per team eliminated so far. 0 = off (terr-001).")]
+        [Min(0f)] public float laneGateOpenPerElimination;
+
         [Tooltip("Slope of the lane gate plank in degrees from horizontal. Its upper end is at the outer wall.")]
         [Range(20f, 70f)] public float laneGateAngle = 45f;
         [Min(1)] public int bankStart = 1;
@@ -185,11 +197,82 @@ namespace SimulationLobby.Simulations.Territory
         [Tooltip("SELF DESTRUCT face: radius in cells of the hole blasted in the team's own territory.")]
         [Min(1)] public int selfDestructRadius = DefaultSelfDestructRadius;
 
+        // terr-002 faces. Not layout fields: older assets load them at these defaults, and layoutVersion is unchanged.
+        [Tooltip("BOOM (CannonStrike) face: whose cannon goes down.")]
+        public CannonStrikeTarget cannonStrikeTarget = CannonStrikeTarget.Leader;
+
+        [Tooltip("BOOM (CannonStrike) face: seconds the cannon is down (no firing, aim frozen). value > 0 on the face overrides it.")]
+        [Min(0.5f)] public float cannonDownSeconds = 10f;
+
+        [Tooltip("RAIN face: drops scheduled per rain (value > 0 on the face overrides it).")]
+        [Min(1)] public int rainDrops = 36;
+
+        [Tooltip("RAIN face: seconds over which the drops land.")]
+        [Min(0.2f)] public float rainSeconds = 4f;
+
+        [Tooltip("RAIN face: seconds between the face resolving and the first drop landing (fall time for the animation).")]
+        [Min(0f)] public float rainLeadSeconds = 0.8f;
+
+        [Tooltip("RAIN face: splash radius in cells (GridPainter.PaintDisc).")]
+        [Min(0)] public int rainSplashRadius = 1;
+
+        [Tooltip("RAIN face: no drop lands, and no splash paints, within this many cells (Chebyshev) of ANY base cell. Rain never touches a cannon.")]
+        [Min(1)] public int rainCannonClearance = 3;
+
+        [Tooltip("Base plate radius in cells, centred on the base cell. An enemy ball painting any cell that overlaps it knocks the team out, and BOMB / LINE / RAIN can never paint those cells. 0 = the base cell alone (terr-001). The builder sizes the cannon's base plate to match.")]
+        [Min(0f)] public float basePlateRadiusCells;
+
+        [Header("Progression (terr-002; every field off by default)")]
+        [Tooltip("A knock-out hands the eliminated team's bank to the team that reached its plate, plus a free spin.")]
+        public bool knockoutReward;
+
+        [Tooltip("Per team eliminated so far, cannons sweep and fire this fraction faster (0.25: x1.25, x1.5, x1.75). 0 = off.")]
+        [Min(0f)] public float cannonSpeedupPerElimination;
+
+        [Tooltip("Final showdown: when two teams are left, their base plates grow to this radius in cells (claiming the cells under them) and SPIN lanes stay open. 0 = no showdown.")]
+        [Min(0f)] public float showdownPlateRadiusCells;
+
+        [Tooltip("Heavy shots: from this many battle seconds, every cell a normal ball paints splashes a disc of heavyShotRadius (BOMB / LINE protection still applies). 0 = off.")]
+        [Min(0f)] public float heavyShotsAfterSeconds;
+
+        [Min(1)] public int heavyShotRadius = 1;
+
+        [Header("Look (read by the scene builder and the presenter)")]
+        [Tooltip("Colours, floor pattern and HUD text. Empty = the terr-001 look (TerritoryTheme defaults).")]
+        public TerritoryTheme theme;
+
+        [NonSerialized] TerritoryTheme _classicTheme;
+
+        /// <summary>The theme to use: <see cref="theme"/>, or an in-memory terr-001 classic when it is empty. Never null.</summary>
+        public TerritoryTheme Theme
+        {
+            get
+            {
+                if (theme != null)
+                {
+                    return theme;
+                }
+
+                if (_classicTheme == null)
+                {
+                    _classicTheme = TerritoryTheme.CreateClassic();
+                }
+
+                return _classicTheme;
+            }
+        }
+
         [Header("Escalation (battle seconds)")]
         [Min(0f)] public float escalateAfterSeconds = 360f;
         [Min(1f)] public float escalateEverySeconds = 60f;
         [Range(0.2f, 1f)] public float escalateDropFactor = 0.8f;
         [Min(0.05f)] public float minDropIntervalSeconds = 0.35f;
+
+        [Tooltip("Every this many battle seconds, every multiplier (board ×n slots, spinner ×n faces, boosts) gains " +
+                 "multiplierRampStep: ×2 becomes ×3, then ×4. 0 = off (terr-001). terr-002 uses 300.")]
+        [Min(0f)] public float multiplierRampSeconds = 0f;
+
+        [Min(1)] public int multiplierRampStep = 1;
 
         [Header("Timing")]
         [Min(0f)] public float preStartHoldSeconds = 5f;
@@ -292,9 +375,62 @@ namespace SimulationLobby.Simulations.Territory
             };
         }
 
+        /// <summary>terr-002 Country Wars, in quadrant order (0 TL, 1 TR, 2 BL, 3 BR). INDIA sits front-left, nearest the camera.</summary>
+        public static TerritoryTeamDef[] CountryWarsTeams()
+        {
+            return new[]
+            {
+                new TerritoryTeamDef("SOUTH AFRICA", Hex(0x1F, 0xB8, 0x5A), "SA"),
+                new TerritoryTeamDef("AUSTRALIA",    Hex(0xFF, 0xCC, 0x1A), "AUS"),
+                new TerritoryTeamDef("INDIA",        Hex(0x2F, 0x7B, 0xFF), "IND"),
+                new TerritoryTeamDef("WEST INDIES",  Hex(0xD3, 0x23, 0x3F), "WI")
+            };
+        }
+
+        /// <summary>terr-002 reel: terr-001's nine faces with + LINE swapped for RAIN and SELF DESTRUCT for BOOM (cannon strike).</summary>
+        public static SpinFace[] CountryWarsSpinFaces()
+        {
+            return new[]
+            {
+                new SpinFace(SlotEffect.Multiply(2), 4),
+                new SpinFace(SpinFaceKind.Boost, 3, 3),
+                new SpinFace(SpinFaceKind.Boost, 1, 5),
+                new SpinFace(SlotEffect.Add(25), 3),
+                new SpinFace(SlotEffect.Add(100), 2),
+                new SpinFace(SlotEffect.Release(), 2),
+                new SpinFace(SpinFaceKind.Bomb, 3),
+                new SpinFace(SpinFaceKind.Rain, 3),
+                new SpinFace(SpinFaceKind.CannonStrike, 2)
+            };
+        }
+
         static Color Hex(int r, int g, int b)
         {
             return new Color(r / 255f, g / 255f, b / 255f, 1f);
+        }
+
+        /// <summary>
+        /// True when cell (x, y) is part of the team's base plate: the base cell itself, or (with
+        /// <see cref="basePlateRadiusCells"/> &gt; 0) any cell whose square overlaps the plate disc centred on the base cell.
+        /// </summary>
+        public bool OnBasePlate(int team, int x, int y)
+        {
+            return OnBasePlate(team, x, y, basePlateRadiusCells);
+        }
+
+        /// <summary>As <see cref="OnBasePlate(int,int,int)"/> for a plate of <paramref name="radiusCells"/> (the showdown plate).</summary>
+        public bool OnBasePlate(int team, int x, int y, float radiusCells)
+        {
+            Vector2Int bc = BaseCell(team);
+            if (radiusCells <= 0f)
+            {
+                return x == bc.x && y == bc.y;
+            }
+
+            // Nearest point of the cell's square to the plate centre (the base cell's centre).
+            float dx = Mathf.Max(0f, Mathf.Abs(x - bc.x) - 0.5f);
+            float dy = Mathf.Max(0f, Mathf.Abs(y - bc.y) - 0.5f);
+            return dx * dx + dy * dy < radiusCells * radiusCells;
         }
 
         /// <summary>The cell a team's cannon stands on: inset from the team's outer corner.</summary>
@@ -416,6 +552,15 @@ namespace SimulationLobby.Simulations.Territory
             if (bombShots < 1 || bombRadius < 1 || lineThickness < 1 || selfDestructRadius < 1)
             {
                 error = "bombShots, bombRadius, lineThickness and selfDestructRadius must be at least 1.";
+                return false;
+            }
+
+            if (cannonDownSeconds <= 0f || rainDrops < 1 || rainSeconds <= 0f || rainLeadSeconds < 0f ||
+                rainSplashRadius < 0 || rainCannonClearance < 1 || basePlateRadiusCells < 0f ||
+                basePlateRadiusCells > baseInsetCells + 0.5f || showdownPlateRadiusCells > baseInsetCells + 0.5f ||
+                cannonSpeedupPerElimination < 0f || heavyShotsAfterSeconds < 0f || heavyShotRadius < 1)
+            {
+                error = "cannonDownSeconds and rainSeconds must be positive, rainDrops and rainCannonClearance at least 1, rainLeadSeconds and rainSplashRadius at least 0, basePlateRadiusCells and showdownPlateRadiusCells between 0 and baseInsetCells + 0.5, cannonSpeedupPerElimination and heavyShotsAfterSeconds at least 0, heavyShotRadius at least 1.";
                 return false;
             }
 

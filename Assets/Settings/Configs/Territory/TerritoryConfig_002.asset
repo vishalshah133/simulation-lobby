@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4667982be32804aae42ba5a0bdd2d9, type: 3}
+  m_Name: TerritoryConfig_002
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Territory::SimulationLobby.Simulations.Territory.TerritoryConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 1500
+  intent: 'terr-002 Country Wars: India, South Africa, Australia and West Indies
+    fight for the board. x2 doubles the bank, R fires it, SPIN drives the reel; BOOM
+    knocks a cannon out for 10 s and RAIN paints a patch of cells. Tune for lead
+    changes first, length second.'
+  layoutVersion: 7
+  teams:
+  - name: SOUTH AFRICA
+    color: {r: 0.12156863, g: 0.72156864, b: 0.3529412, a: 1}
+    shortName: SA
+  - name: AUSTRALIA
+    color: {r: 1, g: 0.8, b: 0.101960786, a: 1}
+    shortName: AUS
+  - name: INDIA
+    color: {r: 0.18431373, g: 0.48235294, b: 1, a: 1}
+    shortName: IND
+  - name: WEST INDIES
+    color: {r: 0.827451, g: 0.13725491, b: 0.24705882, a: 1}
+    shortName: WI
+  gridWidth: 36
+  gridHeight: 48
+  cellSize: 0.33333334
+  baseInsetCells: 3
+  sweepDegreesPerSecond: 30
+  sweepMarginDegrees: 5
+  shotSpeedCellsPerSecond: 12
+  shotHealth: 1
+  fireIntervalSeconds: 0.08
+  maxLiveShotsPerTeam: 60
+  shotMaxLifetimeSeconds: 25
+  boardSlots:
+  - kind: 3
+    value: 0
+  - kind: 2
+    value: 0
+  - kind: 0
+    value: 2
+  - kind: 2
+    value: 0
+  - kind: 0
+    value: 2
+  ballsPerBoard: 6
+  dropIntervalSeconds: 0.85
+  dropSpreadSamples: 3
+  dropSpreadFraction: 0.7
+  spinLaneFraction: 0.5
+  laneGateEnabled: 1
+  laneGateClosedSeconds: 5
+  laneGateOpenSeconds: 2
+  laneGateOpenPerElimination: 2
+  laneGateAngle: 45
+  bankStart: 1
+  bankCap: 4096
+  autoReleaseAtCap: 1
+  ballStuckSeconds: 12
+  ballRecoverMargin: 2
+  spinFaces:
+  - kind: 0
+    effect:
+      kind: 0
+      value: 2
+    value: 0
+    weight: 4
+  - kind: 4
+    effect:
+      kind: 0
+      value: 0
+    value: 3
+    weight: 3
+  - kind: 4
+    effect:
+      kind: 0
+      value: 0
+    value: 5
+    weight: 1
+  - kind: 0
+    effect:
+      kind: 1
+      value: 25
+    value: 0
+    weight: 3
+  - kind: 0
+    effect:
+      kind: 1
+      value: 100
+    value: 0
+    weight: 2
+  - kind: 0
+    effect:
+      kind: 2
+      value: 0
+    value: 0
+    weight: 2
+  - kind: 1
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 3
+  - kind: 6
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 3
+  - kind: 5
+    effect:
+      kind: 0
+      value: 0
+    value: 0
+    weight: 2
+  spinSeconds: 3.5
+  maxQueuedSpins: 1
+  bombShots: 3
+  bombRadius: 4
+  lineThickness: 2
+  boostSeconds: 10
+  selfDestructRadius: 4
+  cannonStrikeTarget: 0
+  cannonDownSeconds: 10
+  rainDrops: 36
+  rainSeconds: 4
+  rainLeadSeconds: 0.8
+  rainSplashRadius: 1
+  rainCannonClearance: 3
+  basePlateRadiusCells: 2.1
+  knockoutReward: 1
+  cannonSpeedupPerElimination: 0.25
+  showdownPlateRadiusCells: 3.5
+  heavyShotsAfterSeconds: 600
+  heavyShotRadius: 1
+  theme: {fileID: 11400000, guid: 8e8b54e226f88044d83f38429730831e, type: 2}
+  escalateAfterSeconds: 210
+  escalateEverySeconds: 60
+  escalateDropFactor: 0.8
+  minDropIntervalSeconds: 0.35
+  multiplierRampSeconds: 600
+  multiplierRampStep: 1
+  preStartHoldSeconds: 5
+  endHoldSeconds: 10
+  decisionAtSeconds: 1200
+  useCameraOverride: 1
+  cameraPosition: {x: -0.06, y: 14.48, z: -5.9}
+  cameraRotation: {x: 0.3907301, y: 0.0020404, z: -0.0008661, w: 0.9205027}
+  boardWidth: 4.5
+  boardLength: 7.4
+  boardTiltDegrees: 25
+  pegRows: 6
+  pegColumns: 4
+  pegRadius: 0.17
+  ballRadius: 0.17
+  tileHeight: 0.03

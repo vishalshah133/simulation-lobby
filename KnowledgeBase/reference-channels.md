@@ -439,3 +439,79 @@ the same week, and its 3K median sits at the low end of the genre band.
 an education channel's job, not a lobby's. **Unverified:** retention (owner-only). Whether the 12.2M hit was the
 topic or the luck of the algorithm: one hit on a 2-week-old channel can't tell those apart. And the specific
 mechanics behind each title, which come from title wording and haven't been watched.
+
+---
+
+## MIKAN (@mikan2d) and MIKAN 3D (@mikan3d): the genre's long-form giants (data pulled 2026-10-16)
+
+One creator, two channels. **Count them as one data point for genre claims** (see [[multi-channel-evidence]]): same
+author, same audience, same title style. Both build marble races, MIKAN 3D in **Unity** (our engine), and MIKAN in
+Algodoo early on, then Unity.
+
+| | @mikan2d ("MIKAN") | @mikan3d ("MIKAN 3D") |
+|---|---|---|
+| Subs / lifetime views | **3.05M / 2.95B** | 291K / 134M |
+| Uploads | 451, created 2020-04 | 22, created 2021-03 |
+| Shape | **All long form, 16:9**. 17 Shorts ever, none since 2023 | Mostly 4-12 min long form, a few 1-3 min 16:9 roller-coaster pieces |
+| Cadence now | ~1 a month in 2026 (6 uploads, May-Sep), after a 6-month gap (Nov 2025 → May 2026) | Dormant: 1 upload since 2023 (2024-10, 5.6M) |
+| Median views | 2024: 11.1M · 2025: 5.8M · **2026: 4.1M** (6 uploads, still accruing) | 3.5M (all-time) |
+| Like-rate | **0.04-0.3%**, the lowest of any channel we've pulled | 0.13-0.7% |
+
+**2026 uploads are still pulling ~45-65K views/day each, months after release** (*The Doubling* 46K/day at day 133,
+*Elimination Soft Marble Race* 63K/day at day 122, *Core Destruction - Crane Game* 48K/day at day 41). That's the
+16:9 long tail at scale, the same slow-climb shape our v13/v15 show at ~200/day.
+
+**Top videos (MIKAN, all-time):** *Roller Coaster - Survival Worm Race* 115M (8:45) · *The Humanoid Factory* 99M
+(8:26) · *The Nightmare - Survival Bicycle Race* 88M (9:32) · *The Baby Factory* 84M (9:41, 2025) · *Escape from the
+Lava #4* 52M · *The Worm Factory #2* 49M (10:25, 2024). **MIKAN 3D:** *Escape from Me - Proliferation Survival
+Marble Race* 28M (5:11) · *Escape from Me 3* 21M · *Abstract World - Roller Coaster* 14.5M (2:01).
+
+**What their series are** (title keyword counts across 451 uploads: *survival* 81, *elimination*/*team* 53,
+*escape* 33, *core destruction* 24, *proliferation* 23, *castle destruction* 20, *factory* 13):
+
+1. **Survival race**: marbles run a course while a hazard (lava, tsunami, a rolling object, a crusher) takes them out.
+   Often **"proliferation"**: marbles multiply as they go, so a survival race is also a multiply race.
+2. **Team elimination**: colour teams, rounds, knockouts, 14-45 min, numbered series (#10, Mega #2, Decisive First #3).
+3. **Core destruction**: each team defends a core and attacks the others'. Structurally the same as our `terr`
+   (lose your cannon tile, you're out).
+4. **Factory**: a physics assembly line that "builds" a thing (worm, baby, humanoid, brain). The biggest hits
+   (84-115M), and the least like a race. It's a curiosity/spectacle arc, not a contest.
+
+**Titles:** a concept noun phrase plus a format label (*"The Doubling - Team Elimination Marble Race"*,
+*"Escape from the Lava #4 - Survival Bicycle Race"*). No questions (2 in 451), no emoji, no CAPS. A recurring
+series name, numbered.
+
+**Length (MIKAN long form since 2024, n=27, older uploads have had longer to accrue):** 8-12 min median ~21M (10
+videos) · 12-20 min ~5.9M · 20-40 min ~7.7M · 40+ min ~2.4M. **Every 20M+ hit since 2024 is 5:41-10:51 (6 of 7 at 10-11 min).**
+Era-confounded, but the direction matches the top-25: almost all of them are 3:30-12 min.
+
+**Reading it honestly:**
+- **Long-form marble physics is not saturated in 2026.** A channel posting monthly still averages millions per
+  upload. That's the strongest evidence yet for Track B, but it's a 3M-sub channel with years of browse history.
+  It shows the audience exists, not that a new channel can reach it quickly.
+- **The ultra-low like% is an audience signal, not a quality one.** It fits a very young, browse-fed, often
+  logged-out audience (autoplay, TV, kids). That's the audience 16:9 marble long form reaches. Expect our
+  long-form like% to stay below our Shorts' (v15 0.58%, v13 0.29% already show it).
+- **Most likely to be what suggests our long form.** *Which Color Takes the Board?* sits squarely in MIKAN's
+  team/core-destruction lane. Check it against Studio's *Suggested videos* list (see `learnings.md` → *10-16 update*).
+- **Unverified:** retention and traffic sources (owner-only), and whether 2026's lower median is decay or just
+  younger uploads.
+
+**What we take:**
+- **10-12 min as the default long-form length**, not 15-20. Our `terr` (15:15) and `terr-002` (20:22) are both
+  above the 10-11 min where 6 of MIKAN's 7 20M+ hits since 2024 sit. Test a 10-12 min cut of the next long video.
+- **Survival + proliferation as a long-form arc.** Marbles multiply while a hazard thins them: our `rom`/`mve`
+  economy on a `race` course, scaled to 10 min. It's the one MIKAN series we have every piece of except the
+  course hazard.
+- **Named, numbered series.** One concept name per series and a number (*Core Destruction #24*). That's what
+  turns one-off uploads into something viewers and the algorithm return to. `terr` is the obvious first series.
+- **Core destruction confirms the `terr` shape.** Teams, a core to defend, knock-out on loss. Ours is already that.
+
+**What we don't take:**
+- **The title style, wholesale.** Their label titles work on a 3M-sub channel that browse already trusts. Ours
+  needs the click from strangers, so keep the stake/question form (*Which Color Takes the Board?*) and borrow only
+  the series label as a suffix.
+- **Factory videos, for now.** They're the biggest hits, but they're an authored animation arc (many hand-built
+  stations), not a seedable contest. Expensive per video and against compose-don't-rewrite. Revisit once the
+  long-form track proves itself.
+- **Multi-hour runs** (161-176 min Stage Lottery / 200-Elimination). They're its weakest-per-view uploads.

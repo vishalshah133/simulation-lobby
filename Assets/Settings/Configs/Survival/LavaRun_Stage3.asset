@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c1d5746b7a0784a9c2a1202ff6ebe0, type: 3}
+  m_Name: LavaRun_Stage3
+  m_EditorClassIdentifier: SimulationLobby.Shared::SimulationLobby.Shared.Tracks.TrackLayout
+  version: 3
+  startWidth: 5.5
+  gateDistance: 3
+  runOutLength: 8
+  defaultRailHeight: 0.45
+  sections:
+  - label: Pens
+    kind: 0
+    length: 3
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 7
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0.33
+    railless: 0
+  - label: Funnel
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 6
+    bankDegrees: 0
+    widthEnd: 3
+    railHeight: 0.45
+    railless: 0
+  - label: Turn out
+    kind: 1
+    length: 0
+    radius: 14
+    arcDegrees: 50
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Approach
+    kind: 0
+    length: 32
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Neck
+    kind: 0
+    length: 10
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0.484
+    railHeight: 0
+    railless: 0
+  - label: Bridge
+    kind: 0
+    length: 60
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 1
+  - label: Landing
+    kind: 0
+    length: 3
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 0
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 1
+  obstacles: []

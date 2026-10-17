@@ -4,7 +4,9 @@
     "references": [
         "SimulationLobby.Core",
         "SimulationLobby.Shared",
-        "SimulationLobby.Presentation"
+        "SimulationLobby.Presentation",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

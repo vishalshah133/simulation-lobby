@@ -25,11 +25,16 @@ namespace SimulationLobby.Simulations.Territory
         [Range(0f, 1f)] public float eliminationVolume = 0.8f;
         [Range(0f, 1f)] public float winVolume = 0.7f;
         [Range(0f, 1f)] public float ambientVolume = 0.1f;
+        [Range(0f, 1f)] public float cannonDownVolume = 0.9f;
+        [Range(0f, 1f)] public float cannonRepairVolume = 0.5f;
+        [Range(0f, 1f)] public float rainStartVolume = 0.6f;
+        [Range(0f, 1f)] public float rainDropVolume = 0.12f;
 
         [Header("Throttles")]
         [Min(1f)] public float maxFlipsPerSecond = 25f;
         [Min(1f)] public float maxShotsPerSecond = 30f;
         [Min(1f)] public float maxPegsPerSecond = 40f;
+        [Min(1f)] public float maxRainDropsPerSecond = 20f;
 
         [Header("Tuning")]
         [Min(0f)] public float minPegSpeed = 0.6f;
@@ -64,10 +69,17 @@ namespace SimulationLobby.Simulations.Territory
         AudioClip _blastBoom;
         AudioClip _blastCrack;
         AudioClip _lineSweep;
+        AudioClip _cannonBoom;
+        AudioClip _cannonClank;
+        AudioClip _repair;
+        AudioClip _thunder;
+        AudioClip[] _rainTicks;
 
         float _lastFlip = -10f;
         float _lastShot = -10f;
         float _lastPeg = -10f;
+        float _lastRainDrop = -10f;
+        const int SampleRate = 44100;
         int _counter;
         int _thudCursor;
         bool _built;
@@ -116,6 +128,17 @@ namespace SimulationLobby.Simulations.Territory
             _blastCrack = ProceduralToneBank.CreateShatter(0.8f, 53, "BlastCrack");
             _lineSweep = ProceduralToneBank.CreateRiser(0.4f, 300f, 1200f, 63, "LineSweep");
             _bedClip = ProceduralToneBank.CreateAmbientBed(8f, 55f, "TerritoryBed");
+
+            // terr-002: cannon knock-out, repair, rain.
+            _cannonBoom = ProceduralToneBank.CreateImpactThud(0.2f, 1.1f, 101, "CannonDownBoom");
+            _cannonClank = CreateClank();
+            _repair = CreateRepair();
+            _thunder = CreateThunder();
+            _rainTicks = new AudioClip[4];
+            for (int i = 0; i < _rainTicks.Length; i++)
+            {
+                _rainTicks[i] = CreateRainTick(200 + i);
+            }
 
             _voices = new AudioSource[Mathf.Max(1, voices)];
             for (int i = 0; i < _voices.Length; i++)
@@ -307,6 +330,163 @@ namespace SimulationLobby.Simulations.Territory
         {
             Play(_shatter, eliminationVolume);
             Play(_boom, eliminationVolume);
+        }
+
+        /// <summary>A big low boom with a metallic clank ringing over it: a cannon knocked out.</summary>
+        public void PlayCannonDown()
+        {
+            if (!_built)
+            {
+                return;
+            }
+
+            Play(_cannonBoom, cannonDownVolume);
+            Play(_blastCrack, cannonDownVolume * 0.45f, 0.8f);
+            Play(_cannonClank, cannonDownVolume * 0.55f);
+        }
+
+        /// <summary>A ratchet click burst and a rising chime: the cannon is back.</summary>
+        public void PlayCannonRepair()
+        {
+            Play(_repair, cannonRepairVolume);
+        }
+
+        /// <summary>A low thunder roll: a filtered-noise swell.</summary>
+        public void PlayRainStart()
+        {
+            Play(_thunder, rainStartVolume);
+        }
+
+        /// <summary>A soft, short patter tick; rate-limited, with deterministic pitch variance.</summary>
+        public void PlayRainDrop()
+        {
+            if (!_built || !Throttle(ref _lastRainDrop, maxRainDropsPerSecond))
+            {
+                return;
+            }
+
+            _counter++;
+            Play(_rainTicks[_counter % _rainTicks.Length], rainDropVolume, Jitter());
+        }
+
+        // ---- local generators (the tone bank keeps its sample rate private) ----
+
+        static AudioClip MakeClip(string name, float[] samples, float peak)
+        {
+            float max = 0f;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                max = Mathf.Max(max, Mathf.Abs(samples[i]));
+            }
+
+            if (max > 1e-5f)
+            {
+                float gain = peak / max;
+                for (int i = 0; i < samples.Length; i++)
+                {
+                    samples[i] *= gain;
+                }
+            }
+
+            AudioClip clip = AudioClip.Create(name, samples.Length, 1, SampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        /// <summary>Inharmonic partials with different decays: struck metal.</summary>
+        static AudioClip CreateClank()
+        {
+            float[] hz = { 410f, 683f, 1130f, 1670f, 2390f };
+            float[] decay = { 5f, 6.5f, 8f, 11f, 15f };
+            float[] gain = { 1f, 0.8f, 0.6f, 0.4f, 0.25f };
+            var samples = new float[Mathf.RoundToInt(SampleRate * 0.9f)];
+            for (int i = 0; i < samples.Length; i++)
+            {
+                float t = i / (float)SampleRate;
+                float v = 0f;
+                for (int p = 0; p < hz.Length; p++)
+                {
+                    v += Mathf.Sin(2f * Mathf.PI * hz[p] * t) * Mathf.Exp(-decay[p] * t) * gain[p];
+                }
+
+                samples[i] = v * Mathf.Min(1f, i / 40f);
+            }
+
+            return MakeClip("CannonClank", samples, 0.7f);
+        }
+
+        /// <summary>Six ratchet clicks, then a rising three-note chime.</summary>
+        static AudioClip CreateRepair()
+        {
+            var rng = new System.Random(303);
+            var samples = new float[Mathf.RoundToInt(SampleRate * 1.3f)];
+            for (int c = 0; c < 6; c++)
+            {
+                int start = Mathf.RoundToInt(SampleRate * (0.04f + c * 0.05f));
+                int length = Mathf.RoundToInt(SampleRate * 0.025f);
+                for (int i = 0; i < length && start + i < samples.Length; i++)
+                {
+                    float t = i / (float)SampleRate;
+                    float noise = (float)(rng.NextDouble() * 2.0 - 1.0);
+                    samples[start + i] += (noise * 0.6f + Mathf.Sin(2f * Mathf.PI * (1500f + c * 120f) * t)) * Mathf.Exp(-140f * t) * 0.5f;
+                }
+            }
+
+            float[] notes = { 523.25f, 783.99f, 1046.5f };
+            for (int n = 0; n < notes.Length; n++)
+            {
+                int start = Mathf.RoundToInt(SampleRate * (0.34f + n * 0.12f));
+                for (int i = 0; start + i < samples.Length; i++)
+                {
+                    float t = i / (float)SampleRate;
+                    float v = Mathf.Sin(2f * Mathf.PI * notes[n] * t) + 0.3f * Mathf.Sin(2f * Mathf.PI * notes[n] * 2f * t);
+                    samples[start + i] += v * Mathf.Exp(-4f * t) * Mathf.Min(1f, i / 80f) * 0.4f;
+                }
+            }
+
+            return MakeClip("CannonRepair", samples, 0.8f);
+        }
+
+        /// <summary>Low-passed noise swelling up and rolling away, over a faint sub rumble.</summary>
+        static AudioClip CreateThunder()
+        {
+            var rng = new System.Random(404);
+            const float seconds = 2.4f;
+            var samples = new float[Mathf.RoundToInt(SampleRate * seconds)];
+            float low = 0f;
+            float low2 = 0f;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                float t = i / (float)SampleRate;
+                float u = t / seconds;
+                float envelope = Mathf.Pow(Mathf.Sin(Mathf.PI * Mathf.Pow(u, 0.6f)), 2f);
+                float wobble = 0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * 7f * t);
+                float noise = (float)(rng.NextDouble() * 2.0 - 1.0);
+                low += (noise - low) * 0.05f;
+                low2 += (low - low2) * 0.12f;
+                float sub = Mathf.Sin(2f * Mathf.PI * (48f - 10f * u) * t) * 0.25f;
+                samples[i] = (low2 * 4f + sub) * envelope * wobble;
+            }
+
+            return MakeClip("RainThunder", samples, 0.85f);
+        }
+
+        /// <summary>A tiny high-passed noise tick with a soft pop.</summary>
+        static AudioClip CreateRainTick(int seed)
+        {
+            var rng = new System.Random(seed);
+            var samples = new float[Mathf.RoundToInt(SampleRate * 0.07f)];
+            float low = 0f;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                float t = i / (float)SampleRate;
+                float noise = (float)(rng.NextDouble() * 2.0 - 1.0);
+                low += (noise - low) * 0.3f;
+                float high = noise - low;
+                samples[i] = (high * 0.7f + Mathf.Sin(2f * Mathf.PI * (900f + (seed % 4) * 140f) * t) * 0.4f) * Mathf.Exp(-70f * t);
+            }
+
+            return MakeClip("RainTick_" + seed, samples, 0.7f);
         }
 
         public void PlayWin()

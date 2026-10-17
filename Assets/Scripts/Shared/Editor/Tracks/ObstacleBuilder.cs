@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using SimulationLobby.Shared;
+using SimulationLobby.Shared.Tracks;
 using UnityEngine;
 
-namespace SimulationLobby.Simulations.Race.EditorTools
+namespace SimulationLobby.Shared.EditorTools
 {
     /// <summary>
     /// Turns the layout's obstacle list into scene objects: chrome pegs, brass rotating arms, lacquer walls
     /// and baffles. Everything is a primitive, positioned in the track's own frame at the obstacle's
     /// distance, so it follows the slope and banking of whatever section it sits on.
     /// </summary>
-    static class ObstacleBuilder
+    public static class ObstacleBuilder
     {
         public struct Kit
         {
@@ -26,7 +27,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         const float ObstacleHeight = 0.3f;
         const float DividerHalfThickness = 0.06f;
 
-        public static Transform Build(Transform parent, RaceTrackLayout layout, List<TrackMeshBuilder.Sample> samples, Kit kit)
+        public static Transform Build(Transform parent, TrackLayout layout, List<TrackMeshBuilder.Sample> samples, Kit kit)
         {
             var root = new GameObject("Obstacles").transform;
             root.SetParent(parent, false);
@@ -36,7 +37,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             {
                 if (obstacle.section < 0 || obstacle.section >= layout.sections.Length)
                 {
-                    Debug.LogWarning($"[race] Obstacle '{obstacle.label}' points at section {obstacle.section}, which does not exist. Skipped.");
+                    Debug.LogWarning($"[track] Obstacle '{obstacle.label}' points at section {obstacle.section}, which does not exist. Skipped.");
                     continue;
                 }
 
@@ -51,6 +52,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                     case ObstacleKind.Pinwheel: BuildPinwheel(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Divider: BuildDivider(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Bottleneck: BuildBottleneck(group, obstacle, samples, distance, kit); break;
+                    case ObstacleKind.Funnel: BuildFunnel(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Chicane: BuildChicane(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Bumps: BuildBumps(group, obstacle, samples, distance, kit); break;
                 }
@@ -60,7 +62,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
         }
 
         /// <summary>Distance along the path at which each section begins.</summary>
-        static float[] SectionStarts(RaceTrackLayout layout, List<TrackMeshBuilder.Sample> samples)
+        static float[] SectionStarts(TrackLayout layout, List<TrackMeshBuilder.Sample> samples)
         {
             var starts = new float[layout.sections.Length];
             for (int i = 1; i < samples.Count; i++)
@@ -92,7 +94,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             int rows = Mathf.Max(1, o.count);
             if (pyramid && rows > fit)
             {
-                Debug.LogWarning($"[race] '{o.label}': a {rows}-row pyramid does not fit {span:0.0}m of lane. Trimmed to {fit} rows.");
+                Debug.LogWarning($"[track] '{o.label}': a {rows}-row pyramid does not fit {span:0.0}m of lane. Trimmed to {fit} rows.");
                 rows = fit;
             }
 
@@ -235,7 +237,7 @@ namespace SimulationLobby.Simulations.Race.EditorTools
             float reach = halfWidth - gap * 0.5f;
             if (reach <= 0.05f)
             {
-                Debug.LogWarning($"[race] '{o.label}': the track is already narrower than the {gap:0.00}m gap.");
+                Debug.LogWarning($"[track] '{o.label}': the track is already narrower than the {gap:0.00}m gap.");
                 return;
             }
 
@@ -249,6 +251,32 @@ namespace SimulationLobby.Simulations.Race.EditorTools
                 AddAngledBar(parent, samples, distance, side * (halfWidth - reach * 0.5f + 0.03f), taper * 0.5f, inYaw, slant, 0.09f, kit);
                 AddAngledBar(parent, samples, distance, side * (gap * 0.5f + 0.045f), taper + neck * 0.5f, 0f, neck, 0.09f, kit);
                 AddAngledBar(parent, samples, distance, side * (halfWidth - reach * 0.5f + 0.03f), taper + neck + taper * 0.5f, outYaw, slant, 0.09f, kit);
+            }
+        }
+
+        /// <summary>Closing taper only: two walls run from the rails in to an exit gap and stop. The obstacle after it does the spreading.</summary>
+        static void BuildFunnel(Transform parent, TrackObstacle o, List<TrackMeshBuilder.Sample> samples, float distance,
+            Kit kit)
+        {
+            float taper = Mathf.Max(1f, o.length > 0f ? o.length : 3f);
+            float gap = Mathf.Max(0.3f, o.size > 0f ? o.size : 1.4f);
+
+            TrackMeshBuilder.Sample start = TrackMeshBuilder.At(samples, distance);
+            float halfWidth = start.width * 0.5f;
+            float reach = halfWidth - gap * 0.5f;
+            if (reach <= 0.05f)
+            {
+                Debug.LogWarning($"[track] '{o.label}': the track is already narrower than the {gap:0.00}m gap.");
+                return;
+            }
+
+            float slant = Mathf.Sqrt(taper * taper + reach * reach);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                float yaw = Mathf.Atan2(-side * reach, taper) * Mathf.Rad2Deg;
+
+                // The +0.03 pushes the upstream end into the rail, so no marble can slip behind the wall.
+                AddAngledBar(parent, samples, distance, side * (halfWidth - reach * 0.5f + 0.03f), taper * 0.5f, yaw, slant, 0.09f, kit);
             }
         }
 

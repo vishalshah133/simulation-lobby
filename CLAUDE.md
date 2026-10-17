@@ -267,6 +267,7 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `cric` | Cricket match on a multiply/release board, two international teams, wagon-wheel shots (`built`, first sport, experiment) | Short |
 | `mve` | Multiply vs Escape — every wall bounce clones the ball, every escape widens the exit; fill up or empty out (`built`, experiment) | Short |
 | `conv` | Math convergence — many balls, one "will they all meet?" prediction with a certain, surprising answer (`built`, experiment, new genre) | Short |
+| `clack` | Pi clacks — a big block slides into a small one against a wall; the clack count spells π as mass goes ×100 (`built`, experiment, maths) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 

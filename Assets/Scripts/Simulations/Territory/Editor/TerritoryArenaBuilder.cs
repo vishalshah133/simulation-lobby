@@ -17,7 +17,6 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
     {
         public const string MaterialFolder = "Assets/Settings/Studio";
         const string ConfigFolder = "Assets/Settings/Configs/Territory";
-        const string PostPath = ConfigFolder + "/TerritoryPost.asset";
 
         // --- Table dimensions (metres). ---
         public const float TableTop = 0.5f;
@@ -42,16 +41,15 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
         const float NearEdgeV = TerritoryHudBuilder.ArenaFloorV;   // grid's near edge: just above the caption band
         const float DrumTopV = 0.95f;         // stand top this far up the frame (5% below the top)
 
-        // --- Floor slabs. ---
+        // --- Floor slabs (RaisedSlabs) and hex tiles (HexTiles). The palette lives in the TerritoryTheme. ---
         const float SlabSize = 1.2f;
         const float SlabGap = 0.08f;
         const int SlabSeed = 20261011;
 
-        // --- Floor palette. ---
-        static readonly Color FloorBase = Hex(0x3B, 0x35, 0x66);
-        static readonly Color FloorAlt = Hex(0x46, 0x40, 0x7A);
-        static readonly Color FloorLight = Hex(0x54, 0x4A, 0x90);
-        static readonly Color FloorGrout = Hex(0x2E, 0x29, 0x55);
+        /// <summary>Hex cell circumradius (flat-top): the pitch the honeycomb is laid out on.</summary>
+        const float HexCell = 0.7f;
+        const float HexGap = 0.06f;
+        const float HexThickness = 0.6f;
 
         public struct Layout
         {
@@ -223,7 +221,8 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
                 Debug.LogWarning($"[terr] Drum faces are {faceHeight:0.000}m tall (< 0.75m): raise DrumRadius for {config.spinFaces.Length} faces.");
             }
 
-            drum.Body.sharedMaterial = LitMaterial("TerritoryDrumBody", Hex(0xFF, 0x4F, 0xA0), 0.8f);
+            TerritoryTheme theme = config.Theme;
+            drum.Body.sharedMaterial = ThemedLit(theme, "DrumBody", theme.drumBody, 0.8f);
             var labels = new string[config.spinFaces.Length];
             for (int i = 0; i < labels.Length; i++)
             {
@@ -234,7 +233,7 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             drum.SetIdle(0);
 
             // Arrow: flat yellow, in front of the post, tip just left of the drum, pointing along +X at the face.
-            Material yellow = LitMaterial("TerritoryArrow", Hex(0xFF, 0xD2, 0x3A), 0.5f);
+            Material yellow = ThemedLit(theme, "Arrow", theme.drumArrow, 0.5f);
             float arrowZ = c.z - DrumRadius - 0.25f;
             float tipX = -DrumWidth * 0.5f - 0.1f;
             const float headLength = 0.8f;
@@ -330,15 +329,15 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
         // ------------------------------------------------------------------ environment
 
-        public static void BuildEnvironment(Layout layout, CameraPose pose, Camera camera)
+        public static void BuildEnvironment(Layout layout, CameraPose pose, Camera camera, TerritoryTheme theme)
         {
-            Color far = Color.Lerp(FloorBase, FloorAlt, 0.5f);
-            BuildFloor(layout, pose);
+            Color far = Color.Lerp(theme.floorBase, theme.floorAlt, 0.5f);
+            BuildFloor(layout, pose, theme);
 
             // Flat, bright ambient and subtle linear fog that blends into the camera background.
             RenderSettings.skybox = null;
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.70f, 0.68f, 0.80f);
+            RenderSettings.ambientLight = theme.ambient;
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = far;
@@ -360,21 +359,92 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             keyObject.transform.rotation = Quaternion.Euler(52f, 32f, 0f);
             Light key = keyObject.AddComponent<Light>();
             key.type = LightType.Directional;
-            key.color = new Color(1f, 0.97f, 0.92f);
-            key.intensity = 0.95f;
+            key.color = theme.keyColor;
+            key.intensity = theme.keyIntensity;
             key.shadows = LightShadows.Soft;
-            key.shadowStrength = 0.6f;
+            key.shadowStrength = theme.keyShadowStrength;
 
-            BuildPost();
+            if (theme.rimIntensity > 0f)
+            {
+                // A cool rim from behind and to the right (the camera sits at -Z): edges the cannons and boards against the floor. No shadows.
+                var rimObject = new GameObject("Rim");
+                rimObject.transform.SetParent(lights, false);
+                rimObject.transform.rotation = Quaternion.Euler(35f, 215f, 0f);
+                Light rim = rimObject.AddComponent<Light>();
+                rim.type = LightType.Directional;
+                rim.color = theme.rimColor;
+                rim.intensity = theme.rimIntensity;
+                rim.shadows = LightShadows.None;
+            }
+
+            if (theme.ambientDust)
+            {
+                BuildDust(layout, theme);
+            }
+
+            BuildPost(theme);
         }
 
         /// <summary>
-        /// A dark grout plane with raised purple slabs on it (1.2 m, 0.08 m gaps, small seeded height variance,
-        /// three shades). Only slabs that can reach the frame, and are not wholly under the table, are created.
+        /// Slow motes hanging over the table (the 3D depth cue, reused from esc): a flat field laid horizontally above the
+        /// table, tinted like the key light at a low alpha so it never competes with the cannons or the balls.
         /// </summary>
-        static void BuildFloor(Layout layout, CameraPose pose)
+        static void BuildDust(Layout layout, TerritoryTheme theme)
         {
-            Material grout = LitMaterial("TerritoryFloorGrout", FloorGrout, 0.05f);
+            var dustObject = new GameObject("Ambient Dust");
+            dustObject.transform.position = new Vector3(0f, TableTop + 2.5f, layout.tableCentre.z);
+            dustObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);   // the field is XY: lay it flat on XZ
+            dustObject.AddComponent<ParticleSystem>();
+            AmbientDriftField dust = dustObject.AddComponent<AmbientDriftField>();
+            dust.fieldSize = new Vector2(layout.tableHalfWidth * 2f, layout.tableMaxZ - layout.tableMinZ);
+            dust.particleCount = 110;
+            dust.maxAlpha = 0.1f;
+            dust.sizeRange = new Vector2(0.06f, 0.2f);
+            dust.tint = theme.keyColor;
+            dust.Apply(EnsureDustTexture(theme));
+            Debug.Log($"[terr] Ambient dust: {dust.fieldSize.x:0.#} x {dust.fieldSize.y:0.#} m field, {dust.particleCount} motes, alpha {dust.maxAlpha:0.00}.");
+        }
+
+        /// <summary>A soft round mote texture saved under the material folder (an asset, so the scene keeps its reference).</summary>
+        static Texture2D EnsureDustTexture(TerritoryTheme theme)
+        {
+            string path = $"{MaterialFolder}/{theme.materialPrefix}DustDot_64.png";
+            var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            Directory.CreateDirectory(MaterialFolder);
+            const int size = 64;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            var pixels = new Color32[size * size];
+            float radius = size * 0.5f;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(radius, radius)) / radius;
+                    float a = Mathf.Clamp01(1f - d);
+                    byte alpha = (byte)Mathf.RoundToInt(a * a * 255f);
+                    pixels[y * size + x] = new Color32(255, 255, 255, alpha);
+                }
+            }
+
+            texture.SetPixels32(pixels);
+            File.WriteAllBytes(path, texture.EncodeToPNG());
+            Object.DestroyImmediate(texture);
+            AssetDatabase.ImportAsset(path);
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        /// <summary>
+        /// Dispatches on the theme's floor pattern: raised square slabs (terr-001) or raised hexagonal tiles (terr-002).
+        /// Both sit on a dark grout plane.
+        /// </summary>
+        static void BuildFloor(Layout layout, CameraPose pose, TerritoryTheme theme)
+        {
+            Material grout = ThemedLit(theme, "FloorGrout", theme.floorGrout, 0.05f);
             var plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.name = "Floor Grout";
             plane.transform.position = new Vector3(0f, -0.02f, layout.tableCentre.z);
@@ -384,11 +454,27 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
             Material[] shades =
             {
-                LitMaterial("TerritoryFloorSlab_A", FloorBase, 0.1f),
-                LitMaterial("TerritoryFloorSlab_B", FloorAlt, 0.1f),
-                LitMaterial("TerritoryFloorSlab_C", FloorLight, 0.1f)
+                ThemedLit(theme, "FloorSlab_A", theme.floorBase, 0.1f),
+                ThemedLit(theme, "FloorSlab_B", theme.floorAlt, 0.1f),
+                ThemedLit(theme, "FloorSlab_C", theme.floorLight, 0.1f)
             };
 
+            if (theme.floorPattern == TerritoryFloorPattern.HexTiles)
+            {
+                BuildHexFloor(layout, pose, shades);
+            }
+            else
+            {
+                BuildSlabFloor(layout, pose, shades);
+            }
+        }
+
+        /// <summary>
+        /// Raised purple slabs on the grout (1.2 m, 0.08 m gaps, small seeded height variance, three shades). Only slabs
+        /// that can reach the frame, and are not wholly under the table, are created.
+        /// </summary>
+        static void BuildSlabFloor(Layout layout, CameraPose pose, Material[] shades)
+        {
             var root = new GameObject("Floor Slabs").transform;
             var rng = new System.Random(SlabSeed);
             float pitch = SlabSize + SlabGap;
@@ -424,6 +510,116 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             Debug.Log($"[terr] Floor: {made} slabs ({SlabSize:0.0} m, {SlabGap:0.00} m gaps), culled to the camera frame.");
         }
 
+        /// <summary>
+        /// Flat-top hexagonal tiles in a honeycomb (cell circumradius <see cref="HexCell"/>, <see cref="HexGap"/> gaps):
+        /// columns 1.5 R apart, every odd column half a row down. One shared in-scene prism mesh (never an asset), three
+        /// shades, seeded height variance drawn before culling so a tile's look never depends on the camera.
+        /// </summary>
+        static void BuildHexFloor(Layout layout, CameraPose pose, Material[] shades)
+        {
+            float rowHeight = Mathf.Sqrt(3f) * HexCell;
+            float apothem = rowHeight * 0.5f - HexGap * 0.5f;
+            float tileRadius = apothem * 2f / Mathf.Sqrt(3f);
+            Mesh mesh = HexPrismMesh(tileRadius);
+
+            var root = new GameObject("Floor Hex Tiles").transform;
+            var rng = new System.Random(SlabSeed);
+            int made = 0;
+            for (int ix = -72; ix <= 72; ix++)
+            {
+                for (int iz = -34; iz <= 78; iz++)
+                {
+                    int shade = rng.Next(shades.Length);
+                    float top = 0.02f + (float)rng.NextDouble() * 0.16f;
+
+                    float x = ix * 1.5f * HexCell;
+                    float z = iz * rowHeight + ((ix & 1) != 0 ? rowHeight * 0.5f : 0f);
+                    bool underTable = Mathf.Abs(x) + HexCell <= layout.tableHalfWidth &&
+                                      z - HexCell >= layout.tableMinZ && z + HexCell <= layout.tableMaxZ;
+                    if (underTable || !InFrame(pose, x, z, HexCell))
+                    {
+                        continue;
+                    }
+
+                    var tile = new GameObject("Hex");
+                    tile.transform.SetParent(root, false);
+                    tile.transform.position = new Vector3(x, top, z);
+                    tile.transform.localScale = new Vector3(1f, HexThickness, 1f);
+                    tile.AddComponent<MeshFilter>().sharedMesh = mesh;
+                    var renderer = tile.AddComponent<MeshRenderer>();
+                    renderer.sharedMaterial = shades[shade];
+                    renderer.shadowCastingMode = ShadowCastingMode.Off;
+                    GameObjectUtility.SetStaticEditorFlags(tile, StaticEditorFlags.BatchingStatic);
+                    made++;
+                }
+            }
+
+            Debug.Log($"[terr] Floor: {made} hex tiles (cell {HexCell:0.0} m, tile circumradius {tileRadius:0.000} m, {HexGap:0.00} m gaps), culled to the camera frame.");
+        }
+
+        /// <summary>
+        /// A flat-top hexagonal prism, top face at local y = 0 and sides down to y = -1 (scale Y by the thickness). Flat
+        /// shaded, no bottom face. Lives in the scene, shared by every tile.
+        /// </summary>
+        static Mesh HexPrismMesh(float circumradius)
+        {
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var triangles = new List<int>();
+
+            void Face(Vector3 normal, params Vector3[] poly)
+            {
+                int start = vertices.Count;
+                for (int i = 0; i < poly.Length; i++)
+                {
+                    vertices.Add(poly[i]);
+                    normals.Add(normal);
+                }
+
+                for (int i = 1; i < poly.Length - 1; i++)
+                {
+                    // Unity front faces are clockwise: flip any triangle whose winding disagrees with the intended normal.
+                    Vector3 cross = Vector3.Cross(poly[i] - poly[0], poly[i + 1] - poly[0]);
+                    if (Vector3.Dot(cross, normal) >= 0f)
+                    {
+                        triangles.Add(start);
+                        triangles.Add(start + i);
+                        triangles.Add(start + i + 1);
+                    }
+                    else
+                    {
+                        triangles.Add(start);
+                        triangles.Add(start + i + 1);
+                        triangles.Add(start + i);
+                    }
+                }
+            }
+
+            var top = new Vector3[6];
+            var bottom = new Vector3[6];
+            for (int i = 0; i < 6; i++)
+            {
+                float angle = i * Mathf.PI / 3f;   // flat-top: corners at 0, 60, ... degrees about Y
+                top[i] = new Vector3(Mathf.Cos(angle) * circumradius, 0f, Mathf.Sin(angle) * circumradius);
+                bottom[i] = new Vector3(top[i].x, -1f, top[i].z);
+            }
+
+            Face(Vector3.up, top);
+            for (int i = 0; i < 6; i++)
+            {
+                int j = (i + 1) % 6;
+                Vector3 mid = (top[i] + top[j]) * 0.5f;
+                Face(new Vector3(mid.x, 0f, mid.z).normalized, top[i], top[j], bottom[j], bottom[i]);
+            }
+
+            var mesh = new Mesh { name = "Hex Prism" };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
         /// <summary>True when any corner of the slab's top projects into the frame (with a margin).</summary>
         static bool InFrame(CameraPose pose, float x, float z, float half)
         {
@@ -444,15 +640,16 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             return false;
         }
 
-        static void BuildPost()
+        static void BuildPost(TerritoryTheme theme)
         {
             Directory.CreateDirectory(ConfigFolder);
-            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(PostPath);
+            string postPath = $"{ConfigFolder}/{theme.postProfileName}.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(postPath);
             bool created = profile == null;
             if (created)
             {
                 profile = ScriptableObject.CreateInstance<VolumeProfile>();
-                AssetDatabase.CreateAsset(profile, PostPath);
+                AssetDatabase.CreateAsset(profile, postPath);
             }
 
             Tonemapping tonemapping = GetOrAdd<Tonemapping>(profile);
@@ -460,15 +657,15 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
             Bloom bloom = GetOrAdd<Bloom>(profile);
             bloom.threshold.Override(1.2f);
-            bloom.intensity.Override(0.2f);
+            bloom.intensity.Override(theme.bloomIntensity);
             bloom.scatter.Override(0.5f);
 
             Vignette vignette = GetOrAdd<Vignette>(profile);
-            vignette.intensity.Override(0.18f);
+            vignette.intensity.Override(theme.vignetteIntensity);
             vignette.smoothness.Override(0.5f);
 
             ColorAdjustments color = GetOrAdd<ColorAdjustments>(profile);
-            color.saturation.Override(10f);
+            color.saturation.Override(theme.saturation);
 
             EditorUtility.SetDirty(profile);
 
@@ -604,6 +801,12 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
                 m.SetFloat("_Metallic", 0f);
                 m.SetFloat("_Smoothness", smoothness);
             });
+        }
+
+        /// <summary>A lit material named <c>theme.materialPrefix + suffix</c> (the classic prefix "Territory" keeps terr-001's names).</summary>
+        public static Material ThemedLit(TerritoryTheme theme, string suffix, Color color, float smoothness)
+        {
+            return LitMaterial(theme.materialPrefix + suffix, color, smoothness);
         }
 
         public static Color Hex(int r, int g, int b)

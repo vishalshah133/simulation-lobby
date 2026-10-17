@@ -1,6 +1,6 @@
 # Learnings — video vs stats
 
-Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-15 03:20Z** (see *10-15 update*).
+Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-17 09:52Z** (see *10-17 update*).
 The first table and channel line below are the 10-06 16:51Z pull; the trajectory table keeps the earlier pulls. Public data only: no
 retention/drop-off (needs OAuth + Analytics API, not set up).
 
@@ -436,6 +436,76 @@ v1-v12 are flat (±3). v11 lost 2 views (52 → 50), the routine invalid-view cl
 - **Day-7 reads:** v10 **1,082** (flat since day 3, recorded). v11 (50) and v12 (159) are due 10-16 and won't move,
   so treat these as final.
 
+## 10-16 update
+
+Pull 2026-10-16 01:40Z: **32 subs · 18 videos · 18,248 views** (per-video sum; the channel endpoint lags at 16,038).
+~22h since the 10-15 03:20Z pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-15 03:20Z | Like% |
+|---|---|---|---|---|---|---|
+| 18 | terr | Which Country Takes the Board? (terr-002, 20:22, long-form) | <1d | 6 | new | — |
+| 17 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? (conv-002) | ~1d | **1,593** | **+1,589** | **2.64%** |
+| 16 | esc | The Exit Shrinks Every Round 😳 (esc-006) | 2.9d | 1,539 | +124 | 1.17% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | 3.2d | 1,039 | +220 | 0.58% |
+| 14 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | 4.5d | 1,720 | +3 | 1.86% |
+| 13 | race | 12 Marbles, 1 Track (16:9) | 5.9d | 1,043 | +205 | 0.29% |
+
+v1-v12 flat (±2). **Day-7 finals: v11 51, v12 161.**
+
+- **conv-002 (v17), the experiment-lane test, cleared the band on day 1 with the channel's best current-era like%.**
+  1,593 at ~day 1 against the ~1-1.5K proven band, and 2.64% likes, above MathCa's 1.2-1.9% reference and every
+  current-era upload (next best v14 1.86%). Like% normally *falls* as reach grows, so a high like% at band reach
+  is the strongest quality hint we've had. Still n=1 *(lead)*. Day 7 is 10-22. A second `conv` (conv-001, or a
+  new shape) is the cheapest replication, and the Shorts-mix rule says it's now a proven-lane candidate if it holds.
+- **The 16:9 slow-climb lead held for both** *(lead, n=2)*. v13 added +205 on day 5-6 (a vertical Short is flat by
+  day 3), v15 +220 on day 2.3-3.2. v15 is decaying, ~400/day → ~240/day. If it keeps halving every ~2 days it ends
+  near ~1.4-1.5K. That's fine reach but below the ~730/day the 4,000 h route needs; see the strategy note below.
+- **v18 (`terr-002`, 20:22) is the second long-form upload.** 6 views at under a day means nothing: both 16:9 uploads
+  had an empty day 1. First read at day 3 (10-18), verdict at day 7 (10-22) on Studio numbers.
+- **Subs 32 → 32 (+0) over ~2.2K new views.** The ~0.14% of the last pulls didn't repeat. Noise at this size.
+- **Run rate ~2,330 views/day over 22h, the best of the revival.** Mostly v17's day-1 burst.
+- **Which videos suggest our long form is unanswerable from the API.** `relatedToVideoId` was removed from the
+  Data API in 2023, and per-video traffic sources are Analytics-only. Studio has it: video → Analytics → *Reach* →
+  *Traffic source types* → **Suggested videos** lists the exact videos we're shown beside. That list is the most
+  useful long-form signal we can get right now (see *What would make this useful*).
+
+## 10-17 update
+
+Pull 2026-10-17 09:52Z: **37 subs · 19 videos · 19,831 views** (per-video sum; the channel endpoint lags at 18,748).
+~32h since the 10-16 01:40Z pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-16 01:40Z | Like% |
+|---|---|---|---|---|---|---|
+| 19 | surv | Which Color Survives the Lava? (surv-002 Lava Run, long-form) | <1d | 0 | new (still processing, API shows 0s) | — |
+| 18 | terr | Which Country Takes the Board? (terr-002, 20:22, long-form) | ~2.3d | **28** | +22 | 3.57% (1 like) |
+| 17 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? (conv-002) | ~2.3d | **2,183** | +590 | **2.43%** |
+| 16 | esc | The Exit Shrinks Every Round 😳 (esc-006) | ~4.2d | 1,713 | +174 | 1.11% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~5.3d | 1,354 | +315 | 0.59% |
+| 14 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | ~5.9d | 1,719 | −1 | 1.86% |
+| 13 | race | 12 Marbles, 1 Track (16:9) | ~7d | **1,500** | **+457** | 0.27% |
+
+v1-v12 flat (±3). **Day-7 final: v13 1,500.**
+
+- **The second long-form upload has not replicated the first.** v18 has 28 views at ~2.3 days. v15 had 819 at the
+  same age, and v13 had ~400. Both earlier 16:9 uploads had an empty first day too, but by day 2 they were
+  climbing, and v18 isn't. It's still one video and day 7 is 10-22. Three things changed at once, so the cause
+  can't be separated: **country theming** (India/Australia/SA/WI vs colours), **length** (20:22 vs 15:15) and the
+  title. *Lead (n=3, confounded):* **every country-themed upload is a current-era low**: `cric` v11 51, `cric` v12
+  161, `terr-002` v18 28. Every colour-themed upload got a push. v19 (Lava Run) uses colours at long length, so it
+  separates the two: if it climbs like v15, theme was the problem; if it stalls like v18, the cause is long-form
+  reach or timing.
+- **The 16:9 slow climb isn't decaying evenly.** v13 (`race`) added +457 on days 6-7 and is now accelerating, not
+  stopping (+205 in the 22h before). v15 added +315 (~235/day), down from ~400/day on days 1-2 but not halving as
+  the 10-16 note projected. *Lead (n=2):* 16:9 uploads keep getting a slow browse/suggested drip after a vertical
+  Short has stopped. That's the watch-hour route's mechanism, and Studio's traffic sources can confirm it.
+- **conv-002 (v17) is still climbing** at day 2.3: +590 after its 1,593 day-1 burst, while other Shorts stop by
+  day 3. It's the best Short since v4 (3,169), and its like% (2.43%) held as reach grew. Day 7 is 10-22. It's
+  a strong lead for promoting `conv` to the proven lane.
+- **esc-006 (v16) has a tail too**: +174 on days 3-4. That's the fifth rotating-gap `esc` in the band, at 1,713.
+- **Subs 32 → 37 (+5) over ~1.6K new views (~0.3%)**, the best ratio of the revival. It's +5, so it's noise until it
+  repeats. The pull doesn't show which video brought them (Studio: *Subscribers* by content).
+- **Run rate ~1,190 views/day over 32h.** That's down from the 10-16 burst but above the ~800/day revival average.
+
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
 - **Every older video went flat on the same day (10-03 → 10-04)**, including v4, which had been
@@ -471,8 +541,10 @@ v1-v12 are flat (±3). v11 lost 2 views (52 → 50), the routine invalid-view cl
 
 ## What would make this useful
 
-- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041), v10 (1,082) done; due v11/v12 10-16, v13 10-17, v14 10-18, v15 10-19, v16 10-20, v17 10-22.** They
+- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041), v10 (1,082) done; v11 (51), v12 (161) done; due v13 10-17, v14 10-18, v15 10-19, v16 10-20, v17 10-22, v18 10-22.** They
   can't be recovered if missed.
+- **Studio → Suggested videos list for v15 and v18** (Reach → Traffic source types → Suggested videos): which channels
+  and titles we're shown next to. Paste it in and it becomes the long-form direction (see *10-16 update*).
 - **Studio traffic source for v13 and v15** (Shorts feed vs browse/suggested), to test the 16:9 slow-climb lead.
   Plus v15's watch time and avg % viewed at day 7.
 - **Studio real-time view for 10-03 → 10-04**, to settle whether the older videos really stopped or

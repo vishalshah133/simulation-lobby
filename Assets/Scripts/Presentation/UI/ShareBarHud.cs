@@ -26,6 +26,12 @@ namespace SimulationLobby.Presentation
         [Tooltip("Gap between neighbouring segments, in canvas units. 0 butts them together.")]
         [Min(0f)] public float segmentGap = 0f;
 
+        [Tooltip("Prefix each label with the segment's name from Configure (\"IND 34%\", \"IND OUT\").")]
+        public bool showNames = false;
+
+        [Tooltip("An eliminated segment reads \"0\" instead of \"OUT\" (count-label mode only).")]
+        public bool eliminatedShowsZero = false;
+
         Color[] _colors = new Color[0];
         string[] _names = new string[0];
         float[] _target = new float[0];     // normalised widths, summing to 1
@@ -33,6 +39,8 @@ namespace SimulationLobby.Presentation
         float[] _shares = new float[0];     // raw shares as last pushed
         bool[] _eliminated = new bool[0];
         int[] _percent = new int[0];
+        int[] _counts = new int[0];         // raw counts as last pushed (count-label mode)
+        bool _countMode;
         int _count;
         bool _snap = true;
 
@@ -56,6 +64,7 @@ namespace SimulationLobby.Presentation
             _shares = new float[_segments.Length];
             _eliminated = new bool[_segments.Length];
             _percent = new int[_segments.Length];
+            _counts = new int[_segments.Length];
 
             for (int i = 0; i < _segments.Length; i++)
             {
@@ -92,10 +101,57 @@ namespace SimulationLobby.Presentation
                 return;
             }
 
+            if (_countMode)
+            {
+                _countMode = false;
+                for (int i = 0; i < _percent.Length; i++)
+                {
+                    _percent[i] = -1;
+                }
+            }
+
             int n = Mathf.Min(_count, shares01.Count);
             for (int i = 0; i < n; i++)
             {
                 _shares[i] = Mathf.Max(0f, shares01[i]);
+            }
+
+            RecomputeTargets();
+        }
+
+        /// <summary>
+        /// Count-label mode: each label shows its integer count ("RED 1,234") instead of a percentage, and
+        /// segment widths are proportional to the counts. All zero gives equal widths. Switches the bar into
+        /// count mode on first call; <see cref="SetShares"/> switches it back. Names still follow
+        /// <see cref="showNames"/>. Eliminated segments still read OUT.
+        /// </summary>
+        public void SetCounts(IReadOnlyList<int> counts)
+        {
+            if (counts == null)
+            {
+                return;
+            }
+
+            if (!_countMode)
+            {
+                _countMode = true;
+                for (int i = 0; i < _percent.Length; i++)
+                {
+                    _percent[i] = -1;
+                }
+            }
+
+            int n = Mathf.Min(_count, counts.Count);
+            long total = 0;
+            for (int i = 0; i < n; i++)
+            {
+                _counts[i] = Mathf.Max(0, counts[i]);
+                total += _counts[i];
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                _shares[i] = total > 0 ? (float)((double)_counts[i] / total) : 0f;
             }
 
             RecomputeTargets();
@@ -197,14 +253,20 @@ namespace SimulationLobby.Presentation
             }
 
             // Cache the integer so the string is only rebuilt when the digits change.
-            int percent = eliminated ? -2 : Mathf.RoundToInt(_shares[index] * 100f);
+            int percent = eliminated ? -2 : _countMode ? _counts[index] : Mathf.RoundToInt(_shares[index] * 100f);
             if (percent == _percent[index])
             {
                 return;
             }
 
             _percent[index] = percent;
-            label.text = eliminated ? "OUT" : percent + "%";
+            string text = eliminated ? (eliminatedShowsZero && _countMode ? "0" : "OUT") : _countMode ? CountFormat.Compact(percent, 6) : percent + "%";
+            if (showNames && _names != null && index < _names.Length && !string.IsNullOrEmpty(_names[index]))
+            {
+                text = _names[index] + " " + text;
+            }
+
+            label.text = text;
         }
     }
 }

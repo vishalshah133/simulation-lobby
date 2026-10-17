@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eee88ffb64efd55448b134350ed5863f, type: 3}
+  m_Name: PiClacksConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.PiClacks::SimulationLobby.Simulations.PiClacks.PiClacksConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'clack-001 Pi Blocks. One question (how many times will they clack?) asked
+    seven times, the big block 100x heavier each time: 3, 31, 314, 3141, 31415, 314159,
+    3141592. The seed is cosmetic only: colours, spark heights and click pitch vary,
+    the maths is exact.'
+  rounds:
+  - massExponent: 0
+    massLabel: 1 kg
+    bigSize: 1
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3
+    maxRunSeconds: 10
+    caption: WATCH THE COUNTER
+    holdCaption: 
+    result: '{n} CLACKS.'
+  - massExponent: 1
+    massLabel: 100 kg
+    bigSize: 1.35
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.93
+    maxRunSeconds: 10
+    caption: "NOW 100\xD7 HEAVIER..."
+    holdCaption: 
+    result: '{n} CLACKS.'
+  - massExponent: 2
+    massLabel: 10K kg
+    bigSize: 1.7
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 7.9
+    maxRunSeconds: 10
+    caption: "100\xD7 HEAVIER AGAIN..."
+    holdCaption: 
+    result: '{n}. WAIT...'
+  - massExponent: 3
+    massLabel: 1M kg
+    bigSize: 2
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.7
+    maxRunSeconds: 10
+    caption: 1 MILLION kg...
+    holdCaption: GUESS THE NEXT ONE?
+    result: "{n}. IT'S \u03C0!"
+  - massExponent: 4
+    massLabel: 100M kg
+    bigSize: 2.35
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.08
+    maxRunSeconds: 10
+    caption: 100 MILLION kg...
+    holdCaption: 
+    result: "{n}. STILL \u03C0."
+  - massExponent: 5
+    massLabel: 10B kg
+    bigSize: 2.7
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 5.78
+    maxRunSeconds: 10
+    caption: 10 BILLION kg...
+    holdCaption: 
+    result: '{n}!'
+  - massExponent: 6
+    massLabel: 1T kg
+    bigSize: 3
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.53
+    maxRunSeconds: 10
+    caption: 1 TRILLION kg...
+    holdCaption: 
+    result: "{n}. EXACTLY \u03C0."
+  smallSize: 1
+  smallMassLabel: 1 kg
+  frameWidth: 12
+  firstHoldSeconds: 1.5
+  preLaunchHoldSeconds: 1.2
+  transitionSeconds: 1.5
+  resultHoldSeconds: 1.8
+  endCardSeconds: 4
+  title: PI BLOCKS
+  question: HOW MANY TIMES WILL THEY CLACK?
+  holdCaption: GUESS?
+  counterLabel: CLACKS
+  endCard: "EVERY 100\xD7 HEAVIER = ONE MORE DIGIT OF \u03C0"
+  endLine: "\u03C0 = 3.1415926\u2026"

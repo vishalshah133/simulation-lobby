@@ -1,0 +1,284 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c1d5746b7a0784a9c2a1202ff6ebe0, type: 3}
+  m_Name: LavaRun_Stage1
+  m_EditorClassIdentifier: SimulationLobby.Shared::SimulationLobby.Shared.Tracks.TrackLayout
+  version: 3
+  startWidth: 5.5
+  gateDistance: 3
+  runOutLength: 8
+  defaultRailHeight: 0.45
+  sections:
+  - label: Pens
+    kind: 0
+    length: 3
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 7
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0.33
+    railless: 0
+  - label: Funnel
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 6
+    bankDegrees: 0
+    widthEnd: 3
+    railHeight: 0.45
+    railless: 0
+  - label: Switchback 1 (run-in)
+    kind: 1
+    length: 0
+    radius: 36
+    arcDegrees: 15
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Switchback 1 (obstacles)
+    kind: 1
+    length: 0
+    radius: 36
+    arcDegrees: 75
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Hairpin 1
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: -180
+    slopeDegrees: 3
+    bankDegrees: 1.5
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Switchback 2 (run-in)
+    kind: 1
+    length: 0
+    radius: 48
+    arcDegrees: -15
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 4.4
+    railHeight: 0
+    railless: 0
+  - label: Switchback 2 (obstacles)
+    kind: 1
+    length: 0
+    radius: 48
+    arcDegrees: -75
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 4.4
+    railHeight: 0
+    railless: 0
+  - label: Hairpin 2
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: 180
+    slopeDegrees: 3
+    bankDegrees: 1.5
+    widthEnd: 3
+    railHeight: 0
+    railless: 0
+  - label: Switchback 3 (run-in)
+    kind: 1
+    length: 0
+    radius: 60
+    arcDegrees: 10
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Switchback 3 (obstacles)
+    kind: 1
+    length: 0
+    radius: 60
+    arcDegrees: 80
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Flare
+    kind: 0
+    length: 6
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 0.8
+    bankDegrees: 0
+    widthEnd: 5
+    railHeight: 0.9
+    railless: 0
+  - label: Basin
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 0
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 1.2
+    railless: 0
+  obstacles:
+  - label: Funnel to Peg garden A
+    kind: 7
+    section: 3
+    offset: 0.6
+    length: 3
+    count: 0
+    spacing: 0
+    size: 1.4
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Peg garden A
+    kind: 0
+    section: 3
+    offset: 4
+    length: 0
+    count: 3
+    spacing: 0.6
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pinwheel A
+    kind: 2
+    section: 3
+    offset: 16
+    length: 0
+    count: 3
+    spacing: 0
+    size: 1.15
+    speed: 110
+    lane: 0
+    lateral: 0
+  - label: Funnel to Pegs entry
+    kind: 7
+    section: 6
+    offset: 0.6
+    length: 3
+    count: 0
+    spacing: 0
+    size: 1.4
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs entry
+    kind: 0
+    section: 6
+    offset: 4
+    length: 0
+    count: 3
+    spacing: 0.6
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Fork divider
+    kind: 3
+    section: 6
+    offset: 14
+    length: 9
+    count: 0
+    spacing: 0
+    size: 0.08
+    speed: 0
+    lane: 0
+    lateral: 1.4
+  - label: Fork pinwheel
+    kind: 2
+    section: 6
+    offset: 20
+    length: 0
+    count: 3
+    spacing: 0
+    size: 1
+    speed: 120
+    lane: 0
+    lateral: 0
+  - label: Funnel to Pegs pyramid
+    kind: 7
+    section: 6
+    offset: 36.6
+    length: 3
+    count: 0
+    spacing: 0
+    size: 1.4
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs pyramid
+    kind: 0
+    section: 6
+    offset: 40
+    length: 0
+    count: 3
+    spacing: 0.6
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Funnel to Peg garden C
+    kind: 7
+    section: 9
+    offset: 0.6
+    length: 3
+    count: 0
+    spacing: 0
+    size: 1.4
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Peg garden C
+    kind: 0
+    section: 9
+    offset: 4
+    length: 0
+    count: 3
+    spacing: 0.6
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pinwheel
+    kind: 2
+    section: 9
+    offset: 28
+    length: 0
+    count: 3
+    spacing: 0
+    size: 1.15
+    speed: -130
+    lane: 0
+    lateral: 0
+  - label: Pinwheel B
+    kind: 2
+    section: 9
+    offset: 46
+    length: 0
+    count: 3
+    spacing: 0
+    size: 1.15
+    speed: 125
+    lane: 0
+    lateral: 0

@@ -1,5 +1,6 @@
 using System;
 using SimulationLobby.Core;
+using SimulationLobby.Shared.Tracks;
 using UnityEngine;
 
 namespace SimulationLobby.Simulations.Race
@@ -27,7 +28,7 @@ namespace SimulationLobby.Simulations.Race
     {
         [Header("Track")]
         [Tooltip("The shape of the course. Baked into meshes by the scene builder: edit it, then rebuild the scene.")]
-        public RaceTrackLayout track;
+        public TrackLayout track;
 
         [Header("Roster")]
         public RaceContender[] roster = DefaultRoster();

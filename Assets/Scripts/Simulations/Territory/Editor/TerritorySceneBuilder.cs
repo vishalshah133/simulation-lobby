@@ -9,9 +9,12 @@ using UnityEngine;
 namespace SimulationLobby.Simulations.Territory.EditorTools
 {
     /// <summary>
-    /// Builds <c>Assets/Scenes/Territory_MultiplyRelease_3D.unity</c>: a flat tile grid and four team-coloured
-    /// Plinko boards flush on one charcoal table, a physical drum on a stand behind it, on a floor of raised
-    /// purple slabs, bright and toy-like (Look v3: portrait grid, low close camera). 16:9, long form. Menu: <c>Simulation Lobby ▸ 3D Formats ▸ Territory (terr) ▸ Multiply or Release</c>.
+    /// Builds the territory scenes, one build path and two menu items: <c>Assets/Scenes/Territory_MultiplyRelease_3D.unity</c>
+    /// (terr-001, <c>Simulation Lobby ▸ 3D Formats ▸ Territory (terr) ▸ Multiply or Release</c>) and
+    /// <c>Assets/Scenes/Territory_CountryWars_3D.unity</c> (terr-002, <c>... ▸ Country Wars (terr-002)</c>). A flat tile grid and
+    /// four team-coloured Plinko boards flush on one table, a physical drum on a stand behind it, on a themed floor,
+    /// bright and toy-like (Look v3: portrait grid, low close camera). 16:9, long form. Every colour, the floor pattern and
+    /// the HUD text come from the config's <see cref="TerritoryTheme"/>; the classic theme is exactly terr-001.
     /// </summary>
     /// <remarks>
     /// Every dimension comes from <see cref="TerritoryConfig"/>, so changing the grid or board geometry means
@@ -22,13 +25,27 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
     /// </remarks>
     static class TerritorySceneBuilder
     {
-        const string ScenePath = "Assets/Scenes/Territory_MultiplyRelease_3D.unity";
+        const string ScenePath001 = "Assets/Scenes/Territory_MultiplyRelease_3D.unity";
+        const string ScenePath002 = "Assets/Scenes/Territory_CountryWars_3D.unity";
         const string ConfigFolder = "Assets/Settings/Configs/Territory";
-        const string ConfigPath = ConfigFolder + "/TerritoryConfig_001.asset";
+        const string ConfigPath001 = ConfigFolder + "/TerritoryConfig_001.asset";
+        const string ConfigPath002 = ConfigFolder + "/TerritoryConfig_002.asset";
+        const string ThemePathCountryWars = ConfigFolder + "/TerritoryTheme_CountryWars.asset";
         const float Aspect = 16f / 9f;
 
         [MenuItem("Simulation Lobby/3D Formats/Territory (terr)/Multiply or Release", false, 211)]
-        static void Build()
+        static void BuildMultiplyRelease()
+        {
+            Build(ScenePath001, ConfigPath001, false);
+        }
+
+        [MenuItem("Simulation Lobby/3D Formats/Territory (terr)/Country Wars (terr-002)", false, 212)]
+        static void BuildCountryWars()
+        {
+            Build(ScenePath002, ConfigPath002, true);
+        }
+
+        static void Build(string scenePath, string configPath, bool countryWars)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -39,13 +56,17 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             Directory.CreateDirectory(ConfigFolder);
             Directory.CreateDirectory(TerritoryArenaBuilder.MaterialFolder);
 
-            TerritoryConfig config = EnsureConfig();
+            TerritoryConfig config = EnsureConfig(configPath, countryWars);
             MigrateConfig(config);
             if (!config.Validate(out string error))
             {
                 Debug.LogError($"[terr] Config '{config.name}' is invalid: {error}. Scene not built.", config);
                 return;
             }
+
+            // The theme drives every colour. A config with no theme gets the in-memory classic (terr-001) one.
+            TerritoryTheme theme = config.Theme;
+            Texture2D[] flags = EnsureFlags(config, theme);
 
             PhysicsMaterial ballPhysics = EnsurePhysicsMaterial("TerritoryBall", 0.12f, 0.15f, PhysicsMaterialCombine.Average, 0.55f);
             PhysicsMaterial pegPhysics = EnsurePhysicsMaterial("TerritoryPeg", 0.1f, 0.12f, PhysicsMaterialCombine.Average, 0.45f);
@@ -90,18 +111,20 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             cameraRig.SetHome(pose.position, pose.lookAt);
 
             // --- Environment: floor, fog, key light, ambient, post. ---
-            TerritoryArenaBuilder.BuildEnvironment(layout, pose, camera);
+            TerritoryArenaBuilder.BuildEnvironment(layout, pose, camera, theme);
 
             // --- Materials (re-applied on every build; the look lives in code). ---
-            Material charcoal = TerritoryArenaBuilder.LitMaterial("TerritoryCharcoal", TerritoryArenaBuilder.Hex(0x22, 0x23, 0x2B), 0.4f);
-            Material muzzle = TerritoryArenaBuilder.LitMaterial("TerritoryMuzzle", TerritoryArenaBuilder.Hex(0x10, 0x11, 0x16), 0.4f);
-            Material chipPink = TerritoryArenaBuilder.LitMaterial("TerritoryChipPink", TerritoryArenaBuilder.Hex(0xFF, 0x4F, 0xA0), 0.5f);
-            Material chipWhite = TerritoryArenaBuilder.LitMaterial("TerritoryChipWhite", TerritoryArenaBuilder.Hex(0xF4, 0xF4, 0xF4), 0.5f);
-            Material chipGold = TerritoryArenaBuilder.LitMaterial("TerritoryChipGold", TerritoryArenaBuilder.Hex(0xFF, 0xC9, 0x3A), 0.5f);
-            Material chipNeutral = TerritoryArenaBuilder.LitMaterial("TerritoryChipNeutral", TerritoryArenaBuilder.Hex(0x8A, 0x8D, 0x9A), 0.5f);
-            Material tileMaterial = TerritoryArenaBuilder.LitMaterial("TerritoryTiles", Color.white, 0.45f);
+            Material charcoal = TerritoryArenaBuilder.ThemedLit(theme, "Charcoal", theme.table, theme.tableSmoothness);
+            Material muzzle = TerritoryArenaBuilder.ThemedLit(theme, "Muzzle", theme.muzzle, theme.tableSmoothness);
+            Material chipPink = TerritoryArenaBuilder.ThemedLit(theme, "ChipPink", theme.chipMultiply, 0.5f);
+            Material chipWhite = TerritoryArenaBuilder.ThemedLit(theme, "ChipWhite", theme.chipRelease, 0.5f);
+            Material chipGold = TerritoryArenaBuilder.ThemedLit(theme, "ChipGold", theme.chipSpin, 0.5f);
+            Material chipNeutral = TerritoryArenaBuilder.ThemedLit(theme, "ChipNeutral", theme.chipNeutral, 0.5f);
+            Material tileMaterial = TerritoryArenaBuilder.ThemedLit(theme, "Tiles", Color.white, theme.tileSmoothness);
             // Shots are tinted per team by the presenter through a property block on _BaseColor.
-            Material shotMaterial = TerritoryArenaBuilder.LitMaterial("TerritoryShot", Color.white, 0.6f);
+            Material shotMaterial = TerritoryArenaBuilder.ThemedLit(theme, "Shot", Color.white, 0.6f);
+            // Only themes with flags get the mast finial material, so a classic build creates no new assets.
+            Material gold = theme.showFlags ? TerritoryArenaBuilder.ThemedLit(theme, "FlagGold", theme.drumArrow, 0.6f) : null;
 
             // --- Table and grid. ---
             TerritoryArenaBuilder.BuildTable(layout, charcoal);
@@ -127,6 +150,8 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
                 chipWhite = chipWhite,
                 chipGold = chipGold,
                 chipNeutral = chipNeutral,
+                gold = gold,
+                theme = theme,
                 boardPhysics = boardPhysics,
                 pegPhysics = pegPhysics,
                 ballPhysics = ballPhysics
@@ -138,15 +163,18 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
                 bool top = team < 2;
                 TerritoryTeamDef def = teams[team];
                 string label = TitleCase(def.name);
+                Texture2D flag = flags != null && team < flags.Length ? flags[team] : null;
                 Color surface = def.color * 0.75f;
                 surface.a = 1f;
                 var look = new TerritoryBoardBuilder.TeamLook
                 {
                     name = label,
                     color = def.color,
-                    surface = TerritoryArenaBuilder.LitMaterial("TerritoryBoard_" + label, surface, 0.3f),
-                    ball = TerritoryArenaBuilder.LitMaterial("TerritoryBall_" + label, def.color, 0.6f),
-                    muzzle = muzzle
+                    surface = TerritoryArenaBuilder.ThemedLit(theme, "Board_" + label, surface, 0.3f),
+                    ball = TerritoryArenaBuilder.ThemedLit(theme, "Ball_" + label, def.color, 0.6f),
+                    muzzle = muzzle,
+                    displayName = def.name,
+                    flag = flag
                 };
 
                 var boardCentre = new Vector3(left ? -layout.boardCentreX : layout.boardCentreX, 0f,
@@ -156,7 +184,8 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
                     layout.gridOrigin.y + config.tileHeight,
                     layout.gridOrigin.z + (baseCell.y + 0.5f) * config.cellSize);
 
-                rigs[team] = TerritoryBoardBuilder.BuildRig(team, config, kit, look, boardCentre, cannonBase, boardsRoot, !left);
+                rigs[team] = TerritoryBoardBuilder.BuildRig(team, config, kit, look, boardCentre, cannonBase, boardsRoot, !left, top,
+                    cameraObject.transform.forward);
             }
 
             // --- The drum, its stand, arrow and label anchors behind the grid's far edge. ---
@@ -183,7 +212,7 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             TerritoryAudioKit audioKit = audioObject.AddComponent<TerritoryAudioKit>();
 
             // --- HUD: built by TerritoryHudBuilder (screen-space canvas + world labels). ---
-            TerritoryHudBuilder.Hud hud = TerritoryHudBuilder.Build(camera, teams);
+            TerritoryHudBuilder.Hud hud = TerritoryHudBuilder.Build(camera, teams, theme);
             CaptionHud caption = hud.caption;
             ShareBarHud shareBar = hud.shareBar;
             WorldLabelLayer labels = hud.labels;
@@ -194,10 +223,10 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
             Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene, ScenePath);
+            EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.SaveAssets();
 
-            Debug.Log($"[terr] Built {ScenePath}: {config.gridWidth}x{config.gridHeight} grid ({layout.gridWidth:0.#}m x {layout.gridDepth:0.#}m, " +
+            Debug.Log($"[terr] Built {scenePath} (config {config.name}, theme {(config.theme != null ? config.theme.name : "classic (in-memory)")}): {config.gridWidth}x{config.gridHeight} grid ({layout.gridWidth:0.#}m x {layout.gridDepth:0.#}m, " +
                       $"tiles {config.tileHeight:0.00}m), 4 boards of {config.boardSlots.Length} slots / {config.pegRows}x{config.pegColumns} pegs " +
                       $"(flat; gravity tilts {config.boardTiltDegrees:0} deg). Camera {pose.position} pitch {TerritoryArenaBuilder.CameraPitch:0}, " +
                       $"FOV {TerritoryArenaBuilder.CameraFov:0}: grid near edge at {pose.nearEdgeV * 100f:0.0}% of frame height, " +
@@ -207,9 +236,13 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
         // ------------------------------------------------------------------ assets
 
-        static TerritoryConfig EnsureConfig()
+        /// <summary>
+        /// Loads the config at <paramref name="path"/>, or creates it. A new terr-002 config gets the Country Wars teams,
+        /// reel and theme; an existing config is never touched here.
+        /// </summary>
+        static TerritoryConfig EnsureConfig(string path, bool countryWars)
         {
-            var existing = AssetDatabase.LoadAssetAtPath<TerritoryConfig>(ConfigPath);
+            var existing = AssetDatabase.LoadAssetAtPath<TerritoryConfig>(path);
             if (existing != null)
             {
                 return existing;
@@ -217,10 +250,85 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
 
             var config = ScriptableObject.CreateInstance<TerritoryConfig>();
             config.ResetLayoutToDefaults();
-            config.intent = "terr-001: four colours, four cannons, four Plinko boards. x2 doubles the bank, R fires it, " +
-                            "a SPIN slot on each board drives a power-face reel. Tune for lead changes first, length second.";
-            AssetDatabase.CreateAsset(config, ConfigPath);
+            if (countryWars)
+            {
+                config.teams = TerritoryConfig.CountryWarsTeams();
+                config.spinFaces = TerritoryConfig.CountryWarsSpinFaces();
+                config.theme = EnsureCountryWarsTheme();
+                // Pacing (playtests 2026-10-15, "very slow"): every multiplier +1 each 10 min, and the SPIN lane open 2 s / shut 5 s,
+                // open 2 s longer per team eliminated (2 s -> 4 s -> 6 s) so the endgame spins more.
+                config.multiplierRampSeconds = 600f;
+                config.multiplierRampStep = 1;
+                config.laneGateOpenSeconds = 2f;
+                config.laneGateClosedSeconds = 5f;
+                config.laneGateOpenPerElimination = 2f;
+                // Target = the cannon's whole base plate (1.4 m disc), not the single cell under it.
+                config.basePlateRadiusCells = 2.1f;
+                // Progression (playtest 2026-10-15, "takes very long"): every knock-out and the clock speed the game up.
+                config.knockoutReward = true;                 // taker gets the loser's bank + a free spin
+                config.cannonSpeedupPerElimination = 0.25f;   // x1.25, x1.5, x1.75 sweep and fire rate
+                config.showdownPlateRadiusCells = 3.5f;       // two left: plates grow to 2.3 m, SPIN lanes stay open
+                config.escalateAfterSeconds = 210f;           // ball drops start speeding up at 3:30 (was 6:00)
+                config.heavyShotsAfterSeconds = 600f;         // from 10:00 every hit splashes radius 1
+                config.heavyShotRadius = 1;
+                config.intent = "terr-002 Country Wars: India, South Africa, Australia and West Indies fight for the board. " +
+                                "x2 doubles the bank, R fires it, SPIN drives the reel; BOOM knocks a cannon out for 10 s and " +
+                                "RAIN paints a patch of cells. Tune for lead changes first, length second.";
+            }
+            else
+            {
+                config.intent = "terr-001: four colours, four cannons, four Plinko boards. x2 doubles the bank, R fires it, " +
+                                "a SPIN slot on each board drives a power-face reel. Tune for lead changes first, length second.";
+            }
+
+            AssetDatabase.CreateAsset(config, path);
+            Debug.Log($"[terr] Created config {path}.", config);
             return config;
+        }
+
+        /// <summary>The Country Wars theme asset: created with <see cref="TerritoryTheme.ApplyCountryWars"/> if missing, never overwritten after.</summary>
+        static TerritoryTheme EnsureCountryWarsTheme()
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<TerritoryTheme>(ThemePathCountryWars);
+            if (theme != null)
+            {
+                return theme;
+            }
+
+            theme = ScriptableObject.CreateInstance<TerritoryTheme>();
+            theme.ApplyCountryWars();
+            AssetDatabase.CreateAsset(theme, ThemePathCountryWars);
+            Debug.Log($"[terr] Created theme {ThemePathCountryWars}.", theme);
+            return theme;
+        }
+
+        /// <summary>
+        /// Paints the country flags (code is the source of truth, so they are rewritten on every build) and assigns them to
+        /// the theme asset. Only for a saved theme that uses them; the in-memory classic theme never gets flags.
+        /// </summary>
+        static Texture2D[] EnsureFlags(TerritoryConfig config, TerritoryTheme theme)
+        {
+            if (config.theme == null || !(theme.showFlags || theme.boardNameDecals))
+            {
+                return null;
+            }
+
+            Texture2D[] flags = CountryFlags.BuildAll(config.teams);
+            var four = new Texture2D[4];
+            for (int i = 0; i < four.Length && i < flags.Length; i++)
+            {
+                four[i] = flags[i];
+                if (flags[i] == null)
+                {
+                    Debug.LogWarning($"[terr] No flag for team '{config.teams[i].name}': the board and cannon go without one.");
+                }
+            }
+
+            theme.flags = four;
+            EditorUtility.SetDirty(theme);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[terr] Flags painted into {CountryFlags.Folder}: {System.Array.FindAll(four, f => f != null).Length} of 4 assigned to theme '{theme.name}'.");
+            return four;
         }
 
         /// <summary>
@@ -265,14 +373,21 @@ namespace SimulationLobby.Simulations.Territory.EditorTools
             return material;
         }
 
+        /// <summary>"GREEN" -> "Green"; "SOUTH AFRICA" -> "SouthAfrica" (no spaces in asset or object names).</summary>
         static string TitleCase(string name)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return "Team";
             }
 
-            return char.ToUpperInvariant(name[0]) + name.Substring(1).ToLowerInvariant();
+            var result = new System.Text.StringBuilder();
+            foreach (string word in name.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries))
+            {
+                result.Append(char.ToUpperInvariant(word[0])).Append(word.Substring(1).ToLowerInvariant());
+            }
+
+            return result.ToString();
         }
     }
 }

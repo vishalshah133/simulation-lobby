@@ -4,6 +4,7 @@
     "references": [
         "SimulationLobby.Core",
         "SimulationLobby.Shared",
+        "SimulationLobby.Shared.Editor",
         "SimulationLobby.Presentation",
         "SimulationLobby.Presentation.Editor",
         "UnityEngine.UI",
