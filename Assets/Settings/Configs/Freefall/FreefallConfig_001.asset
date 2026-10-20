@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3449529c57c09f4d9aa3376db3770d7, type: 3}
+  m_Name: FreefallConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Freefall::SimulationLobby.Simulations.Freefall.FreefallConfig
+  fixedTimestep: 0.004166667
+  maxDurationSeconds: 900
+  intent: fall-001 Freefall Symphony. One marble falls through seven worlds and every
+    bounce plays the next note of a famous song. Pads sit where the marble will be
+    when the note is due; world 5 splits into a three-voice canon; world 7 accelerates.
+    Seed is cosmetic only.
+  worlds:
+  - worldName: GLASS BELLS
+    melody: {fileID: 11400000, guid: 02a8daded3c646c591c985e89a45985f, type: 2}
+    composer: BEETHOVEN
+    bpm: 140
+    bpmEnd: 140
+    passes: 3
+    gravity: 9.81
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 0
+    wallStyle: 0
+    timbre: 0
+    skyTop: {r: 0.043137256, g: 0.043137256, b: 0.18039216, a: 1}
+    skyBottom: {r: 0, g: 0, b: 0, a: 1}
+    fogColor: {r: 0.021568628, g: 0.021568628, b: 0.09019608, a: 1}
+    wallColor: {r: 0.45362502, g: 0.42749998, b: 0.95, a: 1}
+    hueStart: 0.6
+    hueSpan: 0.15
+    padRadius: 0.32
+    cameraRollDegreesPerSecond: 4
+  - worldName: AURORA
+    melody: {fileID: 11400000, guid: 3c63aa55e7af4553b6ec1e9a42b6c6c4, type: 2}
+    composer: GRIEG
+    bpm: 96
+    bpmEnd: 96
+    passes: 3
+    gravity: 7
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 1
+    wallStyle: 7
+    timbre: 1
+    skyTop: {r: 0.043137256, g: 0.16470589, b: 0.1882353, a: 1}
+    skyBottom: {r: 0.11764706, g: 0.08235294, b: 0.03137255, a: 1}
+    fogColor: {r: 0.08039216, g: 0.12352941, b: 0.10980392, a: 1}
+    wallColor: {r: 0.42749998, g: 0.95, b: 0.91865003, a: 1}
+    hueStart: 0.38
+    hueSpan: 0.22
+    padRadius: 0.32
+    cameraRollDegreesPerSecond: 4
+  - worldName: MOON POOL
+    melody: {fileID: 11400000, guid: 624c46d17f01464e8f6d8d4ba322060b, type: 2}
+    composer: SATIE
+    bpm: 80
+    bpmEnd: 80
+    passes: 3
+    gravity: 0.8
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 2
+    wallStyle: 2
+    timbre: 2
+    skyTop: {r: 0.0627451, g: 0.1254902, b: 0.22745098, a: 1}
+    skyBottom: {r: 0.015686275, g: 0.02745098, b: 0.05882353, a: 1}
+    fogColor: {r: 0.039215688, g: 0.07647059, b: 0.14313726, a: 1}
+    wallColor: {r: 0.42749998, g: 0.6364999, b: 0.95, a: 1}
+    hueStart: 0.55
+    hueSpan: 0.1
+    padRadius: 0.4
+    cameraRollDegreesPerSecond: 4
+  - worldName: CRYSTAL CAVE
+    melody: {fileID: 11400000, guid: 28b837da97b1474bb5641f7a7ac6078b, type: 2}
+    composer: BEETHOVEN
+    bpm: 100
+    bpmEnd: 100
+    passes: 2
+    gravity: 9.81
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 3
+    wallStyle: 3
+    timbre: 3
+    skyTop: {r: 0.101960786, g: 0.03137255, b: 0.1882353, a: 1}
+    skyBottom: {r: 0.019607844, g: 0, b: 0.0627451, a: 1}
+    fogColor: {r: 0.060784314, g: 0.015686275, b: 0.1254902, a: 1}
+    wallColor: {r: 0.95, g: 0.42749998, b: 0.77235, a: 1}
+    hueStart: 0.8
+    hueSpan: 0.18
+    padRadius: 0.32
+    cameraRollDegreesPerSecond: 4
+  - worldName: KALEIDOSCOPE
+    melody: {fileID: 11400000, guid: 8c61d2d7d3734b908c74461d2ad110d8, type: 2}
+    composer: PACHELBEL
+    bpm: 72
+    bpmEnd: 72
+    passes: 3
+    gravity: 6
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 3
+    canonDelayBeats: 8
+    padShape: 1
+    wallStyle: 4
+    timbre: 4
+    skyTop: {r: 0.08627451, g: 0.039215688, b: 0.13333334, a: 1}
+    skyBottom: {r: 0.007843138, g: 0.015686275, b: 0.039215688, a: 1}
+    fogColor: {r: 0.047058824, g: 0.027450982, b: 0.08627451, a: 1}
+    wallColor: {r: 0.42749998, g: 0.95, b: 0.95, a: 1}
+    hueStart: 0
+    hueSpan: 1
+    padRadius: 0.32
+    cameraRollDegreesPerSecond: 6
+  - worldName: ECLIPSE
+    melody: {fileID: 11400000, guid: 5e91e1a1cc6149f49e42133c58a57e09, type: 2}
+    composer: BEETHOVEN
+    bpm: 60
+    bpmEnd: 60
+    passes: 4
+    gravity: 5
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 40
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 4
+    wallStyle: 5
+    timbre: 2
+    skyTop: {r: 0.019607844, g: 0.023529412, b: 0.047058824, a: 1}
+    skyBottom: {r: 0, g: 0, b: 0, a: 1}
+    fogColor: {r: 0.009803922, g: 0.011764706, b: 0.023529412, a: 1}
+    wallColor: {r: 0.42749998, g: 0.49542505, b: 0.95, a: 1}
+    hueStart: 0.62
+    hueSpan: 0.05
+    padRadius: 0.34
+    cameraRollDegreesPerSecond: 2
+  - worldName: SINGULARITY
+    melody: {fileID: 11400000, guid: 1ded82dbbadd45dfa0653b5759d3e47e, type: 2}
+    composer: GRIEG
+    bpm: 80
+    bpmEnd: 190
+    passes: 2
+    gravity: 9.81
+    wellRadius: 3.2
+    innerRadiusFraction: 0.25
+    outerRadiusFraction: 0.8
+    degreesPerSecond: 70
+    dropFraction: 0.5
+    maxDropPerNote: 1.6
+    canonVoices: 1
+    canonDelayBeats: 8
+    padShape: 5
+    wallStyle: 6
+    timbre: 5
+    skyTop: {r: 0.16470589, g: 0.023529412, b: 0, a: 1}
+    skyBottom: {r: 0, g: 0, b: 0, a: 1}
+    fogColor: {r: 0.08235294, g: 0.011764706, b: 0, a: 1}
+    wallColor: {r: 0.95, g: 0.64695, b: 0.42749998, a: 1}
+    hueStart: 0.02
+    hueSpan: 0.1
+    padRadius: 0.3
+    cameraRollDegreesPerSecond: 14
+  introDropSeconds: 1.2
+  transitionSeconds: 4
+  worldGap: 6
+  outroSeconds: 5
+  marbleRadius: 0.12
+  padLeadSeconds: 0.9

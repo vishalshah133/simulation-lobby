@@ -1,0 +1,198 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd46ebcfd904493ca74c5f896c79d6a1, type: 3}
+  m_Name: MoonlightSonata
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.MelodySequence
+  songTitle: "MOONLIGHT SONATA"
+  source: "Beethoven, Piano Sonata No. 14, Op. 27 No. 2, 1st mvt (1801), right-hand triplet figure bars 1-5 with the melody's G#4 entry. Public domain worldwide. Notes: G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 A3 C#4 E4 A3 C#4 E4 A3 D4 F#4 A3 D4 F#4 G#3 B#3 F#4 G#3 C#4 E4 G#3 C#4 D#4 F#3 B#3 D#4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 E4 G#3 C#4 G#4"
+  tonicHz: 277.18
+  notes:
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -4
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -4
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -4
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 1
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -4
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 1
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -1
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 2
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -7
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -1
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 2
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 3
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: -5
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 0
+    beats: 0.333333
+    endsPhrase: 0
+  - semitone: 7
+    beats: 0.333333
+    endsPhrase: 1

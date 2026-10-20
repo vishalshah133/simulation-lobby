@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd46ebcfd904493ca74c5f896c79d6a1, type: 3}
+  m_Name: GymnopedieNo1
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.MelodySequence
+  songTitle: "GYMNOPEDIE NO. 1"
+  source: "Satie, Gymnopedie No. 1 (1888), opening melody from bar 5 (quarter-note line to the held A and F#), stated twice. Public domain worldwide. Notes: F#5 A5 G5 F#5 C#5 B4 C#5 D5 A4 F#4 F#5 A5 G5 F#5 C#5 B4 C#5 D5 A4 F#4"
+  tonicHz: 293.66
+  notes:
+  - semitone: 16
+    beats: 2
+    endsPhrase: 0
+  - semitone: 19
+    beats: 1
+    endsPhrase: 0
+  - semitone: 17
+    beats: 1
+    endsPhrase: 0
+  - semitone: 16
+    beats: 1
+    endsPhrase: 0
+  - semitone: 11
+    beats: 1
+    endsPhrase: 0
+  - semitone: 9
+    beats: 1
+    endsPhrase: 0
+  - semitone: 11
+    beats: 1
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 3
+    endsPhrase: 0
+  - semitone: 4
+    beats: 6
+    endsPhrase: 1
+  - semitone: 16
+    beats: 2
+    endsPhrase: 0
+  - semitone: 19
+    beats: 1
+    endsPhrase: 0
+  - semitone: 17
+    beats: 1
+    endsPhrase: 0
+  - semitone: 16
+    beats: 1
+    endsPhrase: 0
+  - semitone: 11
+    beats: 1
+    endsPhrase: 0
+  - semitone: 9
+    beats: 1
+    endsPhrase: 0
+  - semitone: 11
+    beats: 1
+    endsPhrase: 0
+  - semitone: 12
+    beats: 1
+    endsPhrase: 0
+  - semitone: 7
+    beats: 3
+    endsPhrase: 0
+  - semitone: 4
+    beats: 6
+    endsPhrase: 1
