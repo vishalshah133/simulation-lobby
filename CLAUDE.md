@@ -272,6 +272,7 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `fall` | Freefall Symphony — a marble falls through worlds and every bounce plays the next note of a song; pads are solved from the music (`building`, 3D, hypnotic/sound-on) | Long + Short cuts |
 | `press` | Hydraulic press — every crushed ball splits in 2; how many balls before the press stops, as it gets 2× stronger (`built`, experiment) | Short |
 | `royale` | Color Rumble — four colours in one spinning ring; the EXIT drops marbles out, the gold x2 arc clones them; last colour standing wins (`built`, experiment) | Short |
+| `mach` | Marble Machine — a giant 3D marble machine loop (lifts, drops, a ski jump, a colour sorter); which colour fills its glass tube first? (`building`, 3D, style from @ball_simulations) | Long |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 

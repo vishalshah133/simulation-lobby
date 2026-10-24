@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f412a699b43e454687642b0b15a6f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SimulationLobby.Simulations.MarbleMachine::SimulationLobby.Simulations.MarbleMachine.MachineConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 900
+  intent: 'mach-001: 16,800 balls in 7 colours through a marble machine into a colour
+    sorter. Which colour fills its tube first? Tune tubeCapacity for a winner at
+    10:00-10:45.'
+  ballCount: 16800
+  ballRadius: 0.065
+  ballMass: 0.03
+  ballBounciness: 0.25
+  ballFriction: 0.3
+  ballSolverIterations: 6
+  maxBallSpeed: 12
+  colours:
+  - name: RED
+    color: {r: 0.92, g: 0.12, b: 0.14, a: 1}
+  - name: ORANGE
+    color: {r: 1, g: 0.5, b: 0.05, a: 1}
+  - name: YELLOW
+    color: {r: 1, g: 0.86, b: 0.1, a: 1}
+  - name: GREEN
+    color: {r: 0.15, g: 0.78, b: 0.25, a: 1}
+  - name: BLUE
+    color: {r: 0.12, g: 0.42, b: 0.95, a: 1}
+  - name: PURPLE
+    color: {r: 0.58, g: 0.22, b: 0.88, a: 1}
+  - name: PINK
+    color: {r: 1, g: 0.38, b: 0.7, a: 1}
+  tubeCapacity: 1000
+  finaleFraction: 0.85
+  outroSeconds: 14
+  holdSeconds: 6
+  stages:
+  - label: Trickle
+    startSeconds: 6
+    ballsPerSecond: 6
+    flood: 0
+    phase: 1
+  - label: Steady
+    startSeconds: 90
+    ballsPerSecond: 13
+    flood: 0
+    phase: 2
+  - label: Flood
+    startSeconds: 330
+    ballsPerSecond: 0
+    flood: 1
+    phase: 3
+  - label: Steady
+    startSeconds: 365
+    ballsPerSecond: 13
+    flood: 0
+    phase: 2
+  chuteWidth: 0.9
+  bucketWheelRpm: 6
+  screwDegreesPerSecond: 330
+  waveAmplitude: 0.2
+  waveLength: 2
+  waveFrequency: 0.6
+  trapdoorCycleSeconds: 5
+  trapdoorStaggerSeconds: 0.15
+  tipperThreshold: 60
+  skiJumpGap: 1.6
+  pegWallSpinnerDegreesPerSecond: 90
+  sorterLanes: 3
+  singulatorDegreesPerSecond: 270
+  sorterFlapOpenSeconds: 0.1
+  cannonIntervalSeconds: 0.2
+  cannonLaunchAngle: 55
+  cannonJitter: 0.25
+  killPlaneY: -2
+  stallSeconds: 6

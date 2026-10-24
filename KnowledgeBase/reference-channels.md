@@ -584,3 +584,61 @@ Seeker - Hide and Seek Marble Race* 2.9M (2020, 9 min) · *Zombie Defense - Surv
 - **Meme-character trend-chasing** (Italian Brainrot). It's a short-lived spike, character likeness is someone
   else's IP, and the channel went dormant straight after.
 - **25-55 min runs.** Carson Jay's longest uploads aren't its best per view, and MIKAN's 10-12 min finding holds.
+
+## @ball_simulations ("Ball Simulations"): Blender marble-machine loops (data pulled 2026-10-24)
+
+A small, young channel, but the closest reference we have for the **closed-loop marble machine** look. The
+user dropped two of its videos into `Recordings/Inspiration/` (*20000 Colorful Balls*, 4:21, and *16,800 Colorful
+Balls Marble Run Loop animation V07*). Neither matches a public upload exactly: the channel's six public videos
+are V01-V06, so the V07 file and the 4:21 cut are probably newer, unlisted or re-cut. Unverified.
+
+| | @ball_simulations |
+|---|---|
+| Subs / lifetime views | 296 / 155K |
+| Uploads | 6 since 2026-05-10 (channel created 2025-11), **all 16:9 long form, 3:27-6:08** |
+| Cadence | ~1 a month, every upload a numbered version of the same machine idea (V01 → V06) |
+| Views | V02 85.8K (best, ~540/day) · V01 34.6K · V03 16.3K · V04 8.5K · V05 7.6K · V06 2.2K (6 days old). Median 16.3K |
+| Like-rate | 0.17-0.32%, the same browse-fed, low-like band as MIKAN |
+| Tool | **Blender** (stated in the channel description) |
+
+**Titles:** `<N> Colorful Balls Marble Run Loop animation V0x | Ball Simulations`. A big number plus a label, no
+question, no stake. The number (17,500-21,500) is the hook.
+
+### What the machine is (from frame analysis of the 4:21 file)
+
+- **One closed loop, ~15 stations, one continuous camera flight.** Cut detection found no hard cuts. The camera
+  glides from station to station, spends 6-12 s at each one, and opens and closes on a wide shot of the whole loop.
+- **Stations:** a clear hopper releasing onto an asphalt chute, a glass S-curve tank, a paddle scoop, a gear-linkage
+  rocker rake, a **stepped comb lifter** (alternating slats walk balls up in single-file lanes), a wide slatted belt
+  elevator, pusher trays, a terrazzo staircase, a **6-arm carousel of glass cups**, a **rod-grate step lifter**, mesh
+  sluices, a rotating drum, a tilt tray, a **ladder shelf elevator**, and finally a giant glass reservoir that refills
+  the hopper.
+- **Look:** a grey seamless cyclorama, soft area light and contact shadows. The machine is in **neutral, textured
+  materials** (wood, asphalt, terrazzo, brick, chrome rods, glass, cast gears) and the balls are the only saturated
+  colour (~7 glossy hues). Neutral machine plus saturated payload is the readability trick.
+- **Sound:** dense ball clatter over a quiet music bed, mixed loud (mean −8.6 dB, peaks at 0 dB). The clatter swells
+  on every batch drop.
+- **"20,000" is mostly stored balls.** Most of them sit in the reservoir and hopper. Only hundreds to low thousands
+  are moving at any one station.
+
+**Reading it honestly:**
+- **One small channel, so it's a lead, not evidence.** The per-version views decline (V02 86K → V05 7.6K) on a
+  channel posting the same idea again and again. That looks like novelty decay, but six uploads can't confirm it.
+- **It's proof the no-contest machine loop gets browse views** at all on a sub-300 channel (V02 86K). That's the
+  same lane as MIKAN's *Factory* videos (84-115M), at a far smaller scale.
+- **It breaks our story rules on purpose** (no question, no counter, no one to root for). Any version we build
+  needs a light spine added (see `ideas-backlog.md`), or it's a pure ambient piece that our strategy doesn't
+  currently fund.
+
+**What we take:**
+- **The look kit:** a grey cyclorama, neutral textured machinery and saturated glossy balls. It's cheap in URP and
+  matches our 3D baseline (floor, fill light, depth cue).
+- **Lift mechanisms as reusable `Shared` arena pieces** (stepped comb, rod-grate step lifter, cup carousel, ladder
+  elevator). Each one is a kinematic animation pushing rigidbodies, so they're reusable as return legs in `race`,
+  `terr` or `royale` reservoirs.
+- **A one-shot camera flight** with a wide open and a wide close, so the loop reads as a loop.
+
+**What we don't take:**
+- **Its station list or its layout.** Our machine is original. Only the style is borrowed.
+- **The bare number title.** We keep a stake or question form.
+- **20K live rigidbodies in real time.** In Unity that's an offline render at a fixed timestep, with most balls asleep.

@@ -1,0 +1,27 @@
+{
+    "name": "SimulationLobby.Simulations.MarbleMachine.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.MarbleMachine.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Shared.Editor",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "SimulationLobby.Simulations.MarbleMachine"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

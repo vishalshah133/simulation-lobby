@@ -50,6 +50,9 @@ format slug it would use. Mark `[built]` / `[published]` / `[dead]` as they move
   Spin-offs if it works: one-song 9:16 Shorts per world, a "guess the song from the sculpture" variant.
 - **Factory** (`[parked]`, too costly per video): a physics assembly line that "builds" something. MIKAN's
   biggest hits (84-115M), but hand-authored stations and no seedable contest. Revisit once long form is proven.
+  **2026-10-24:** `mach` (Marble Machine) is building as a cheaper cousin. It has no "build a thing" arc, but it's the same
+  watch-the-machine lane with a colour-sorter contest on top ([mach-001](../plans/videos/mach-001-colour-sorter.md)). If it
+  retains, its station kit lowers the cost of a Factory later.
 
 ### From Carson Jay + Crazy Marble Race (2026-10-18, see `reference-channels.md` → *@carsonjay*)
 
