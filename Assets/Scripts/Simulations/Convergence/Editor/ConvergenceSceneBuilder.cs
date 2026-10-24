@@ -11,9 +11,10 @@ using UnityEngine;
 namespace SimulationLobby.Simulations.Convergence.EditorTools
 {
     /// <summary>
-    /// Builds the <c>conv</c> scenes from code: <c>Convergence_EllipseFocus_2D</c> (conv-001) and
-    /// <c>Convergence_EllipseStretch_2D</c> (conv-002). Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Math Convergence (conv)</c>.
-    /// Re-running replaces the scene. Both share one build path and differ only by <see cref="Preset"/>.
+    /// Builds the <c>conv</c> scenes from code: <c>Convergence_EllipseFocus_2D</c> (conv-001),
+    /// <c>Convergence_EllipseStretch_2D</c> (conv-002) and <c>Convergence_ParabolaFocus_2D</c> (conv-003).
+    /// Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Math Convergence (conv)</c>.
+    /// Re-running replaces the scene. All share one build path and differ only by <see cref="Preset"/>.
     /// </summary>
     static class ConvergenceSceneBuilder
     {
@@ -22,11 +23,11 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
         {
             public readonly string ScenePath;
             public readonly string ConfigPath;
-            public readonly System.Func<EllipseFocusConfig> CreateFresh;
-            public readonly System.Func<EllipseFocusConfig, bool> IsStale;
+            public readonly System.Func<ConvergenceConfig> CreateFresh;
+            public readonly System.Func<ConvergenceConfig, bool> IsStale;
 
-            public Preset(string scenePath, string configPath, System.Func<EllipseFocusConfig> createFresh,
-                          System.Func<EllipseFocusConfig, bool> isStale)
+            public Preset(string scenePath, string configPath, System.Func<ConvergenceConfig> createFresh,
+                          System.Func<ConvergenceConfig, bool> isStale)
             {
                 ScenePath = scenePath;
                 ConfigPath = configPath;
@@ -55,8 +56,8 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
                 "Assets/Settings/Configs/EllipseFocusConfig_001.asset",
                 CreateConv001,
                 // Only the first-cut asset (4 rounds, no result lines) is replaced; none of its values carry over.
-                existing => existing.rounds == null || existing.rounds.Length == 0 ||
-                            string.IsNullOrEmpty(existing.rounds[0].info.result)));
+                existing => !(existing is EllipseFocusConfig ellipse) || ellipse.rounds == null ||
+                            ellipse.rounds.Length == 0 || string.IsNullOrEmpty(ellipse.rounds[0].info.result)));
         }
 
         [MenuItem("Simulation Lobby/2D Formats/Math Convergence (conv)/Ellipse Stretch (conv-002)", false, 142)]
@@ -66,6 +67,16 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
                 "Assets/Scenes/Convergence_EllipseStretch_2D.unity",
                 "Assets/Settings/Configs/EllipseFocusConfig_002.asset",
                 CreateConv002,
+                existing => false));
+        }
+
+        [MenuItem("Simulation Lobby/2D Formats/Math Convergence (conv)/Parabola Focus (conv-003)", false, 143)]
+        static void BuildParabolaFocus()
+        {
+            Build(new Preset(
+                "Assets/Scenes/Convergence_ParabolaFocus_2D.unity",
+                "Assets/Settings/Configs/ParabolaMirrorConfig_003.asset",
+                CreateConv003,
                 existing => false));
         }
 
@@ -82,16 +93,26 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
             Sprite circle = GeneratedArt.Circle();
             Sprite glow = GeneratedArt.SoftGlow();
             Sprite ring = GeneratedArt.RingSprite();
-            EllipseFocusConfig config = EnsureConfig(preset);
+            ConvergenceConfig config = EnsureConfig(preset);
             Material lineMaterial = EnsureLineMaterial();
 
             // --- Framing: derive the orthographic size from the rounds and the HUD panels ---
+            // Extents come from each round's kernel: the sampled outline plus the start and target points.
             float maxHalfHeight = 0f;
             float maxHalfWidth = 0f;
-            for (int i = 0; i < config.rounds.Length; i++)
+            var outlineScratch = new System.Collections.Generic.List<Kernel.Double2>(ConvergenceSimulation.OutlineSamples);
+            for (int i = 0; i < config.RoundCount; i++)
             {
-                maxHalfHeight = Mathf.Max(maxHalfHeight, config.rounds[i].halfHeight);
-                maxHalfWidth = Mathf.Max(maxHalfWidth, config.rounds[i].halfWidth);
+                Kernel.IConvergenceKernel kernel = config.CreateKernel(i);
+                kernel.SampleOutline(ConvergenceSimulation.OutlineSamples, outlineScratch);
+                for (int s = 0; s < outlineScratch.Count; s++)
+                {
+                    maxHalfWidth = Mathf.Max(maxHalfWidth, Mathf.Abs((float)outlineScratch[s].X));
+                    maxHalfHeight = Mathf.Max(maxHalfHeight, Mathf.Abs((float)outlineScratch[s].Y));
+                }
+
+                maxHalfWidth = Mathf.Max(maxHalfWidth, Mathf.Abs((float)kernel.Start.X), Mathf.Abs((float)kernel.Target.X));
+                maxHalfHeight = Mathf.Max(maxHalfHeight, Mathf.Abs((float)kernel.Start.Y), Mathf.Abs((float)kernel.Target.Y));
             }
 
             // The gap between the panels is (1920 - top - bottom) px of a 1920 px frame that spans 2*size
@@ -227,10 +248,7 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
                 ConvergenceRoundInfo info = config.GetRound(i);
                 rounds.AppendLine(
                     $"    {i + 1}. \"{info.caption}\" -> \"{info.result}\": expect {info.expected}, run {info.runSeconds:0.0}s, " +
-                    $"half {config.rounds[i].halfWidth:0.##} x {config.rounds[i].halfHeight:0.##}, " +
-                    $"red offset ({config.rounds[i].startOffset.x:0.##}, {config.rounds[i].startOffset.y:0.##}), " +
-                    $"blue offset ({config.rounds[i].targetOffset.x:0.##}, {config.rounds[i].targetOffset.y:0.##}), " +
-                    $"{config.RoundBallCount(i)} balls, trail {info.trailSeconds:0.0}s");
+                    $"{config.RoundBallCount(i)} balls, trail {info.trailSeconds:0.0}s, {config.DescribeRound(i)}");
             }
 
             Debug.Log(
@@ -252,13 +270,18 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
         /// Keeps an existing asset so hand tuning survives; creates a fresh one only when none exists (or the
         /// preset calls the existing one stale). The topic defaults reach the asset only at creation.
         /// </summary>
-        static EllipseFocusConfig EnsureConfig(Preset preset)
+        static ConvergenceConfig EnsureConfig(Preset preset)
         {
             Directory.CreateDirectory("Assets/Settings/Configs");
-            var existing = AssetDatabase.LoadAssetAtPath<EllipseFocusConfig>(preset.ConfigPath);
+            var existing = AssetDatabase.LoadAssetAtPath<ConvergenceConfig>(preset.ConfigPath);
             if (existing != null)
             {
-                if (!preset.IsStale(existing))
+                // An asset of the wrong concrete type is stale too: the preset rebuilds it.
+                ConvergenceConfig probe = preset.CreateFresh();
+                bool wrongType = existing.GetType() != probe.GetType();
+                Object.DestroyImmediate(probe);
+
+                if (!wrongType && !preset.IsStale(existing))
                 {
                     return existing;
                 }
@@ -266,14 +289,14 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
                 AssetDatabase.DeleteAsset(preset.ConfigPath);
             }
 
-            EllipseFocusConfig config = preset.CreateFresh();
+            ConvergenceConfig config = preset.CreateFresh();
             config.fixedTimestep = 1f / 120f;
             config.maxDurationSeconds = config.SeriesSeconds;
             AssetDatabase.CreateAsset(config, preset.ConfigPath);
             return config;
         }
 
-        static EllipseFocusConfig CreateConv001()
+        static ConvergenceConfig CreateConv001()
         {
             var config = ScriptableObject.CreateInstance<EllipseFocusConfig>();
             config.intent = "conv-001 ellipse focus. One question (120 balls from red: how many hit blue?), two " +
@@ -287,7 +310,7 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
         /// conv-002: the same question nine times, one visible change per round. Round 5's dots stay where
         /// round 4's foci were: c = sqrt(hh^2 - hw^2), so 4.9054 (3.0 x 5.75) vs 5.3910 (2.0 x 5.75).
         /// </summary>
-        static EllipseFocusConfig CreateConv002()
+        static ConvergenceConfig CreateConv002()
         {
             var config = ScriptableObject.CreateInstance<EllipseFocusConfig>();
             config.intent = "conv-002 ellipse stretch. One repeated question (how many balls from red hit blue?), nine " +
@@ -321,6 +344,38 @@ namespace SimulationLobby.Simulations.Convergence.EditorTools
                 Round("MAKE IT A CIRCLE...", "ALL {n} BACK TO THE MIDDLE.", ConvergenceAnswer.Meet, 1.58f, 0.4f, 0, 3.75f, 3.75f, Vector2.zero, Vector2.zero),
                 Round("NOW 600 BALLS...", "ALL {n}!", ConvergenceAnswer.Meet, 2.08f, 0f, 600, 3.75f, 5f, Vector2.zero, Vector2.zero)
             };
+            return config;
+        }
+
+        /// <summary>
+        /// conv-003: a rainbow row of balls falls into a parabola, every one crosses the focus at the same
+        /// instant, then rises back out as a flat vertical line. Rounds are the config's own defaults
+        /// (5, 10, 50, 100, 500, 1000 balls); only the shell text and pacing are set here.
+        /// </summary>
+        static ConvergenceConfig CreateConv003()
+        {
+            var config = ScriptableObject.CreateInstance<ParabolaMirrorConfig>();
+            config.intent = "conv-003 parabola focus. One repeated question (how many balls hit the dot?): a rainbow row " +
+                            "falls into a parabola, all cross the focus at the same instant, then rise back out as a flat " +
+                            "vertical line. 5 balls, then 10, 50, 100, 500, 1000. Seed is cosmetic only.";
+            config.title = "THE PERFECT CURVE";
+            config.endTitle = "IT'S CALLED A PARABOLA";
+            config.question = "HOW MANY BALLS WILL HIT THE DOT?";
+            config.holdCaption = string.Empty;
+            config.counterLabel = "HIT THE DOT";
+            config.endCard = "EVERY PATH IS THE SAME LENGTH. THE DOT IS THE FOCUS.";
+            config.idealSpotLabel = string.Empty;
+            config.ballCount = 5;
+            config.ballRadius = 0.1f;
+            config.hueSpan = 0.85f;
+            config.showBodiesDuringHold = true;
+            config.showStartPoint = false;
+            config.maxAngleOffsetDegrees = 0f;
+            config.firstHoldSeconds = 2.0f;
+            config.preLaunchHoldSeconds = 1.5f;
+            config.transitionSeconds = 0.5f;
+            config.resultHoldSeconds = 1.4f;
+            config.endCardSeconds = 4f;
             return config;
         }
 

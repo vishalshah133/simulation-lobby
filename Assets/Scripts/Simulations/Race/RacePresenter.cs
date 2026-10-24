@@ -40,6 +40,8 @@ namespace SimulationLobby.Simulations.Race
         float _finishCameraUntil;
         bool _winnerShown;
         bool _complete;
+        int _generation = -1;
+        bool _started;
 
         static readonly Color Ivory = new Color(0.95f, 0.93f, 0.89f, 1f);
         static readonly Color Brass = new Color(0.93f, 0.71f, 0.38f, 1f);
@@ -55,21 +57,6 @@ namespace SimulationLobby.Simulations.Race
         void Start()
         {
             _simulation = GetComponent<RaceSimulation>();
-            var entries = _simulation.Entries;
-            if (entries.Count == 0)
-            {
-                Debug.LogError("[race] The simulation has no marbles. Check the config and the SimulationRunner.", this);
-                enabled = false;
-                return;
-            }
-
-            _hud.Configure(entries.Count);
-            _hud.SetTitle(title);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                var identity = entries[i].identity;
-                _hud.SetContender(identity.Index, identity.DisplayName, identity.Color);
-            }
 
             // Synthesising clips on first use would stutter the first clack, so make them up front.
             var degrees = new int[10];
@@ -89,12 +76,89 @@ namespace SimulationLobby.Simulations.Race
                 _rollSource.Play();
             }
 
-            _camera.Orbit(_simulation.StartOrigin.position + Vector3.up * 0.4f - _simulation.StartOrigin.forward * 0.5f);
-            _camera.Snap();
-
             _simulation.Released += OnReleased;
             _simulation.MarbleFinished += OnMarbleFinished;
             _simulation.LeaderChanged += OnLeaderChanged;
+            _started = true;
+
+            // Reads the field now if the simulation is already initialised; otherwise Update picks it up
+            // the moment it is (a heat rig that is activated before or after its Initialize both work).
+            SyncToSimulation();
+        }
+
+        void OnEnable()
+        {
+            // A rig that is switched off and on again may have missed a restart or a whole run: read it fresh.
+            if (_started)
+            {
+                _generation = -1;
+                if (_rollSource != null && _rollSource.clip != null && !_rollSource.isPlaying)
+                {
+                    _rollSource.Play();
+                }
+            }
+        }
+
+        /// <summary>
+        /// (Re)read everything about the current run: the field, the leaderboard rows, the camera and the
+        /// per-run beats. Safe at any phase, so it serves first start, a new heat on the same rig, and a rig
+        /// that is activated mid-run.
+        /// </summary>
+        void SyncToSimulation()
+        {
+            _generation = _simulation.InitializeCount;
+            var entries = _simulation.Entries;
+            if (entries.Count == 0)
+            {
+                return;
+            }
+
+            _cameraTarget = null;
+            _candidate = null;
+            _lastCountdown = -1;
+            _finishCameraActive = false;
+            _winnerShown = false;
+            _complete = false;
+
+            _hud.Configure(entries.Count);
+            _hud.SetTitle(title);
+            _hud.HideBanner();
+            _hud.SetTimer(FormatTime(0f));
+            for (int i = 0; i < entries.Count; i++)
+            {
+                var identity = entries[i].identity;
+                _hud.SetContender(entries[i].slot, identity.DisplayName, identity.Color);
+            }
+
+            _camera.ResetTracking();
+            _camera.Orbit(_simulation.StartOrigin.position + Vector3.up * 0.4f - _simulation.StartOrigin.forward * 0.5f);
+            _camera.Snap();
+
+            if (_simulation.Phase == RacePhase.Hold)
+            {
+                return;
+            }
+
+            // Joined mid-run: restore what the run so far would have shown.
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].finished)
+                {
+                    _hud.SetNote(entries[i].slot, FormatTime(entries[i].finishTime));
+                    _winnerShown |= entries[i].finishPlace == 1;
+                }
+            }
+
+            RaceEntry front = FrontRunner();
+            if (front != null)
+            {
+                _cameraTarget = front;
+                Vector3 flat = front.body.linearVelocity;
+                flat.y = 0f;
+                _camera.SetHeading(flat.sqrMagnitude > 0.01f ? flat : _simulation.StartOrigin.forward);
+                _camera.Chase(front.transform);
+                _camera.Snap();
+            }
         }
 
         void OnDestroy()
@@ -114,10 +178,24 @@ namespace SimulationLobby.Simulations.Race
                 return;
             }
 
+            if (_generation != _simulation.InitializeCount)
+            {
+                SyncToSimulation();
+            }
+
             var entries = _simulation.Entries;
+            if (entries.Count == 0)
+            {
+                return;
+            }
+
+            // Heat mode: the cut line and names-only board follow the simulation. Both are no-ops at SafeCount 0.
+            _hud.SetCutLine(_simulation.SafeCount);
+            _hud.SetShowNotes(_simulation.SafeCount <= 0);
+
             for (int i = 0; i < entries.Count; i++)
             {
-                _hud.SetRank(entries[i].identity.Index, entries[i].rank);
+                _hud.SetRank(entries[i].slot, entries[i].rank);
             }
 
             switch (_simulation.Phase)
@@ -177,7 +255,7 @@ namespace SimulationLobby.Simulations.Race
 
         void OnMarbleFinished(RaceEntry entry, int place)
         {
-            _hud.SetNote(entry.identity.Index, FormatTime(entry.finishTime));
+            _hud.SetNote(entry.slot, FormatTime(entry.finishTime));
             _audio.PlayNote(Mathf.Max(0, 9 - place));
 
             if (place == 1)

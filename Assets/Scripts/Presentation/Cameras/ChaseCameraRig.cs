@@ -72,6 +72,29 @@ namespace SimulationLobby.Presentation
             }
         }
 
+        /// <summary>
+        /// Forget the followed target and the heading learned from it. Call when the scene it was following is
+        /// replaced (a new heat) so nothing stale carries over.
+        /// </summary>
+        public void ResetTracking()
+        {
+            _target = null;
+            _hasTarget = false;
+            _velocity = Vector3.zero;
+            _lookVelocity = Vector3.zero;
+            _heading = Vector3.forward;
+        }
+
+        /// <summary>Set the direction of travel the chase view assumes until the target has moved enough to show its own.</summary>
+        public void SetHeading(Vector3 direction)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude > 1e-6f)
+            {
+                _heading = direction.normalized;
+            }
+        }
+
         /// <summary>Stay at <paramref name="position"/> and look at <paramref name="focus"/>.</summary>
         public void Hold(Vector3 position, Vector3 focus)
         {

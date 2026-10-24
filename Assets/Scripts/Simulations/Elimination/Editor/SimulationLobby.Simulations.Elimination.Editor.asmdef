@@ -1,0 +1,28 @@
+{
+    "name": "SimulationLobby.Simulations.Elimination.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.Elimination.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Shared.Editor",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "SimulationLobby.Simulations.Race",
+        "SimulationLobby.Simulations.Race.Editor",
+        "SimulationLobby.Simulations.Elimination"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

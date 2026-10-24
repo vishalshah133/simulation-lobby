@@ -1,0 +1,250 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c1d5746b7a0784a9c2a1202ff6ebe0, type: 3}
+  m_Name: ElimTrack_Gauntlet
+  m_EditorClassIdentifier: SimulationLobby.Shared::SimulationLobby.Shared.Tracks.TrackLayout
+  version: 3
+  startWidth: 1.6
+  gateDistance: 4.4
+  runOutLength: 8
+  pegWallClearance: 0.4
+  defaultRailHeight: 0.34
+  sections:
+  - label: Start pen
+    kind: 0
+    length: 5
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 4
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Opening run
+    kind: 0
+    length: 14
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 6
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Left sweep
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: 180
+    slopeDegrees: 6
+    bankDegrees: 10
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Garden flare
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 3.2
+    railHeight: 0
+    railless: 0
+  - label: Peg garden
+    kind: 0
+    length: 18
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Garden exit
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 1.7
+    railHeight: 0
+    railless: 0
+  - label: Right sweep
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: -180
+    slopeDegrees: 6
+    bankDegrees: 10
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Wheel hall
+    kind: 0
+    length: 18
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 2.2
+    railHeight: 0
+    railless: 0
+  - label: Helix
+    kind: 1
+    length: 0
+    radius: 3.6
+    arcDegrees: 360
+    slopeDegrees: 8
+    bankDegrees: 14
+    widthEnd: 1.5
+    railHeight: 0
+    railless: 0
+  - label: Pinch run
+    kind: 0
+    length: 22
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 6
+    bankDegrees: 0
+    widthEnd: 1.7
+    railHeight: 0
+    railless: 0
+  - label: Final bend
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: -200
+    slopeDegrees: 5
+    bankDegrees: 12
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bump alley
+    kind: 0
+    length: 20
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Home straight
+    kind: 0
+    length: 14
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Run-out
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  obstacles:
+  - label: Rumble strip
+    kind: 6
+    section: 1
+    offset: 8
+    length: 0
+    count: 5
+    spacing: 0.9
+    size: 0.03
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs pyramid
+    kind: 0
+    section: 4
+    offset: 1
+    length: 0
+    count: 5
+    spacing: 0.65
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs plinko
+    kind: 1
+    section: 4
+    offset: 8
+    length: 0
+    count: 5
+    spacing: 0.7
+    size: 0.05
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Wheel one
+    kind: 2
+    section: 7
+    offset: 5
+    length: 0
+    count: 3
+    spacing: 0
+    size: 0
+    speed: 120
+    lane: 0
+    lateral: 0
+  - label: Wheel two
+    kind: 2
+    section: 7
+    offset: 13
+    length: 0
+    count: 3
+    spacing: 0
+    size: 0
+    speed: -140
+    lane: 0
+    lateral: 0
+  - label: Bottleneck
+    kind: 4
+    section: 9
+    offset: 5
+    length: 9
+    count: 0
+    spacing: 0
+    size: 0.46
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Bump alley
+    kind: 6
+    section: 11
+    offset: 3
+    length: 0
+    count: 8
+    spacing: 0.9
+    size: 0.04
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Last spinner
+    kind: 2
+    section: 12
+    offset: 8
+    length: 0
+    count: 2
+    spacing: 0
+    size: 0
+    speed: -150
+    lane: 0
+    lateral: 0

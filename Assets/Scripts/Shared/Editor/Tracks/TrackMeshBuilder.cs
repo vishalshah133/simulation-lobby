@@ -149,6 +149,35 @@ namespace SimulationLobby.Shared.EditorTools
         }
 
         /// <summary>The sample nearest <paramref name="distance"/> metres along the path.</summary>
+        /// <summary>
+        /// Like <see cref="At"/>, but blends the two samples around <paramref name="distance"/> instead of snapping to
+        /// the next one, so things placed at even distances come out evenly spaced.
+        /// </summary>
+        public static Sample AtExact(List<Sample> samples, float distance)
+        {
+            Sample after = At(samples, distance);
+            int index = samples.IndexOf(after);
+            if (index <= 0 || after.distance <= distance)
+            {
+                return after;
+            }
+
+            Sample before = samples[index - 1];
+            float span = after.distance - before.distance;
+            float t = span > 1e-5f ? Mathf.Clamp01((distance - before.distance) / span) : 1f;
+            return new Sample
+            {
+                position = Vector3.Lerp(before.position, after.position, t),
+                forward = Vector3.Slerp(before.forward, after.forward, t).normalized,
+                right = Vector3.Slerp(before.right, after.right, t).normalized,
+                up = Vector3.Slerp(before.up, after.up, t).normalized,
+                width = Mathf.Lerp(before.width, after.width, t),
+                distance = distance,
+                section = after.section,
+                railHeight = Mathf.Lerp(before.railHeight, after.railHeight, t)
+            };
+        }
+
         public static Sample At(List<Sample> samples, float distance)
         {
             int lo = 0;

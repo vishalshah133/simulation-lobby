@@ -129,6 +129,11 @@ namespace SimulationLobby.Shared.Tracks
         [Tooltip("Metres before the end of the course where the finish line is drawn. The sections after it are the run-out.")]
         [Min(1f)] public float runOutLength = 8f;
 
+        [Tooltip("Pegs only: the gap in metres kept between the rails and the nearest peg's surface. Set it wider " +
+                 "than a marble (about 1.6 diameters) so a marble can't wedge between the outer peg and the wall. " +
+                 "0 = the original packing, which keeps older courses (and their logged seeds) unchanged.")]
+        [Min(0f)] public float pegWallClearance;
+
         [Tooltip("Rail height in metres for sections that do not set their own. 0 or less means 0.34.")]
         public float defaultRailHeight = 0.34f;
 

@@ -43,6 +43,9 @@ namespace SimulationLobby.Simulations.Race
 
         public int respawns;
 
+        /// <summary>Position in <see cref="RaceSimulation.Entries"/> (0..count-1). The leaderboard row key; <c>identity.Index</c> is the roster index, which can exceed the heat's size.</summary>
+        public int slot;
+
         internal int pathIndex;
         internal float stalledSeconds;
         internal float previousFinishSide;
@@ -58,8 +61,11 @@ namespace SimulationLobby.Simulations.Race
     /// roster is a config change with no scene rebuild. Two safety nets (off-track recovery and a push for a
     /// stalled marble) exist so a run can never hang with a marble lost or stuck. Both are logged as events.
     /// </remarks>
-    [RequireComponent(typeof(SimulationRunner))]
-    public sealed class RaceSimulation : MonoBehaviour, ISimulation
+    /// <remarks>
+    /// No <c>RequireComponent(SimulationRunner)</c>: a standalone scene adds the runner itself, and a heat inside an
+    /// orchestrator (<c>elim</c>) is ticked by the orchestrator instead.
+    /// </remarks>
+    public sealed class RaceSimulation : MonoBehaviour, IHeatSimulation
     {
         [Header("Scene wiring")]
         [Tooltip("Inactive marble with Rigidbody, SphereCollider (radius 0.5), CollisionDetector3D, ContenderIdentity, renderer and trail.")]
@@ -89,6 +95,7 @@ namespace SimulationLobby.Simulations.Race
         int _holdTicksRemaining;
         int _racingTicks;
         int _firstFinishTick = -1;
+        int _safeFinishTick = -1;
         int _finishedCount;
         int _finishIndex;
         float _finishDistance;
@@ -112,6 +119,11 @@ namespace SimulationLobby.Simulations.Race
             _path = path;
         }
 
+        // Heat mode. Null / 0 means "never configured": the race behaves exactly as a standalone race.
+        HeatEntrant[] _entrants;
+        int _safeCount;
+        int _initializeCount;
+
         public string FormatSlug => "race";
         public bool IsComplete { get; private set; }
         public RunResult Result => _recorder?.Result;
@@ -126,6 +138,15 @@ namespace SimulationLobby.Simulations.Race
 
         public int FinishedCount => _finishedCount;
         public int LeadChanges => _leadChanges;
+
+        /// <summary>Zero when the normal finish rule applies; otherwise the heat ends once this many have finished.</summary>
+        public int SafeCount => _safeCount;
+
+        /// <summary>The heat's marble count: the configured entrants, else the config roster.</summary>
+        public int EntrantCount => _entrants != null ? _entrants.Length : (_config != null ? _config.roster.Length : 0);
+
+        /// <summary>Increments on every <see cref="Initialize"/>, so presentation can tell a new run began.</summary>
+        public int InitializeCount => _initializeCount;
 
         /// <summary>Seconds since the gate opened.</summary>
         public float ElapsedSeconds => _racingTicks * _fixedDelta;
@@ -144,8 +165,41 @@ namespace SimulationLobby.Simulations.Race
         /// <summary>The front of the field changed hands.</summary>
         public event Action<RaceEntry> LeaderChanged;
 
+        /// <inheritdoc/>
+        public void ConfigureHeat(IReadOnlyList<HeatEntrant> entrants, int safeCount)
+        {
+            if (entrants == null)
+            {
+                _entrants = null;
+            }
+            else
+            {
+                if (entrants.Count < 2)
+                {
+                    throw new ArgumentException("A heat needs at least two entrants.", nameof(entrants));
+                }
+
+                var seen = new HashSet<string>();
+                var copy = new HeatEntrant[entrants.Count];
+                for (int i = 0; i < copy.Length; i++)
+                {
+                    copy[i] = entrants[i];
+                    if (!seen.Add(copy[i].name))
+                    {
+                        throw new ArgumentException($"Heat entrant names must be unique; '{copy[i].name}' appears twice.", nameof(entrants));
+                    }
+                }
+
+                _entrants = copy;
+            }
+
+            _safeCount = Mathf.Max(0, safeCount);
+        }
+
         public void Initialize(int seed, SimulationConfig config)
         {
+            _initializeCount++;
+            _safeFinishTick = -1;
             _config = (RaceConfig)config;
             _random = new SeededRandom(seed);
             _recorder = new RunRecorder(FormatSlug, seed, config, _random);
@@ -238,13 +292,16 @@ namespace SimulationLobby.Simulations.Race
         {
             for (int i = _marbleParent.childCount - 1; i >= 0; i--)
             {
-                Destroy(_marbleParent.GetChild(i).gameObject);
+                GameObject old = _marbleParent.GetChild(i).gameObject;
+                // Destroy is deferred to the end of the frame; a re-initialised heat must not collide with the old field in the meantime.
+                old.SetActive(false);
+                Destroy(old);
             }
         }
 
         void SpawnField()
         {
-            int count = _config.roster.Length;
+            int count = _entrants != null ? _entrants.Length : _config.roster.Length;
             float radius = _config.marbleRadius;
             int columns = Mathf.Max(1, _config.gridColumns);
             float columnSpacing = radius * 2f * 1.4f;
@@ -280,8 +337,21 @@ namespace SimulationLobby.Simulations.Race
                     + right * (lateral + jitterX)
                     + up * (radius + 0.02f);
 
-                RaceContender contender = _config.roster[i];
-                _entries.Add(SpawnMarble(i, contender, position));
+                RaceContender contender;
+                int identityIndex = i;
+                if (_entrants != null)
+                {
+                    contender = new RaceContender(_entrants[i].name, _entrants[i].color);
+                    identityIndex = _entrants[i].rosterIndex;
+                }
+                else
+                {
+                    contender = _config.roster[i];
+                }
+
+                RaceEntry spawned = SpawnMarble(identityIndex, contender, position);
+                spawned.slot = i;
+                _entries.Add(spawned);
             }
         }
 
@@ -384,6 +454,13 @@ namespace SimulationLobby.Simulations.Race
             bool everyoneIn = _finishedCount >= _entries.Count;
             bool graceOver = _firstFinishTick >= 0 &&
                              (_racingTicks - _firstFinishTick) * fixedDelta >= _config.finishGraceSeconds;
+            if (_safeCount > 0)
+            {
+                // Heat mode: the last safe spot ends the race (plus a short grace), not the winner's finish.
+                graceOver = _safeFinishTick >= 0 &&
+                            (_racingTicks - _safeFinishTick) * fixedDelta >= _config.cutGraceSeconds;
+            }
+
             if (everyoneIn || graceOver)
             {
                 Complete();
@@ -430,6 +507,11 @@ namespace SimulationLobby.Simulations.Race
                 if (_firstFinishTick < 0)
                 {
                     _firstFinishTick = _racingTicks;
+                }
+
+                if (_safeCount > 0 && _safeFinishTick < 0 && _finishedCount >= _safeCount)
+                {
+                    _safeFinishTick = _racingTicks;
                 }
 
                 _recorder.LogEvent($"finish_{entry.identity.DisplayName}", entry.finishTime);

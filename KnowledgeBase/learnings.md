@@ -1,6 +1,6 @@
 # Learnings — video vs stats
 
-Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-17 09:52Z** (see *10-17 update*).
+Live pull from the YouTube Data API (`youtube` skill, `videos`/`report` commands). Latest: **2026-10-24 02:45Z** (see *10-24 update*).
 The first table and channel line below are the 10-06 16:51Z pull; the trajectory table keeps the earlier pulls. Public data only: no
 retention/drop-off (needs OAuth + Analytics API, not set up).
 
@@ -506,6 +506,127 @@ v1-v12 flat (±3). **Day-7 final: v13 1,500.**
   repeats. The pull doesn't show which video brought them (Studio: *Subscribers* by content).
 - **Run rate ~1,190 views/day over 32h.** That's down from the 10-16 burst but above the ~800/day revival average.
 
+## 10-18 update
+
+Pull 2026-10-18 03:19Z: **42 subs · 20 videos · 23,647 views** (per-video sum; the channel endpoint lags at 19,553).
+~17.5h since the 10-17 09:52Z pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-17 09:52Z | Like% |
+|---|---|---|---|---|---|---|
+| 20 | clack | How Many Times Will They CLACK? Each Block 100x Heavier (clack-001) | <0.75d | **2,694** | new | **2.49%** (5 comments) |
+| 19 | surv | Which Color Survives the Lava? (surv-002 Lava Run, 6:45, long-form) | ~0.7d | 38 | +38 | 7.9% (3 likes) |
+| 18 | terr | Which Country Takes the Board? (terr-002, 20:22, long-form) | ~3.0d | 129 | +101 | 1.55% |
+| 17 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? (conv-002) | ~3.1d | **2,607** | +424 | 2.26% |
+| 16 | esc | The Exit Shrinks Every Round 😳 (esc-006) | ~5.1d | 1,718 | +5 | 1.11% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~6.1d | 1,638 | **+284** | 0.49% |
+| 14 | esc | Will It Escape? The Exit Keeps Moving 🔄 7 Rounds | ~7d | 1,719 | 0 | 1.86% |
+| 13 | race | 12 Marbles, 1 Track (16:9) | ~8d | 1,779 | **+279** | 0.22% |
+
+v1-v12 flat (±10). **Day-7 final: v14 1,719.**
+
+- **Maths Shorts are 2 for 2, and both beat the proven band by ~1.7x** *(lead, n=2)*. `clack-001` (v20) did 2,694 in
+  under 18h, the best first day of the revival (v17 had 1,593 at ~1d, v7 1,524). Its 2.49% likes and 5 comments are
+  the era's best on both. `conv-002` (v17) is still climbing on day 3 (+424, ~580/day), when every other vertical
+  Short has stopped. They're different formats with the same shape: one prediction, a certain answer, a surprising
+  reason. That's the "two in the band" bar from the Shorts-mix rule, cleared by two different builds, so it's a
+  shape-level result and not one lucky format. It's still two uploads in four days, and day 7 for both is ahead.
+- **The country-theme lead got stronger, and the contest-shape lead is gone.** v13 (`race`, a colour contest)
+  looked like a contest-shape flop at 435 on 10-13 and is now 1,779 on day 8, still accelerating. So "head-to-head
+  contests get no push" was a day-3 read of a 16:9 upload, the mistake the 10-15 note warned about. The lows that
+  remain are all country-themed (v11 52, v12 162, v18 129 at day 3). *Lead (n=3, still confounded with length,
+  sport and title).* **Counter-evidence (same day, `reference-channels.md` → *@carsonjay*):** Carson Jay's biggest
+  video is *50 Countries Elimination* (7.9M), and its 4 country titles have a 408K median. So the lead is narrower
+  than "countries don't work". It's "2-4 nation matches haven't worked *for us*".
+- **v18 is climbing now, but ~8x behind v15** (129 vs 1,039 at day 3). That's the day-3 read the strategy asked for.
+  v19 (colours, 6:45) has 38 at ~0.7d, ahead of both earlier long uploads at that age (v15 26 at 7.5h, v18 6 at <1d).
+  Too early to split theme from long-form reach; day 3 is 10-20.
+- **The 16:9 drip is speeding up, not decaying** *(lead, n=2)*. v13 added ~380/day on day 7-8 and v15 ~390/day on
+  day 5-6, up from ~235/day. All four 16:9 uploads together ran **~970 views/day**. The watch-hour route needs
+  ~2,260 watch-minutes a day to reach 4,000 h by 02-01. That's ~750 views/day at a 3-min average view or ~1,130 at
+  2 min. We don't know the average view (Studio), and v13 is only 2:05 long, so its views count for little. It's
+  the first pull where the 16:9 total is near the needed pace, though.
+- **Subs 37 → 42 (+5) over ~3.8K new views (~0.13%)**, in line with the ~0.1-0.14% of earlier pulls. Subs are up
+  32 → 42 in ~2 days (~4.8/day), against the ~9/day the 1K-by-02-01 line needs.
+- **Run rate ~5,250 views/day over 17.5h**, the best of the revival by ~2x. About 70% is clack's first day.
+
+## 10-20 update
+
+Pull 2026-10-20 02:09Z: **46 subs · 22 videos · 26,200 views** (per-video sum; the channel endpoint lags at 25,901).
+~47h since the 10-18 03:19Z pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-18 03:19Z | Like% |
+|---|---|---|---|---|---|---|
+| 22 | elim | 16 Marbles, 6 Races, Only 1 Survives (elim-001, 9:51, long-form) | ~1.1d | 7 | new | 1 like |
+| 21 | brach | Same Start, Same Finish... Which Ball Gets There FIRST? (brach-001) | ~2.1d | **1,220** | new | 1.48% |
+| 20 | clack | How Many Times Will They CLACK? (clack-001) | ~3.1d | 2,879 | +185 | 2.57% |
+| 19 | surv | Which Color Survives the Lava? (surv-002, 6:45, long-form) | ~3.1d | 73 | +35 | 5.5% (4 likes) |
+| 18 | terr | Which Country Takes the Board? (terr-002, 20:22, long-form) | ~5.1d | 198 | +69 | 1.0% |
+| 17 | conv | Stretch It, Squash It... Do They STILL All Hit Blue? (conv-002) | ~5.1d | **2,945** | +338 | 2.41% |
+| 16 | esc | The Exit Shrinks Every Round 😳 (esc-006) | ~7.1d | 1,721 | +3 | 1.1% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~8.1d | **2,231** | **+593** | 0.4% |
+| 13 | race | 12 Marbles, 1 Track (16:9) | ~10d | 1,837 | +58 | 0.22% |
+
+v1-v12 and v14 flat (±5). **Day-7 finals: v16 1,721; v15 ~1,900** (missed on 10-19, interpolated).
+
+- **Long form is 0 for 3 at replicating v15** *(lead, n=4)*. At day 3: v15 1,039, v18 (countries, 20:22) 129,
+  v19 (colours, 6:45) 73. v22 (`elim`, 9:51) has 7 at day 1. v19 was the test that split theme from long-form reach,
+  and it came in *below* the country upload. **So country theming doesn't explain the long-form lows**, and the
+  10-17 pause rests only on the two `cric` Shorts now. Length doesn't explain it either (6:45, 9:51 and 20:22 all
+  stalled). v15 is the outlier, not the baseline. Studio's traffic sources for v15 are the only way to see what
+  pushed it (browse, suggested from which video, or search).
+- **The 16:9 drip is slowing, which reverses the 10-18 lead.** v13 went from ~380/day to ~29/day (+58 in 2 days, so
+  it has stopped). v15 is still going at ~300/day, down from ~390. All 16:9 uploads together ran **~380 views/day**,
+  from ~970 on 10-18. The watch-hour route needs ~770/day at a 3-min average view, so it's now ~2x off pace again,
+  carried by one video.
+- **Maths Shorts: 2 of 3 above the band** *(lead, n=3)*. `brach-001` (v21) has 1,220 at day 2.1, in the ~1-1.7K
+  proven band, with 1.48% likes (the other two had ~2.5%). conv-002 and clack-001 both stopped near ~2.9K (clack added
+  only +185 after its first-day burst). By the Shorts-mix bar (two in the band) maths stays proven, but "maths beats
+  the band by 1.7x" was n=2 and doesn't hold for every topic. One difference to check against the next maths upload:
+  brach's question is *which wins?* (a pick, like a race), while conv and clack ask *how many?* / *will they all?*
+  with a number or a yes as the answer.
+- **Subs 42 → 46 (+4) over ~2.55K new views (~0.16%)**, in line with recent pulls. ~2/day over this window, against
+  the ~9/day needed for 1K by 02-01.
+- **Run rate ~1,300 views/day**, back near the revival average after the clack burst.
+
+## 10-24 update
+
+Pull 2026-10-24 02:45Z: **58 subs · 25 videos · 30,985 views** (per-video sum; the channel endpoint lags at 29,377).
+~4.0 days since the 10-20 02:09Z pull. Ages are from publish dates (the API returns days only).
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-20 | Like% |
+|---|---|---|---|---|---|---|
+| 25 | conv | How Many of 1000 Balls Hit the Dot? (conv-003 parabola) | ~1.1d | **1,321** | new | 1.67% (2 comments) |
+| 24 | royale | 4 Colors, 1 Exit, 1 x2… Which Color SURVIVES? (royale-001) | ~3.1d | 1,233 | new | 1.14% |
+| 23 | press | Every Crushed Ball Splits in 2... (press-001) | ~4.1d | **1,425** | new | 1.54% |
+| 22 | elim | 16 Marbles, 6 Races, Only 1 Survives (elim-001, 9:51, long-form) | ~5.1d | 229 | +222 | 0.87% |
+| 21 | brach | Same Start, Same Finish... (brach-001) | ~6.1d | 1,242 | +22 | 1.45% |
+| 20 | clack | How Many Times Will They CLACK? (clack-001) | ~7.1d | **2,970** | +91 | 2.59% |
+| 19 | surv | Which Color Survives the Lava? (surv-002, 6:45, long-form) | ~7.1d | 90 | +17 | 4.4% |
+| 18 | terr | Which Country Takes the Board? (terr-002, 20:22, long-form) | ~9.1d | 213 | +15 | 0.94% |
+| 17 | conv | Stretch It, Squash It... (conv-002) | ~9.1d | 2,957 | +12 | 2.4% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~12d | **2,605** | **+374** | 0.42% |
+| 4 | esc | Will It Escape? The Exit Keeps Moving | ~25d | 3,190 | +40 | 0.53% |
+
+Others flat (±15). **Day-7 finals: v19 90, v20 2,970. v17 ~2,950 and v18 ~205 missed on 10-22** (interpolated).
+
+- **The band is now the ceiling as well as the floor** *(lead, n=4)*. brach (1,242, final), press (1,425, day 4),
+  royale (1,233, day 3) and conv-003 (1,321, day 1) all landed at 1.2-1.4K. Two experiments and two maths Shorts, so
+  the format didn't move the number. The ~1-1.7K first push looks like what the channel gets per Short for now, and
+  only conv-002, clack-001 and v4 have broken it (~3K each). The experiments are cheap insurance: none has fallen below.
+- **conv-003 is behind conv-002 on day 1** (1,321 vs 1,593), and its like% is lower (1.67% vs 2.64%). It asks
+  *how many?*, the question type the 10-20 note favoured over brach's *which wins?*, so the question type alone isn't
+  the lever. Too early to call: conv-002 kept climbing to day 5. **Read it on day 3 (10-26).** The other open
+  variable: conv-002 and clack had a *twist* (the break round, the π digits), and conv-003 and brach are pure
+  escalations with no twist. That's what the conv-003 plan called the experiment. *Lead to watch, n=2 each side.*
+- **Long form is 0 for 4 at replicating v15**, but v22 (`elim`) is the best of the four after v15: 229 at day 5, against
+  v18's 198 and v19's 90 at their day 7. It's still ~10x behind v15. v15 keeps a tail (+374, ~95/day on days 8-12).
+- **The 16:9 drip is ~170 views/day** (v15 ~95, v22 ~55, the rest ~20), from ~380 on 10-20. The watch-hour route
+  needs ~800 long-form views/day at a 3-min average view, so it's ~5x off pace.
+- **Subs 46 → 58 (+12) over ~4.8K new views (~0.25%)**, the best conversion of any pull (0.1-0.16% before). It's
+  one window and 12 subs, so it's noise until it repeats; Studio's per-video subs would say which upload drove it.
+  ~3/day, against the ~9.4/day the 1K-by-02-01 line needs.
+- **Run rate ~1,190 views/day**, the revival average. Three Shorts in four days gave about the same rate as one did.
+
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
 - **Every older video went flat on the same day (10-03 → 10-04)**, including v4, which had been
@@ -541,7 +662,7 @@ v1-v12 flat (±3). **Day-7 final: v13 1,500.**
 
 ## What would make this useful
 
-- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041), v10 (1,082) done; v11 (51), v12 (161) done; due v13 10-17, v14 10-18, v15 10-19, v16 10-20, v17 10-22, v18 10-22.** They
+- **Day-7 snapshots: v3 (899), v4 (3,150), v5 (246), v6 (1,188), v7 (1,649), v8 (1,742), v9 (1,041), v10 (1,082) done; v11 (51), v12 (161) done; due v13 (1,500), v14 (1,719) done; due v15 10-19, v16 10-20, v17 10-22, v18 10-22, v19 10-24, v20 10-24.** They
   can't be recovered if missed.
 - **Studio → Suggested videos list for v15 and v18** (Reach → Traffic source types → Suggested videos): which channels
   and titles we're shown next to. Paste it in and it becomes the long-form direction (see *10-16 update*).

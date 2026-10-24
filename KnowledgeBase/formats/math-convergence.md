@@ -48,7 +48,7 @@ explained: MathCa's explainer-only uploads were its weakest (5-13K).
    1D arc-length integrator, a second kernel.
 3. **Pendulum wave**: they drift apart and line up again at period T. Analytic.
 4. **Circle polygon orbits**: one ball at angle 360/n closes an n-gon, an irrational angle never closes.
-5. **Parabolic mirror**: parallel rays all pass through the focus. Same billiard kernel, open boundary.
+5. **Parabolic mirror**: parallel rays all pass through the focus. Same billiard kernel, open boundary. *conv-003* ([plan](../../plans/videos/conv-003-parabola-focus.md)): a row falls in, all cross the focus at the same instant (every path is the same length), and rise out as a flat line. Constant speed, not gravity: dropped balls under gravity curve after the bounce and miss the focus. The row is gap-free and symmetric. Balls dropped within |x| < 4f²/W still hit the focus on time, but they exit over the rim diagonally rather than rising flat.
 
 ### Wider maths backlog (added 2026-10-17)
 
@@ -66,7 +66,8 @@ needs its own motion model and its own HUD becomes its own format (as `clack` di
    rounds.
 10. **Buffon's needle**: sticks rain on striped floorboards, and the share that crosses a line converges on 3.14159.
 11. **Brachistochrone race**: straight ramp vs steep dive vs curve, and the curve wins although it's longest. A
-    1D arc-length integrator, shared with the tautochrone (topic 2). Could reuse `race` tracks.
+    1D arc-length integrator, shared with the tautochrone (topic 2). *Own format: `brach`, first video
+    [brach-001](../../plans/videos/brach-001-fastest-path.md), brief [brachistochrone.md](brachistochrone.md).*
 12. **Butterfly effect**: 100 pendulums (or billiard balls) start 0.0001° apart, move as one, then burst into
     chaos. Guess when.
 13. **Chaos game**: a dot hops halfway to a random triangle corner each step, and 10,000 hops draw the Sierpinski

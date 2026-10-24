@@ -332,6 +332,8 @@ and watch time (owner-only), and whether the 2025-26 decline is the channel or t
 
 - [Will the Ball Escape? / Ball Bouncing Brainrot — Know Your Meme](https://knowyourmeme.com/memes/will-the-ball-escape-ball-bouncing-brainrot)
 - [FuncFlow — YouTube](https://www.youtube.com/@FuncFlow)
+- [Carson Jay Marbles — YouTube](https://www.youtube.com/@carsonjay)
+- [Crazy Marble Race — YouTube](https://www.youtube.com/@crazymarblerace)
 
 ## @marblejamboree: Multiply or Release long form (data pulled 2026-10-12)
 
@@ -515,3 +517,70 @@ Era-confounded, but the direction matches the top-25: almost all of them are 3:3
   stations), not a seedable contest. Expensive per video and against compose-don't-rewrite. Revisit once the
   long-form track proves itself.
 - **Multi-hour runs** (161-176 min Stage Lottery / 200-Elimination). They're its weakest-per-view uploads.
+
+## @carsonjay and @crazymarblerace: Algodoo 2D marble long form (data pulled 2026-10-18)
+
+Two separate creators, so **two data points**, unlike MIKAN. Both started in **Algodoo**, a 2D physics sandbox: flat
+side-view tracks, simple shapes and colours, little lighting. That's the look our 2D builds already have, so
+these are the closest references for 2D long form.
+
+| | @carsonjay ("Carson Jay Marbles") | @crazymarblerace ("Crazy Marble Race") |
+|---|---|---|
+| Subs / lifetime views | 157K / 59.4M | **256K / 111.7M** |
+| Uploads | 302, created 2017-08 | 215, created 2018-08 |
+| Shape | All long form, 16:9. 35 Shorts, none since 2024-05 (median 9K) | All long form, 16:9. 7 Shorts, none since 2025-02 (median 72K) |
+| Length | 25 min median since 2025 (8-55 min) | 15 min median since 2025 (5-38 min) |
+| Cadence now | **Dormant**: last upload 2025-10-23. Before that, a burst of 21 uploads in 5 weeks (May-June 2025) | **Every 2 weeks, like clockwork**, 18 uploads in 2026 |
+| Median views by year | 2022 254K · 2023 64K · 2024 12K · **2025 195K** (the burst) | 2020 556K · 2023 353K · 2024 166K · 2025 101K · **2026 58K** |
+| Like-rate | 0.3-0.75% | **Hidden** (API returns 0 likes). Can't be compared |
+
+**Top videos.** Carson Jay: *50 Countries Elimination Marble Race* **7.9M** (2022, 50 min) · *ALL 67 Italian
+Brainrot Characters Marble Race* 5.8M (2025, 40 min) · *Multiply or Release #2* 3.4M (2021, 13 min) · *Escape the
+Seeker - Hide and Seek Marble Race* 2.9M (2020, 9 min) · *Zombie Defense - Survive 100 Rounds* 2.0M (2022) ·
+*Escape The Virus - Infection Marble Race* 2.0M (2020, 5.5 min). Crazy Marble Race: *24 Marble Survival : Angry Ball*
+**7.0M** (2023, 12.5 min) · *24 Marble Race EP. 18: Disaster Race* 6.1M (2020) · *EP. 1: Lucky Race* 5.8M (2019) ·
+*24 Races Elimination* 4.0M (2021, 25 min) · *Marble Survival : Happy Ball* 2.6M (2024).
+
+**What their series are** (title keywords across both channels):
+- **Crazy Marble Race's spine is one numbered, themed show:** *24 Marble Race EP. 78: Tiny Race*. It always has 24
+  marbles and 5 stages, and 4 marbles go out per stage. A new theme every episode (Western, Zoo, Chess, Vegetable).
+  That's MIKAN's "named, numbered series", run every two weeks for seven years. *Marble Survival* (26 titles, median
+  123K) is its best series per view: marbles escape a hazard ball that chases them.
+- **Carson Jay rides themes and trends:** countries (4 titles, median 408K), *Multiply or Release* (24 titles,
+  median 207K), zombie defense (17, median 208K), and the *Italian Brainrot* meme (21 titles in 2025, median 308K,
+  the 5.8M hit). Territory wars (11 titles, median 59K) is its weakest series.
+
+**Reading it honestly:**
+- **Crazy Marble Race moved from Algodoo to Unity in February 2026** (EP. 71 onward is titled *(by Unity)*).
+  Unity episodes median ~78K (n=8) against ~101K for 2025 Algodoo episodes (n=13). The Unity ones are younger and
+  the channel was already declining ~40%/year, so **the switch cost no visible audience**. It's evidence that a
+  2D-look marble audience accepts a Unity build, which is what we make.
+- **2D Algodoo long form is decaying.** Crazy Marble Race's median has halved roughly every 1.5 years since 2020
+  despite a perfect cadence. Carson Jay's 2024 fell to 12K before the meme burst. MIKAN's 2026 median (4.1M) is
+  ~70x Crazy Marble Race's (58K). The genre's long-form money is in MIKAN-style 3D spectacle, not plain 2D.
+- **Country theming works for Carson Jay.** *50 Countries Elimination* is its biggest video, and *200 Countries*
+  got 446K. That cuts against our 10-17 country-theme lead (v11, v12 and v18 got no push). The difference may be
+  scale and audience (a 2022 channel with browse history, a 50-country elimination rather than a 2- or 4-nation
+  match), so our lead stays a lead, but it's no longer "country theming doesn't work". It's "country theming hasn't
+  worked *for us*, at 2-4 teams".
+- **Trend-riding pays, briefly.** The *Italian Brainrot* burst took Carson Jay from a 12K median to 195K, then the
+  channel stopped. Unverified: why it went dormant.
+- **Both channels dropped Shorts.** Neither has posted one since early 2025. One possible reason is that their
+  audience is browse-fed 16:9, like MIKAN's. That's inferred from titles and cadence; we can't see their traffic.
+
+**What we take:**
+- **A fixed-rules numbered show with a new theme each episode** (24 marbles, 5 stages, 4 out per stage). The rules
+  never change, so each episode costs a theme, not a build. Our `race` course system plus `elim` heats is the
+  same structure. This is the clearest template for a cheap long-form series.
+- **Marble Survival: a hazard ball chases the field.** 7.0M and 2.6M hits, and the channel's best series per view.
+  It's a `surv` variant that reuses the Lava Run idea, with a moving hunter instead of rising lava.
+- **Multiply or Release in long form** (Carson Jay #2, 3.4M) is more support for `terr`/`rom` at 10-15 min.
+- **Infection / hide-and-seek** (2.0M, 2.9M): one marble converts or hunts the others. That's our backlog's `wars`
+  *1 red vs 100 blue, conversion on touch*, now with reference support.
+
+**What we don't take:**
+- **Algodoo itself, or its flat look.** The 2D-look audience is shrinking, and our 3D studio look is closer to
+  where the money is (MIKAN).
+- **Meme-character trend-chasing** (Italian Brainrot). It's a short-lived spike, character likeness is someone
+  else's IP, and the channel went dormant straight after.
+- **25-55 min runs.** Carson Jay's longest uploads aren't its best per view, and MIKAN's 10-12 min finding holds.

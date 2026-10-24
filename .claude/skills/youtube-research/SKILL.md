@@ -31,6 +31,7 @@ from that section** rather than leaving it to rot.
 | `@FuncFlow` | Named popularizer of the "will the ball escape" format — our `esc` inspiration |
 | `@satisfying.ba11s` | Originated the format (Nov 2023); videos at 38M–67M views |
 | `@mikan2d`, `@mikan3d` | One creator (MIKAN): the genre's long-form giant, 3M subs, 16:9 marble races 8-40 min. The reference for Track B |
+| `@carsonjay`, `@crazymarblerace` | Algodoo-era 2D marble long form (countries, multiply-or-release, numbered themed shows). Crazy Marble Race moved to Unity in 2026 |
 | Jack's Physics, CodeCraftedPhysics | Also named in the genre; handles unconfirmed |
 
 Handles may be wrong or renamed — if `no channel found`, search YouTube for the current handle

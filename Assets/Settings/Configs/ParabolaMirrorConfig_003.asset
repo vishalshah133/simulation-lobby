@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 454543d67b2839b4aa25a5ce6edd75a6, type: 3}
+  m_Name: ParabolaMirrorConfig_003
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Convergence::SimulationLobby.Simulations.Convergence.ParabolaMirrorConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 61.150005
+  intent: 'conv-003 parabola focus. One repeated question (how many balls hit the
+    dot?): a rainbow row falls into a parabola, all cross the focus at the same instant,
+    then rise back out as a flat vertical line. 5 balls, then 10, 50, 100, 500, 1000.
+    Seed is cosmetic only.'
+  ballCount: 5
+  ballRadius: 0.1
+  showBodiesDuringHold: 1
+  showStartPoint: 0
+  hueSpan: 0.85
+  meetRadius: 0.25
+  meetFraction: 0.95
+  verdictWindowSeconds: 0.06
+  firstHoldSeconds: 2
+  preLaunchHoldSeconds: 1.5
+  resultHoldSeconds: 1.4
+  transitionSeconds: 0.5
+  endCardSeconds: 4
+  holdCaption: 
+  counterLabel: HIT THE DOT
+  title: THE PERFECT CURVE
+  endTitle: IT'S CALLED A PARABOLA
+  question: HOW MANY BALLS WILL HIT THE DOT?
+  endCard: EVERY PATH IS THE SAME LENGTH. THE DOT IS THE FOCUS.
+  idealSpotLabel: 
+  maxAngleOffsetDegrees: 0
+  dropMargin: 0.06
+  rounds:
+  - info:
+      caption: 5 BALLS. GUESS?
+      result: ALL {n}! SAME MOMENT.
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 1
+      ballCount: 5
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2
+  - info:
+      caption: 10 BALLS...
+      result: ALL {n}!
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 1
+      ballCount: 10
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2
+  - info:
+      caption: 50 BALLS...
+      result: ALL {n}!
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 0.8
+      ballCount: 50
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2
+  - info:
+      caption: 100 BALLS...
+      result: ALL {n}!
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 0.7
+      ballCount: 100
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2
+  - info:
+      caption: 500 BALLS...
+      result: ALL {n}!
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 0.5
+      ballCount: 500
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2
+  - info:
+      caption: 1000 BALLS?!
+      result: ALL {n}. EVERY SINGLE ONE.
+      expected: 0
+      runSeconds: 6.125
+      trailSeconds: 0.5
+      ballCount: 1000
+    focalLength: 0.8
+    rimHalfWidth: 4
+    vertexY: -4.5
+    dropY: 4.5
+    speed: 3.2

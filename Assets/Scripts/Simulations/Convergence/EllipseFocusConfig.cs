@@ -78,6 +78,14 @@ namespace SimulationLobby.Simulations.Convergence
                 r.speed);
         }
 
+        public override string DescribeRound(int index)
+        {
+            EllipseRound r = rounds[index];
+            return $"half {r.halfWidth:0.##} x {r.halfHeight:0.##}, " +
+                   $"red offset ({r.startOffset.x:0.##}, {r.startOffset.y:0.##}), " +
+                   $"blue offset ({r.targetOffset.x:0.##}, {r.targetOffset.y:0.##})";
+        }
+
         public override bool Validate(out string error)
         {
             if (!base.Validate(out error))

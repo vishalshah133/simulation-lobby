@@ -267,7 +267,11 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `cric` | Cricket match on a multiply/release board, two international teams, wagon-wheel shots (`built`, first sport, experiment) | Short |
 | `mve` | Multiply vs Escape — every wall bounce clones the ball, every escape widens the exit; fill up or empty out (`built`, experiment) | Short |
 | `conv` | Math convergence — many balls, one "will they all meet?" prediction with a certain, surprising answer (`built`, experiment, new genre) | Short |
+| `brach` | Brachistochrone — same start, same finish, which track wins? The cycloid, always (`built`, maths) | Short |
 | `clack` | Pi clacks — a big block slides into a small one against a wall; the clack count spells π as mass goes ×100 (`built`, experiment, maths) | Short |
+| `fall` | Freefall Symphony — a marble falls through worlds and every bounce plays the next note of a song; pads are solved from the music (`building`, 3D, hypnotic/sound-on) | Long + Short cuts |
+| `press` | Hydraulic press — every crushed ball splits in 2; how many balls before the press stops, as it gets 2× stronger (`built`, experiment) | Short |
+| `royale` | Color Rumble — four colours in one spinning ring; the EXIT drops marbles out, the gold x2 arc clones them; last colour standing wins (`built`, experiment) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 
@@ -309,6 +313,22 @@ changes the monetisation goal or the strategy. If it does, update `KnowledgeBase
 *Next pick* notes in `PROJECTS.md`) in the same pass and tell the user what changed and why. Write it as a dated,
 tiered note (lead / validated, like `learnings.md`). Don't silently overwrite a decision the user made: propose
 the change, mark it *proposed*, and leave the decided text in place until they confirm.
+
+**Fresh stats trigger the whole chain.** Whenever latest stats are fetched (`youtube` or `youtube-research`),
+don't stop at reporting numbers. Work through these in order, in the same pass, and only touch a doc when the new
+data actually earns a change:
+
+1. **`PROJECTS.md`**: views and earnings per published video, and the stats snapshot.
+2. **`KnowledgeBase/learnings.md`**: new findings (dated, tiered lead / validated). Respect the noise rule above:
+   single-digit deltas are not findings.
+3. **`KnowledgeBase/channel-strategy.md`**: per *Learnings feed strategy*.
+4. **Goals** (`channel-strategy.md` → *The goal: monetization*): progress toward YPP (subs, Shorts views/90d,
+   watch hours) and whether the timeline still holds.
+5. **`KnowledgeBase/ideas-backlog.md`**: promote ideas the data favours, mark `[dead]` the ones it rules out,
+   add new ones the reference channels suggest.
+
+Finish with a short summary of what changed in each doc and why, including any that were checked and left as is.
+User-made decisions are still proposed, never overwritten.
 
 ## Working agreements
 

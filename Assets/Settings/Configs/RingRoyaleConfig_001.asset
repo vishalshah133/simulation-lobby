@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0cc1cb4465b5c4ea72234bd8392df9, type: 3}
+  m_Name: RingRoyaleConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.RingRoyale::SimulationLobby.Simulations.RingRoyale.RingRoyaleConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 157
+  intent: royale-001 first build. 4 colours x 5 marbles; x2 arc 40 deg (clone on
+    wall hit) opposite an EXIT of 16 deg; sudden death widens the exit 3 deg/s from
+    40 s. Modelled ~55-65 s without ball-ball collisions; collisions should shorten
+    it.
+  colours:
+  - {r: 0.95, g: 0.18, b: 0.2, a: 1}
+  - {r: 0.2, g: 0.45, b: 1, a: 1}
+  - {r: 0.15, g: 0.82, b: 0.32, a: 1}
+  - {r: 1, g: 0.93, b: 0.2, a: 1}
+  colourNames:
+  - RED
+  - BLUE
+  - GREEN
+  - YELLOW
+  marblesPerColour: 5
+  ballRadius: 0.18
+  ballSpeed: 5
+  cloneTurnDegrees: {x: 15, y: 55}
+  spawnRadiusFraction: 0.75
+  spawnSpacing: 0.9
+  ringRadius: 4.6
+  exitStartDegrees: 16
+  exitCenterDegrees: 90
+  x2ArcDegrees: 40
+  x2CenterDegrees: 270
+  ringAngularSpeed: 30
+  suddenDeathAtSeconds: 40
+  suddenDeathDegreesPerSecond: 3
+  maxExitDegrees: 300
+  bodyCap: 300
+  maxGameSeconds: 150
+  preLaunchHoldSeconds: 2
+  resultHoldSeconds: 4
+  recycleDistance: 9

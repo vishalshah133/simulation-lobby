@@ -146,6 +146,7 @@ namespace SimulationLobby.Simulations.Convergence
         int _hudTotalShown = -2;
         int _hudResultKey = -1;
         int _hudVerdictCount = -1;
+        string _hudTitleShown;
 
         void Reset()
         {
@@ -371,7 +372,7 @@ namespace SimulationLobby.Simulations.Convergence
                 if (view.ColourTotal != roundTotal)
                 {
                     // The hue wheel is the launch angle, so it follows this round's ball count.
-                    ApplyColour(view, i, roundTotal);
+                    ApplyColour(view, i, roundTotal, config);
                 }
 
                 if (view.Trail != null && view.TrailOn != trailsOn)
@@ -438,14 +439,18 @@ namespace SimulationLobby.Simulations.Convergence
                 view.Trail.emitting = true;
             }
 
-            ApplyColour(view, index, total);
+            ApplyColour(view, index, total, config);
             return view;
         }
 
-        void ApplyColour(BodyView view, int index, int total)
+        void ApplyColour(BodyView view, int index, int total, ConvergenceConfig config)
         {
             view.ColourTotal = total;
-            float hue = Mathf.Repeat(_hueStart + index / (float)Mathf.Max(1, total), 1f);
+            float span = config.hueSpan;
+            float fraction = span >= 1f
+                ? index / (float)Mathf.Max(1, total)
+                : (total <= 1 ? 0f : span * index / (total - 1));
+            float hue = Mathf.Repeat(_hueStart + fraction, 1f);
             Color body = Color.HSVToRGB(hue, _saturation, 1f);
             if (view.Renderer != null)
             {
@@ -514,7 +519,7 @@ namespace SimulationLobby.Simulations.Convergence
                 pulse = 0.92f + 0.16f * wave;
             }
 
-            PlaceDot(_startDot, _startRing, _simulation.StartPoint, show, pulse);
+            PlaceDot(_startDot, _startRing, _simulation.StartPoint, show && _simulation.Config.showStartPoint, pulse);
             PlaceDot(_targetDot, _targetRing, _simulation.TargetPoint, show, pulse);
 
             if (_ghostRing != null)
@@ -788,10 +793,18 @@ namespace SimulationLobby.Simulations.Convergence
             if (!_hudInitialised)
             {
                 _hudInitialised = true;
-                _hud.SetTitle(config.title);
                 _hud.SetQuestion(config.question);
                 _hud.SetScoreVisible(false);
                 _hud.SetRoundLabel(string.Empty);
+            }
+
+            string title = phase == ConvergencePhase.EndCard && !string.IsNullOrEmpty(config.endTitle)
+                ? config.endTitle
+                : config.title;
+            if (title != _hudTitleShown)
+            {
+                _hudTitleShown = title;
+                _hud.SetTitle(title);
             }
 
             UpdateCounter(config, phase);

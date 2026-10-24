@@ -26,6 +26,10 @@ namespace SimulationLobby.Presentation
         [Tooltip("Gap between neighbouring segments, in canvas units. 0 butts them together.")]
         [Min(0f)] public float segmentGap = 0f;
 
+        [Tooltip("A live segment keeps at least this share of the bar, so a team down to its last few stays " +
+                 "findable. 0 = proportional only (the default).")]
+        [Range(0f, 0.2f)] public float minAliveShare = 0f;
+
         [Tooltip("Prefix each label with the segment's name from Configure (\"IND 34%\", \"IND OUT\").")]
         public bool showNames = false;
 
@@ -186,6 +190,10 @@ namespace SimulationLobby.Presentation
                 if (_eliminated[i])
                 {
                     w = Mathf.Max(w, outMinShare);
+                }
+                else if (w > 0f)
+                {
+                    w = Mathf.Max(w, minAliveShare);
                 }
 
                 _target[i] = w;

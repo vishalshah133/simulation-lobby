@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b71ac0b4ed55648a8e4137b0e43621, type: 3}
+  m_Name: BrachistochroneConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Brachistochrone::SimulationLobby.Simulations.Brachistochrone.BrachistochroneConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: brach-001 Fastest Path. One question (which ball wins?) asked five times
+    as tracks are added and the finish moves; the cycloid wins every round. The seed
+    is cosmetic only (palette start).
+  rounds:
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    finishX: 6
+    finishY: 4
+    caption: SHORTEST vs CURVE
+    holdCaption: 
+    result: CURVE WINS!
+    showLengths: 1
+    maxRunSeconds: 15
+    caption2: 
+    result2: BUT IT'S LONGER!
+    resultSeconds: 5.5
+    expectedRunSeconds: 4.2
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    finishX: 6
+    finishY: 4
+    caption: NOW A STEEP DROP
+    holdCaption: 
+    result: CURVE AGAIN!
+    showLengths: 0
+    maxRunSeconds: 15
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 4.2
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    finishX: 6
+    finishY: 4
+    caption: NOW A CIRCLE
+    holdCaption: 
+    result: CURVE. JUST!
+    showLengths: 0
+    maxRunSeconds: 15
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 4.6
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    finishX: 8
+    finishY: 2.6
+    caption: FINISH MOVES UP
+    holdCaption: 
+    result: STILL THE CURVE!
+    showLengths: 0
+    maxRunSeconds: 15
+    caption2: CURVE GOES UNDER IT!
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 6.1
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    - kind: 3
+      label: PARABOLA
+      shape: 0
+    - kind: 5
+      label: DEEP
+      shape: 1
+    finishX: 7
+    finishY: 3.2
+    caption: 6 SHAPES
+    holdCaption: 
+    result: CURVE. ALWAYS!
+    showLengths: 0
+    maxRunSeconds: 15
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 5
+  gravity: 1.5
+  frameWidth: 10
+  pathSamples: 2000
+  firstHoldSeconds: 3.5
+  preLaunchHoldSeconds: 2.4
+  transitionSeconds: 3
+  resultHoldSeconds: 3.2
+  endCardSeconds: 9
+  slowMoRadius: 0.8
+  slowMoGap: 0.1
+  slowMoRate: 0.3
+  title: FASTEST PATH
+  question: WHICH BALL WINS?
+  holdCaption: GUESS?
+  endCard: BRACHISTOCHRONE CURVE
+  endCardSizePercent: 80
+  endTitle: GREEK FOR "SHORTEST TIME"
+  endLabel: BRACHISTOCHRONE
+  endLine: BRACHISTOS = SHORTEST
+  endLine2: CHRONOS = TIME

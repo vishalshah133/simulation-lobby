@@ -21,6 +21,22 @@ What makes this category work on YouTube:
 > (10-19). Decided since: the two-track plan (10-09), the Shorts 2:1 mix (10-13), and the MIKAN long-form
 > changes (10-16: 10-12 min, numbered series, survival + proliferation next). **Proposed 10-17:** hold the long-form
 > priority call until v18's day 7 (10-22), since the replication stalled, and pause country theming (*10-17 read*).
+> **Proposed 10-18:** count maths Shorts as a proven shape and fill the next experiment slot with another maths topic
+> (*10-18 read*). **Proposed 10-20:** keep the two-track balance and don't make long form the priority track; v15's
+> push hasn't repeated in three tries (*10-20 read*). **Proposed 10-24:** point the experiment lane at a breakout
+> (a new shape), since every Short now lands in the same band; read conv-003's day 3 before the next maths pick (*10-24 read*).
+
+**Progress, 2026-10-24 02:45Z** (100 days to 2027-02-01; public numbers only, the real gauges are in Studio):
+
+| Bar | Now | Needed by 02-01 | Current pace | On track? |
+|---|---|---|---|---|
+| Subs | **58** / 1,000 | ~9.4/day | ~3/day over the last 4 days (best yet, ~0.25% of views) | No, ~3x short. Binds on every route |
+| Shorts views, 90 days | ~27.5K public (engaged views lower, Studio) / 10M | ~100K/day | ~1K/day | No, ~100x short. Only a breakout changes it |
+| Watch hours, 12 months | unknown (Studio), est. low hundreds / 4,000 | ~2,400 watch-min/day | 16:9 uploads ~170 views/day (from ~380 on 10-20), avg view unknown | **No, ~5x short at a 3-min average view**, still resting on v15's tail |
+
+The timeline doesn't hold on any route. Subs are the one bar that moved closer (3x short, from 4x). Long-form pace
+halved again, because v22 added a small drip and nothing else did. Studio's watch hours and average view duration
+are still the real gauge, and still unread.
 
 **Get into the YouTube Partner Program through the Shorts path: 1,000 subscribers + 10M Shorts
 views in the trailing 90 days.** For new applicants that becomes **20M on 2027-02-01**, so the
@@ -119,6 +135,62 @@ made. Neither touches the decided cadence or the MIKAN changes.
 - **The 16:9 drip is the mechanism the watch-hour route needs**, and it held: v13 is accelerating on day 7 (+457),
   and v15 is decaying slower than the 10-16 projection. This supports *several long uploads stacking their drips*
   over *one long upload carrying the route*, which is what the 10-16 refinement already said.
+
+**10-18 read (proposed, leads only, `learnings.md` → *10-18 update*).** Nothing here overrides a decision.
+- **Maths is the strongest Shorts shape we have.** conv-002 (2,607 at day 3) and clack-001 (2,694 in <18h) both
+  beat the ~1-1.7K proven band by ~1.7x, with the era's best like%. Under the Shorts-mix rule that's two in the
+  band, so maths counts as proven. Proposal: **the proven lane alternates `esc` (the control) with maths**, and
+  the next experiment slot is another maths topic from `math-convergence.md` → *Wider maths backlog*. The 2:1
+  ratio stays as decided. Watch for the risk the brief names: maths has to stay framed as a sim with a question,
+  not a lesson.
+- **Long form: the hold-until-10-22 call stands, but the drip evidence keeps improving.** v13 and v15 are both
+  speeding up (~380-390/day each), and the four 16:9 uploads together are near the watch-hour pace if the average
+  view is ~3 min. v18 (country) is climbing but ~8x behind v15, and v19 (colours) had a better first day than
+  either. Read v15's Studio numbers on 10-19 and v19's day 3 on 10-20, as planned.
+- **Drop "contest shape" as a suspect.** v13, the colour race, recovered to 1,779 in 16:9. That leaves country
+  theming as the only common factor in the lows, which supports the 10-17 pause. **But keep it a pause, not a ban:**
+  Carson Jay's biggest video is a 50-country elimination (7.9M). If countries come back, try them as a big field
+  (many nations, elimination), not a 2-4 nation match.
+- **The cheapest long-form series template is a fixed-rules numbered show** (Crazy Marble Race: *24 Marble Race
+  EP. 78*, 24 marbles, 5 stages, 4 out per stage, a new theme each episode, every 2 weeks for 7 years). Each
+  episode costs a theme, not a build. Our `race` course system plus `elim` heats fits that exactly, so `elim` moves
+  up as a long-form candidate after Lava Run. It also showed a 2D-look marble audience accepted a switch to Unity.
+- **Don't lean on plain 2D for long form.** Both Algodoo channels are decaying (Crazy Marble Race's median halved
+  about every 1.5 years, 58K in 2026), while MIKAN's 3D spectacle still averages ~4M. Long form stays 3D studio look.
+
+**10-20 read (proposed, leads only, `learnings.md` → *10-20 update*).** Nothing here overrides a decision.
+- **Don't make long form the priority track.** The 10-17 hold asked for v19's day 3 and v18's day 7. v19 (colours,
+  6:45) has 73 at day 3, below v18 (countries, 129), and v22 (`elim`, 9:51) has 7 at day 1. Three long uploads with
+  different themes, lengths and formats all missed v15's push. Keep the decided 1-2/week long-form cadence and the
+  two-track balance, and treat v15 as an outlier until a second long upload clears ~1K by day 7.
+- **The next long-form question is "what pushed v15?", not "which format next?".** Before choosing the next long
+  build, read v15's Studio traffic sources and the *Suggested videos* that sent viewers to it. If it was suggested
+  from one big channel's video, the lever is making videos that sit beside that one. If it was browse, it's luck of
+  the first-hour test, and cadence matters more than format.
+- **Country theming: narrow the pause to Shorts-sized matches.** v19 showed colours didn't rescue a long upload, so
+  the long-form lows aren't a theme effect. The `cric` Shorts are still the only evidence against countries. The
+  `terr` series can keep colours (it costs nothing), but country theming is no longer a reason for the long-form lows.
+- **Maths stays in the proven lane, with a lower expected ceiling.** brach-001 is in the band (1,220 at day 2), not
+  above it. The 2:1 mix and the `esc`/maths alternation stand. For the next maths pick, prefer a *how many / will they
+  all* question (conv, clack) over a *which wins* pick (brach). That's a lead from n=3.
+- **The watch-hour route is ~2x off pace again**, carried by v15's tail. It doesn't change the decided cadence. It
+  does mean the Feb-1 date shouldn't drive build choices on either route (the 10-11 rethink's point 2).
+
+**10-24 read (proposed, leads only, `learnings.md` → *10-24 update*).** Nothing here overrides a decision.
+- **The Shorts floor is reliable, and so is the ceiling.** brach, press, royale and conv-003 all landed at 1.2-1.4K,
+  two maths and two experiments. The 2:1 mix keeps producing ~1.3K per upload whatever we put in it, so *choosing
+  between band formats* is no longer worth much thought. **Proposal: judge the experiment lane on breakouts (≥ ~2.5K),
+  not on landing in the band,** and fill it with shapes we haven't tried rather than variants of ones we have.
+- **The maths lift may be the twist, not the topic.** The two maths breakouts (conv-002, clack) each had a turn in
+  the middle (a break round, a digit ladder). The two that stayed in the band (brach, conv-003 so far) are pure
+  escalations. Proposal: **the next maths Short carries a twist round**, e.g. conv-003's tilt-the-bowl idea, or Bell
+  curve drop with a rigged board. Wait for conv-003's day 3 (10-26) before acting; if it climbs like conv-002, the
+  lead is wrong.
+- **Long form: no change.** 0 for 4 at v15's level, but v22 `elim` (229 at day 5) is the best since, and it's the
+  cheapest series template. The 10-20 point stands: v15's Studio traffic sources decide the next long build. The
+  watch-hour route is ~5x off pace, so it isn't a 02-01 plan on either route.
+- **Subs converted at ~0.25%**, the best window so far. One window, so not a finding; check Studio's subs per video to
+  see which upload drove it before reading anything into it.
 
 ## Audience and the pick mechanic
 
@@ -328,7 +400,8 @@ original is ready. Rules:
 5. **A flop costs one slot, not the channel.** v11-v13 flopped and v14 still landed in the band right after.
 
 **Current experiment slate** (details in `ideas-backlog.md` → *Experiment slate*): *Multiply vs Escape* (new),
-*Reach the Core* (reference-backed), *Glass Gauntlet* (3D, studio look).
+*Reach the Core* (reference-backed), *Glass Gauntlet* (3D, studio look). **Proposed 10-18:** maths (`conv`, `clack`)
+moves to the proven lane, and *Bell curve drop* / *Brachistochrone race* join the slate (*10-18 read*).
 
 ## Hooks that reliably work
 

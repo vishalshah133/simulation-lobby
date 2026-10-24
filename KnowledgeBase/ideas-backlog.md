@@ -26,27 +26,50 @@ format slug it would use. Mark `[built]` / `[published]` / `[dead]` as they move
 
 - `wars` — 4-faction arena, 200 each, 12 min
 - `elim` — 16-marble bracket tournament, different track each round
-- `race` — 100 marbles, 3D banked mega-track, full leaderboard
+- `race` — 100 marbles, 3D banked mega-track, full leaderboard. **Supported 10-18:** the 2:05 16:9 Grand Prix (v13) is at 1,779 on day 8 and still accelerating, so a full-length race has a real drip to build on. **Weaker 10-20:** v13 stopped at ~1.84K by day 10 (+58 in 2 days)
 - `elim` — Season: recurring named contenders with a standings table across videos
 - `wars` — Conversion vs destruction A/B, same seed, side by side
 - `surv` — Escalating hazard gauntlet, 15 min, survivor counter throughout
 
 ### From MIKAN (2026-10-16, see `reference-channels.md` → *MIKAN*)
 
-- **Survival + proliferation race** (new long-form format, **next long-form pick**) `[built]` [surv-002 Lava Run](../plans/videos/surv-002-lava-run.md). Colour teams run a 3D course;
+- **Survival + proliferation race** (new long-form format, **next long-form pick**) `[published]` v19, 73 views at day 3 [surv-002 Lava Run](../plans/videos/surv-002-lava-run.md). Colour teams run a 3D course;
   ×2 gates multiply marbles while a hazard (lava rising behind, a crusher, a rolling boulder, a tsunami) thins them.
   Last colour with marbles alive wins. Reuses `rom`/`mve` multiply gates, `BodyPool3D`, the `race` course builder and
   `terr` team colours; only the hazard is new. 10-12 min, one arc in acts (calm → hazard starts → hazard speeds up →
   last survivors). Reference: MIKAN *Escape from Me* (28M), *Roller Coaster - Survival Worm Race* (115M).
-- `terr` — **Numbered series**: *Which Country Takes the Board? #2*, rotating country line-ups. Cut to 10-12 min.
+- `terr` — **Numbered series**: *Which Country Takes the Board? #2*, rotating country line-ups. Cut to 10-12 min. **On hold (proposed 10-17, stronger 10-18):** country theming is on every low (v11, v12, v18). Continue the series with colour teams instead. *10-20:* colours didn't rescue v19 either, so theme isn't why long uploads stall.
 - `elim` — **Team elimination series**, numbered: 8 colour teams, a different course per round, the losing team out
   each round. MIKAN's longest-running series (53 titles). Needs `elim` built.
 - `terr`/`wars` — **Core destruction**: each team defends a core, attacks the others'. Same shape as `terr`
   (cannon tile = core); a pure-physics variant without the Plinko economy is the cheaper cousin.
 - `race` — **Survival roller coaster**: marbles on a looping coaster track, the ones flung off are out. MIKAN's
   biggest single title shape (115M, also MIKAN 3D's 14.5M *Abstract World* coaster). Short (2 min, 16:9) or long.
+- `fall` — **Freefall Symphony** `[building]` [fall-001](../plans/videos/fall-001-freefall-symphony.md): a hypnotic, sound-on long form from
+  MIKAN 3D's *Abstract World* (14.5M) as inspiration. A marble falls through 7 worlds and every bounce plays a public-domain song.
+  Spin-offs if it works: one-song 9:16 Shorts per world, a "guess the song from the sculpture" variant.
 - **Factory** (`[parked]`, too costly per video): a physics assembly line that "builds" something. MIKAN's
   biggest hits (84-115M), but hand-authored stations and no seedable contest. Revisit once long form is proven.
+
+### From Carson Jay + Crazy Marble Race (2026-10-18, see `reference-channels.md` → *@carsonjay*)
+
+- `elim`/`race` — **Fixed-rules numbered show** `[published]` v22, 2026-10-19 (7 views at day 1; judge at day 7), elim-001 (16 marbles, 6 heats, a Last Chance heat): *24 Marble Race EP. N: <Theme> Race*. 24 marbles, 5 stages, 4 out
+  per stage, a new theme (and course dressing) every episode. The rules never change, so an episode is a theme and a
+  seed. Crazy Marble Race has run it every 2 weeks for 7 years (5.8M for EP. 1, ~60-110K now). **Strongest
+  long-form series candidate after Lava Run.** Needs `elim` built on the `Shared` track course.
+- `surv` — **Marble Survival: a hunter ball chases the field**, anything it touches is out. Crazy Marble Race's best
+  series per view (*Angry Ball* 7.0M, *Happy Ball* 2.6M, median 123K). A Lava Run sibling: the hazard moves and
+  hunts instead of rising.
+- `wars` — **Infection / hide and seek**: one marble converts (*Escape the Virus*, 2.0M) or hunts (*Escape the Seeker*,
+  2.9M) the rest. Reference support for the `wars` *1 red vs 100 blue, conversion on touch* idea above.
+- `surv` — **Zombie defense, survive 100 rounds** (Carson Jay, 2.0M; 17 titles, median 208K). Marbles defend a castle
+  against waves. Overlaps `terr`'s core defence.
+- `elim` — **Elimination variants as one-rule episodes** (Crazy Marble Race): *Size Elimination*, *Leader
+  Elimination*, *Don't be too fast, the last will lose*, *Elimination Wheel*. Each changes one rule, at 8-13 min.
+- `elim` — **Big-field country elimination** (Carson Jay *50 Countries*, 7.9M). Only if countries come off pause, and
+  as a many-nation knockout, not a 2-4 nation match.
+- `[dead]` — Meme-character races (*Italian Brainrot*, Carson Jay's 2025 burst). A short spike, other people's
+  character IP, and the channel went dormant straight after.
 
 ## New categories — from adjacent-channel research (2026-09-29, see `reference-channels.md`)
 
@@ -93,7 +116,7 @@ actually being built, per this file's own rule.
 
 Ranked. Each one tests a single new thing, and the reuse notes are what keep it cheap.
 
-1. **Multiply vs Escape** (new, no reference) `[built]` mve-001, 2026-10-13, slug `mve`. One ball sits in the rotating-gap circle. **Every wall bounce
+1. **Multiply vs Escape** (new, no reference) `[built]` mve-001, 2026-10-13, slug `mve`. Its arena shipped as `royale-001` `[published]` 2026-10-21 (1,233 at day 3). One ball sits in the rotating-gap circle. **Every wall bounce
    clones it**, and any ball through the gap is gone for good. The question: *will the circle fill up before
    they all get out?* Two live counters (INSIDE / ESCAPED), and the swarm sweeps the gap like a tide. Tests:
    **a new mechanic on the proven threshold shape** (the shape stays, only the mechanic changes). Reuse:
@@ -107,10 +130,21 @@ Ranked. Each one tests a single new thing, and the reuse notes are what keep it 
    a bit thicker. *How many can it break?* Tests: whether 3D glass and the shatter sound can pull the band in
    a threshold shape (v5 was 3D threshold, but without the studio look). Reuse: studio-look kit, `CollisionDetector3D`,
    procedural glass break, slow-mo director, camera rig. How it loses: the ball stops.
+4. **Bell curve drop** (maths, added 10-18). 1,000 marbles through a peg board pile into a bell curve. *Guess the
+   shape.* Tests: whether the maths shape still lifts a peg board, the genre's most familiar look. Reuse: `rom` peg
+   fields, `BodyPool2D`, `TriggerZone2D` slot counters. Brief: `math-convergence.md` #7. **10-24:** promoted to next
+   maths pick, but give it a twist round (e.g. a rigged / tilted board that skews the curve), per the *10-24 read*.
+5. **Brachistochrone race** (maths, added 10-18) `[published]` brach-001, 2026-10-18 (1,242, in the band). Straight ramp vs steep dive vs curve, and the longest path wins.
+   Tests: maths inside a contest. Reuse: the `Shared` track course. Brief: `math-convergence.md` #11.
+
+6. **Split Press** (added 10-20, reference-backed) `[published]` press-001, 2026-10-20 (1,425 at day 4, in the band). A press lowers onto a ball; every crushed
+   ball splits in 2, and each ball holds 1 ton. *How many balls before the press stops?*, with the press 2× stronger
+   each round. Tests: the @satisfying2dsims multiply + crusher shape (*"Every ball crushed splits into 3"* 1.7M,
+   *"crushed one ball into 15,939 pieces"* 1.9M) on our `clack` answer-ladder. Brief: `formats/hydraulic-press.md`.
 
 ## From MathCa + Bouncy Physics (2026-10-14, see `reference-channels.md`)
 
-- **Math inevitability / convergence** (working name `conv`, new category). Many identical glowing bodies
+- **Math inevitability / convergence** (`conv`) `[published]` conv-002, 2026-10-15 (2,607 at day 3) and conv-003 parabola, 2026-10-23 (1,321 at day 1). **conv-003 v2: tilt round** (tilt the bowl, the focus smears into a caustic, tilt it back), if day 3 shows the pure escalation stalled. Sibling `clack` `[published]` clack-001, 2026-10-17 (2,694 in <18h). **Maths is the strongest Shorts shape so far** (`learnings.md` → *10-18 update*); next topics live in `formats/math-convergence.md` → *Wider maths backlog*. Many identical glowing bodies
   start at different points, and a known mathematical fact makes them meet, sync or close up: cycloid
   (tautochrone) balls arriving together, ellipse-focus rebounds, a pendulum wave lining up, the golden-angle
   spiral. Title shape: **"Will they all ___?"**. Reference: MathCa, 12.2M / 902K / 474K in its first 2 weeks,

@@ -46,6 +46,9 @@ namespace SimulationLobby.Simulations.Race
         [Min(1)] public int gridColumns = 4;
         [Min(0.2f)] public float gridRowSpacing = 0.32f;
 
+        [Tooltip("Most marbles any heat on this config will start (4 columns x 4 rows = 16). The rig builder makes sure the pen is long enough for this many; the Grand Prix pen already is.")]
+        [Min(1)] public int maxEntrants = 16;
+
         [Tooltip("Random offset of each marble from its grid slot, as a fraction of the marble radius.")]
         [Range(0f, 0.6f)] public float gridJitter = 0.25f;
 
@@ -55,6 +58,9 @@ namespace SimulationLobby.Simulations.Race
         [Header("Finish")]
         [Tooltip("After the winner crosses, how long the others get to finish before the race is called.")]
         [Min(1f)] public float finishGraceSeconds = 14f;
+
+        [Tooltip("Heat mode only (a safe count is set): after the last safe spot is taken, how long the heat runs on so the camera sees it, then the rest are out.")]
+        [Min(0.1f)] public float cutGraceSeconds = 1.5f;
 
         [Header("Safety nets (the run must always end)")]
         [Tooltip("A marble this far from the track centreline has left the track and is put back.")]

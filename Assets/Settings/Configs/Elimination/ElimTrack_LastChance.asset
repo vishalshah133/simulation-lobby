@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c1d5746b7a0784a9c2a1202ff6ebe0, type: 3}
+  m_Name: ElimTrack_LastChance
+  m_EditorClassIdentifier: SimulationLobby.Shared::SimulationLobby.Shared.Tracks.TrackLayout
+  version: 3
+  startWidth: 1.6
+  gateDistance: 4.4
+  runOutLength: 8
+  pegWallClearance: 0.4
+  defaultRailHeight: 0.34
+  sections:
+  - label: Start pen
+    kind: 0
+    length: 5
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 4
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Opening run
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 8
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bank left
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: 160
+    slopeDegrees: 8
+    bankDegrees: 20
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Link
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 8
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bank right
+    kind: 1
+    length: 0
+    radius: 6
+    arcDegrees: -170
+    slopeDegrees: 8
+    bankDegrees: 20
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Pinch run
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 8
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bank left 2
+    kind: 1
+    length: 0
+    radius: 7
+    arcDegrees: 150
+    slopeDegrees: 8
+    bankDegrees: 20
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Home straight
+    kind: 0
+    length: 14
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 7
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Run-out
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 3
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  obstacles:
+  - label: Rumble strip
+    kind: 6
+    section: 1
+    offset: 5
+    length: 0
+    count: 4
+    spacing: 0.9
+    size: 0.03
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Bottleneck
+    kind: 4
+    section: 5
+    offset: 3
+    length: 9
+    count: 0
+    spacing: 0
+    size: 0.46
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Exit bumps
+    kind: 6
+    section: 7
+    offset: 4
+    length: 0
+    count: 4
+    spacing: 0.9
+    size: 0.03
+    speed: 0
+    lane: 0
+    lateral: 0

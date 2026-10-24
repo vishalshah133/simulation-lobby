@@ -32,7 +32,7 @@ namespace SimulationLobby.Simulations.Convergence
         [Range(0f, 4f)] public float trailSeconds;
 
         [Tooltip("Bodies launched this round. 0 = use the config's ballCount.")]
-        [Range(0, 600)] public int ballCount;
+        [Range(0, 1000)] public int ballCount;
     }
 
     /// <summary>
@@ -44,10 +44,21 @@ namespace SimulationLobby.Simulations.Convergence
     {
         [Header("Bodies")]
         [Tooltip("Bodies launched each round.")]
-        [Range(8, 600)] public int ballCount = 120;
+        [Range(1, 1000)] public int ballCount = 120;
 
         [Tooltip("Drawn radius of a body, world units. Presentation only.")]
         [Range(0.02f, 0.3f)] public float ballRadius = 0.09f;
+
+        [Tooltip("Bodies sit frozen at their launch positions through Hold, so the row is seen before it drops " +
+                 "(an anticipation beat). Off = bodies first appear at launch.")]
+        public bool showBodiesDuringHold = false;
+
+        [Tooltip("Show the red start dot and its ring. Off for a topic with no start point.")]
+        public bool showStartPoint = true;
+
+        [Tooltip("Fraction of the hue wheel spread across the bodies. 1 = the full wheel (a fan, where the hue is " +
+                 "the launch angle). Below 1 for a row, so the two ends are not both red.")]
+        [Range(0.1f, 1f)] public float hueSpan = 1f;
 
         [Header("Meeting")]
         [Tooltip("A body counts as at the target point within this distance, world units.")]
@@ -85,6 +96,9 @@ namespace SimulationLobby.Simulations.Convergence
 
         public string title = "THE MAGIC POINT";
 
+        [Tooltip("If not empty, replaces the title in the top panel during the end card, e.g. IT'S CALLED A PARABOLA. Empty = the title stays.")]
+        public string endTitle = string.Empty;
+
         public string question = "120 BALLS FROM RED. HOW MANY HIT BLUE?";
 
         public string endCard = "ONLY THIS POINT WORKS. IT'S CALLED A FOCUS.";
@@ -102,6 +116,9 @@ namespace SimulationLobby.Simulations.Convergence
 
         /// <summary>Caption, answer and timing for round <paramref name="index"/> (0-based).</summary>
         public abstract ConvergenceRoundInfo GetRound(int index);
+
+        /// <summary>Topic geometry for round <paramref name="index"/> as a short string, for the scene builder's log. Empty when a topic has none to add.</summary>
+        public virtual string DescribeRound(int index) => string.Empty;
 
         /// <summary>A fresh kernel holding round <paramref name="index"/>'s geometry, not yet launched.</summary>
         public abstract IConvergenceKernel CreateKernel(int index);

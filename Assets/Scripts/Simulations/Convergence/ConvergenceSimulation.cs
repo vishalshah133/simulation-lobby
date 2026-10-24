@@ -32,8 +32,9 @@ namespace SimulationLobby.Simulations.Convergence
     /// <remarks>
     /// Determinism: phases are counted in ticks, the kernel is pure double maths, and the only random
     /// draws are one cosmetic launch-fan rotation per round, taken up front in round order.
-    /// Bodies are not drawn (ParticleCount is 0) during Transition, Hold and EndCard; they appear at
-    /// launch and stay frozen in place through Result.
+    /// Bodies are not drawn (ParticleCount is 0) during Transition and EndCard. In Hold they are drawn
+    /// frozen at their launch layout only when <see cref="ConvergenceConfig.showBodiesDuringHold"/> is on
+    /// (no Step runs); otherwise they appear at launch. They stay frozen in place through Result.
     /// </remarks>
     [RequireComponent(typeof(SimulationRunner))]
     public sealed class ConvergenceSimulation : MonoBehaviour, ISimulation
@@ -366,6 +367,12 @@ namespace SimulationLobby.Simulations.Convergence
 
                 case ConvergencePhase.Hold:
                     _particleCount = 0;
+                    if (Config.showBodiesDuringHold)
+                    {
+                        // Frozen launch layout: no Step runs in Hold, and Running re-launches fresh.
+                        LaunchBodies();
+                    }
+
                     _phaseTicks = TicksFor(RoundIndex == 0 ? Config.firstHoldSeconds : Config.preLaunchHoldSeconds);
                     ShowTarget();
                     _recorder.LogEvent($"round_{RoundIndex + 1}_hold");

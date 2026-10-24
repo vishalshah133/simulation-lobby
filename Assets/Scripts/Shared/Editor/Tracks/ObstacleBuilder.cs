@@ -47,8 +47,8 @@ namespace SimulationLobby.Shared.EditorTools
 
                 switch (obstacle.kind)
                 {
-                    case ObstacleKind.PegPyramid: BuildPegs(group, obstacle, samples, distance, kit, pyramid: true); break;
-                    case ObstacleKind.PegGrid: BuildPegs(group, obstacle, samples, distance, kit, pyramid: false); break;
+                    case ObstacleKind.PegPyramid: BuildPegs(group, obstacle, samples, distance, kit, layout.pegWallClearance, pyramid: true); break;
+                    case ObstacleKind.PegGrid: BuildPegs(group, obstacle, samples, distance, kit, layout.pegWallClearance, pyramid: false); break;
                     case ObstacleKind.Pinwheel: BuildPinwheel(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Divider: BuildDivider(group, obstacle, samples, distance, kit); break;
                     case ObstacleKind.Bottleneck: BuildBottleneck(group, obstacle, samples, distance, kit); break;
@@ -80,12 +80,25 @@ namespace SimulationLobby.Shared.EditorTools
         // ------------------------------------------------------------------ pegs
 
         static void BuildPegs(Transform parent, TrackObstacle o, List<TrackMeshBuilder.Sample> samples, float distance,
-            Kit kit, bool pyramid)
+            Kit kit, float wallClearance, bool pyramid)
         {
             TrackMeshBuilder.Sample middle = TrackMeshBuilder.At(samples, distance + 1f);
             float radius = o.size > 0f ? o.size : 0.05f;
             float spacing = Mathf.Max(0.3f, o.spacing > 0f ? o.spacing : 0.46f);
             LaneRange(middle, o.lane, out float min, out float max);
+            if (wallClearance > 0f)
+            {
+                // Peg centres stay clearance + radius from the rail. A gap narrower than a marble next to the wall is
+                // a trap: the marble presses into the peg and the rail and can't get past either.
+                float inset = Mathf.Max(0f, wallClearance + radius - WallMargin);
+                min += inset;
+                max -= inset;
+                if (max <= min)
+                {
+                    Debug.LogWarning($"[track] '{o.label}': the lane is too narrow for {wallClearance:0.00}m peg clearance. Skipped.");
+                    return;
+                }
+            }
             float span = max - min;
             float centre = (min + max) * 0.5f;
             float pitch = spacing * 0.85f;
@@ -100,7 +113,12 @@ namespace SimulationLobby.Shared.EditorTools
 
             for (int row = 0; row < rows; row++)
             {
-                TrackMeshBuilder.Sample frame = TrackMeshBuilder.At(samples, distance + row * pitch);
+                // With clearance on (plinko mode), rows are placed at exact distances. The legacy snap to the next
+                // sample bunches rows where the sample spacing doesn't match the row pitch, and a bunched row is a wall.
+                float rowDistance = distance + row * pitch;
+                TrackMeshBuilder.Sample frame = wallClearance > 0f
+                    ? TrackMeshBuilder.AtExact(samples, rowDistance)
+                    : TrackMeshBuilder.At(samples, rowDistance);
                 int pegs;
                 float first;
                 if (pyramid)
