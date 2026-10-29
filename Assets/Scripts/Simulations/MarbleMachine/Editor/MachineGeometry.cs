@@ -10,6 +10,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     /// </summary>
     public static class MachineGeometry
     {
+        public const float GlassMinThickness = 0.12f;
         public const string MeshFolder = "Assets/Art/Generated/MarbleMachine/Meshes";
 
         static PhysicsMaterial _wallMaterial;
@@ -32,6 +33,75 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 }
 
                 return _wallMaterial;
+            }
+        }
+
+        static PhysicsMaterial _gripMaterial;
+
+        /// <summary>High-friction, non-bouncy surface: where balls must not slide back (the screw lift's glass tube and ribs).</summary>
+        public static PhysicsMaterial GripPhysics
+        {
+            get
+            {
+                if (_gripMaterial == null)
+                {
+                    _gripMaterial = new PhysicsMaterial("MachineGrip")
+                    {
+                        bounciness = 0f,
+                        dynamicFriction = 0.9f,
+                        staticFriction = 1.0f,
+                        bounceCombine = PhysicsMaterialCombine.Minimum,
+                        frictionCombine = PhysicsMaterialCombine.Maximum
+                    };
+                }
+
+                return _gripMaterial;
+            }
+        }
+
+        static PhysicsMaterial _glideMaterial;
+
+        /// <summary>Zero-bounce, low-friction surface for moving floors: balls are carried, not bounced.</summary>
+        public static PhysicsMaterial GlidePhysics
+        {
+            get
+            {
+                if (_glideMaterial == null)
+                {
+                    _glideMaterial = new PhysicsMaterial("MachineGlide")
+                    {
+                        bounciness = 0f,
+                        dynamicFriction = 0.12f,
+                        staticFriction = 0.15f,
+                        bounceCombine = PhysicsMaterialCombine.Minimum,
+                        frictionCombine = PhysicsMaterialCombine.Average
+                    };
+                }
+
+                return _glideMaterial;
+            }
+        }
+
+        static PhysicsMaterial _slickMaterial;
+
+        /// <summary>Near-frictionless, non-bouncy surface for ledges where balls must keep their speed.</summary>
+        public static PhysicsMaterial SlickPhysics
+        {
+            get
+            {
+                if (_slickMaterial == null)
+                {
+                    _slickMaterial = new PhysicsMaterial("MachineSlick")
+                    {
+                        bounciness = 0f,
+                        dynamicFriction = 0.05f,
+                        staticFriction = 0.05f,
+                        bounceCombine = PhysicsMaterialCombine.Minimum,
+                        frictionCombine = PhysicsMaterialCombine.Minimum
+                    };
+                }
+
+                return _slickMaterial;
             }
         }
 
@@ -59,6 +129,14 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             go.transform.SetParent(parent, false);
             go.transform.localPosition = localPosition;
             go.transform.localRotation = localRotation;
+            // Glass walls are at least GlassMinThickness thick (their thinnest side): a ball at 12 m/s moves 0.12 m a step and
+            // slips through anything thinner. The thickening is centred, so a wall that must keep a face in place moves its centre.
+            if (collider && material != null && material.name.IndexOf("Glass", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                int thin = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+                if (size[thin] < GlassMinThickness) size[thin] = GlassMinThickness;
+            }
+
             go.transform.localScale = size;
             go.GetComponent<MeshRenderer>().sharedMaterial = material;
             var box = go.GetComponent<BoxCollider>();
@@ -93,13 +171,15 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
         /// <summary>Renderer + MeshCollider (non-convex unless asked) from a generated mesh, saved fresh as an asset.</summary>
         public static GameObject MeshObject(Transform parent, string name, Mesh mesh, string assetName, Material material,
-            bool collider = true, bool convex = false)
+            bool collider = true, bool convex = false, Material wallMaterial = null)
         {
             Mesh saved = TrackMeshAssets.SaveMeshFresh(mesh, assetName, MeshFolder);
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.AddComponent<MeshFilter>().sharedMesh = saved;
-            go.AddComponent<MeshRenderer>().sharedMaterial = material;
+            var mr = go.AddComponent<MeshRenderer>();
+            if (wallMaterial != null) mr.sharedMaterials = new[] { material, wallMaterial };
+            else mr.sharedMaterial = material;
             if (collider)
             {
                 var mc = go.AddComponent<MeshCollider>();
@@ -172,8 +252,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         /// wall height <paramref name="wallHeight"/>. Up is world-ish up projected per segment. Double-sided.
         /// Good for connectors, the helix, inruns.
         /// </summary>
-        public static Mesh Channel(IList<Vector3> centreline, float width, float wallHeight, IList<float> bankDegrees = null)
+        public static Mesh Channel(IList<Vector3> centreline, float width, float wallHeight, IList<float> bankDegrees = null, bool splitWalls = false)
         {
+            var wallTris = new List<int>();
             var verts = new List<Vector3>();
             var uvs = new List<Vector2>();
             var tris = new List<int>();
@@ -202,18 +283,43 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 for (int k = 0; k < 3; k++)
                 {
                     int a = i * 4 + k, b = a + 1, c = a + 4, d = c + 1;
-                    tris.Add(a); tris.Add(b); tris.Add(c);
-                    tris.Add(b); tris.Add(d); tris.Add(c);
+                    List<int> target = splitWalls && k != 1 ? wallTris : tris;
+                    target.Add(a); target.Add(b); target.Add(c);
+                    target.Add(b); target.Add(d); target.Add(c);
                 }
+            }
+
+            if (splitWalls)
+            {
+                // Floor is submesh 0, the two side walls submesh 1 (so they can take a glass material).
+                AppendBackFaces(verts, uvs, tris, wallTris);
+                var mesh = Finish(verts, uvs, tris);
+                mesh.subMeshCount = 2;
+                mesh.SetTriangles(tris, 0);
+                mesh.SetTriangles(wallTris, 1);
+                mesh.RecalculateNormals();
+                mesh.RecalculateBounds();
+                return mesh;
             }
 
             AppendBackFaces(verts, uvs, tris);
             return Finish(verts, uvs, tris);
         }
 
-        static void AppendBackFaces(List<Vector3> verts, List<Vector2> uvs, List<int> tris)
+        static void AppendBackFaces(List<Vector3> verts, List<Vector2> uvs, List<int> tris, List<int> extraTris = null)
         {
             int n = verts.Count;
+            if (extraTris != null)
+            {
+                int e = extraTris.Count;
+                for (int i = 0; i < e; i += 3)
+                {
+                    extraTris.Add(extraTris[i] + n);
+                    extraTris.Add(extraTris[i + 2] + n);
+                    extraTris.Add(extraTris[i + 1] + n);
+                }
+            }
+
             int t = tris.Count;
             for (int i = 0; i < n; i++)
             {
@@ -229,6 +335,27 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             }
         }
 
+        /// <summary>
+        /// Gives a stand-in normal (up) to any vertex RecalculateNormals left at zero: vertices whose triangles are all degenerate or
+        /// cancel out. A zero normal lights as an enormous white blob once bloom gets hold of it.
+        /// </summary>
+        public static void FixDegenerateNormals(Mesh mesh)
+        {
+            Vector3[] normals = mesh.normals;
+            bool changed = false;
+            for (int i = 0; i < normals.Length; i++)
+            {
+                float m = normals[i].sqrMagnitude;
+                if (float.IsNaN(m) || m < 0.25f)
+                {
+                    normals[i] = Vector3.up;
+                    changed = true;
+                }
+            }
+
+            if (changed) mesh.normals = normals;
+        }
+
         static Mesh Finish(List<Vector3> verts, List<Vector2> uvs, List<int> tris)
         {
             var mesh = new Mesh();
@@ -237,6 +364,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             mesh.SetUVs(0, uvs);
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
+            FixDegenerateNormals(mesh);
             mesh.RecalculateBounds();
             return mesh;
         }

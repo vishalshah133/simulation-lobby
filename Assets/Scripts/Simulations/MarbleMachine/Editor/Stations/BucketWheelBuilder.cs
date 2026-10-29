@@ -24,21 +24,38 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     ///    so the load slides out over the back wall onto the apron (at axle + R - 1.0). The apron plate is kept 0.27 m
     ///    below the lowest tipped bucket and its +Z wall 0.2 m, so nothing is pinched.
     ///  - Rise: entry floor -> exit lip = apron (R - 1.0 + cy = 6.93) - plate drop to the collector (0.19) - collector fall
-    ///    (4 deg over 6.4 m = 0.45) = 6.3 m; pit floor -> exit lip = 6.6 m.
+    ///    (8 deg over ~8.3 m = 1.2) = ~5.5 m; the apron is 3.2 m long (z 0.7..3.9) and the collector runs to z = 9.0.
     /// </summary>
     public static class BucketWheelBuilder
     {
         const int BucketCount = 16;
         const float Radius = 4.0f, CentreZ = 2.6f, BowlBottom = -0.30f, Gap = 0.02f, EntryY = -0.02f, FloorStartZ = -0.6f;
-        const float BucketW = 0.70f, BucketL = 0.55f, BucketH = 0.42f, Wall = 0.03f;
+        const float BucketW = 1.40f, Wall = 0.03f; // 2x wide: ~2x the balls per bucket
+        /// <summary>Bucket depth and height. 0.55 x 0.42 at r 0.065; grown in <see cref="Build"/> for big balls (a 0.4 m racer needs a 0.64 x 0.52 cup).</summary>
+        static float BucketL = 0.55f, BucketH = 0.42f;
         const float HugDegrees = 40f, ShelfDz = 0.4f, ShelfDy = 0.45f, CasingAboveAxle = 2.5f;
-        const float PitHalfWide = 0.62f, PitHalfNarrow = BucketW * 0.5f + 0.035f, PitWallH = 0.6f, PitWallT = 0.06f;
-        const float RimX = 0.55f, TowerX = 1.2f;
-        const float ApronDrop = 1.0f, ApronFrontDz = 1.5f, ApronBackDz = 1.1f, ApronTilt = 12f;
-        const float ApronMinX = -0.9f, ApronMaxX = 0.38f, CollectorHalf = 0.55f, CollectorPitch = 4f;
+        const float PitHalfNarrow = BucketW * 0.5f + 0.035f, PitWallH = 0.9f, PitWallT = 0.06f;
+        const float RimX = 1.1f, TowerX = 1.75f;
+        /// <summary>Set from the config at the start of <see cref="Build"/>: the pit opens to the track's inner width, the collector is as wide as the track.</summary>
+        static float PitHalfWide = 0.9f, CollectorHalf = 0.9f;
+        const float ApronFrontDz = 1.9f, ApronBackDz = 1.3f, ApronTilt = 12f;
+        /// <summary>Apron depth under the top of the wheel; deepened when the buckets and apron walls grow for big balls.</summary>
+        static float ApronDrop = 1.0f, ApronBackWallH = 0.40f, ApronFrontWallH = 0.34f;
+        const float ApronMinX = -1.8f, ApronMaxX = 0.76f, CollectorPitch = 8f;
+        const float ExitPortLength = 1.2f;
 
         public static BucketWheelStation Build(Transform parent, StationPlacement placement, MachineKit kit, MachineConfig config)
         {
+            PitHalfWide = config.chuteWidth * 0.5f;
+            CollectorHalf = config.chuteWidth * 0.5f;
+            // Size the cups and the apron walls from the ball radius (all unchanged at 0.065): a bucket holds a 0.4 m racer with
+            // room to spare, and the apron sinks to keep the same clearance under the taller tipped buckets and walls.
+            float ballR = config.ballRadius;
+            BucketL = Mathf.Max(0.55f, 3.2f * ballR);
+            BucketH = Mathf.Max(0.42f, 2.6f * ballR);
+            ApronBackWallH = Mathf.Max(0.40f, 2.5f * ballR);
+            ApronFrontWallH = Mathf.Max(0.34f, 2.2f * ballR);
+            ApronDrop = 1.0f + (BucketH - 0.42f) * 0.5f + (BucketL - 0.55f) * 0.3f + (ApronBackWallH - 0.40f);
             var root = new GameObject("Bucket Wheel");
             root.transform.SetParent(parent, false);
             root.transform.position = placement.entry;
@@ -62,10 +79,10 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             st.entry = MachineGeometry.Anchor(root.transform, "Entry", Vector3.zero);
             st.exit = MachineGeometry.Anchor(root.transform, "Exit", exitLocal);
             st.cameraFocus = MachineGeometry.Anchor(root.transform, "Camera Focus", centre + new Vector3(-0.3f, 0.4f, 0.6f));
-            st.cameraOffset = placement.Rotation * new Vector3(-15f, 0.5f, 0f);
+            st.cameraOffset = placement.Rotation * new Vector3(-19f, 0.5f, 0f);
             st.tourSeconds = 11f;
-            Vector3 bc = new Vector3(-0.4f, 3.7f, 3.1f);
-            Vector3 half = new Vector3(1.9f, 4.6f, 5.1f);
+            Vector3 bc = new Vector3(-1.2f, 3.7f, 3.5f);
+            Vector3 half = new Vector3(3.4f, 4.6f, 5.9f);
             var b = new Bounds(root.transform.TransformPoint(bc), Vector3.zero);
             for (int i = 0; i < 8; i++)
             {
@@ -156,7 +173,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 float xc = s * ((h0 + h1) * 0.5f + PitWallT * 0.5f);
                 Vector3 wdir = new Vector3(s * (h1 - h0), dn.y * len2, dn.x * len2);
                 MachineGeometry.Box(pit, tag + " Wall", mid + new Vector3(xc, 0f, 0f) + up * (wallH * 0.5f - yBelow * 0.5f),
-                    Quaternion.LookRotation(wdir, up), new Vector3(PitWallT, wallH + yBelow, wdir.magnitude + 0.03f), kit.woodDark);
+                    Quaternion.LookRotation(wdir, up), new Vector3(PitWallT, wallH + yBelow, wdir.magnitude + 0.03f), kit.glass);
             }
         }
 
@@ -178,12 +195,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             for (int s = -1; s <= 1; s += 2)
             {
                 MachineGeometry.Box(pit, "Casing Fin", new Vector3(s * (PitHalfNarrow + PitWallT * 0.5f), shelfTop.y + boardH * 0.5f, zc - 0.25f), Quaternion.identity,
-                    new Vector3(PitWallT, boardH, 0.5f), kit.woodDark);
+                    new Vector3(PitWallT, boardH, 0.5f), kit.glass);
                 // Visible posts behind the casing, down to the studio floor.
                 float postTop = casingTop;
                 float postH = postTop + rootY;
                 if (postH > 0.2f)
-                    MachineGeometry.Box(pit, "Casing Post", new Vector3(s * 0.6f, postTop - postH * 0.5f, zc + 0.3f), Quaternion.identity,
+                    MachineGeometry.Box(pit, "Casing Post", new Vector3(s * (PitHalfNarrow + 0.3f), postTop - postH * 0.5f, zc + 0.3f), Quaternion.identity,
                         new Vector3(0.14f, postH, 0.14f), kit.woodDark, false);
             }
 
@@ -314,14 +331,14 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             float xa = ApronMinX / cosT, xb = ApronMaxX / cosT;               // along the slope
             float wPlate = xb - xa, xcPlate = (xa + xb) * 0.5f;
             MachineGeometry.Box(apron.transform, "Apron Plate", new Vector3(xcPlate, -0.05f, 0f), Quaternion.identity, new Vector3(wPlate, 0.1f, len), kit.wood);
-            MachineGeometry.Box(apron.transform, "Apron Wall +X", new Vector3(xb + 0.03f, 0.125f, 0f), Quaternion.identity, new Vector3(0.06f, 0.35f, len), kit.woodDark);
-            MachineGeometry.Box(apron.transform, "Apron Wall Back", new Vector3(xcPlate, 0.1f, len * 0.5f - 0.03f), Quaternion.identity, new Vector3(wPlate, 0.2f, 0.06f), kit.woodDark);
-            MachineGeometry.Box(apron.transform, "Apron Wall Front", new Vector3(xcPlate, 0.1f, -len * 0.5f + 0.03f), Quaternion.identity, new Vector3(wPlate, 0.2f, 0.06f), kit.woodDark);
+            MachineGeometry.Box(apron.transform, "Apron Wall +X", new Vector3(xb + 0.03f, 0.5f, 0f), Quaternion.identity, new Vector3(0.06f, 1.1f, len), kit.glass); // tall: tipped loads bounce off the side
+            MachineGeometry.Box(apron.transform, "Apron Wall Back", new Vector3(xcPlate, ApronBackWallH * 0.5f, len * 0.5f - 0.03f), Quaternion.identity, new Vector3(wPlate, ApronBackWallH, 0.06f), kit.glass);
+            MachineGeometry.Box(apron.transform, "Apron Wall Front", new Vector3(xcPlate, ApronFrontWallH * 0.5f, -len * 0.5f + 0.03f), Quaternion.identity, new Vector3(wPlate, ApronFrontWallH, 0.06f), kit.glass); // as tall as the swept buckets allow (front/back walls sit inside the bucket ring, so they cannot rise further)
 
             // Collector: runs along +Z at x = -1.45, 1.1 m wide (chuteWidth + 0.2), sloping 4 deg downhill. Its +X side is open
             // where the apron drains into it and walled where the apron isn't.
             float edgeY = apronY + ApronMinX * tanT;                          // apron surface at its -X edge
-            float zExit = CentreZ + Radius + 0.9f;
+            float zExit = CentreZ + Radius + 2.4f;                // 1.5 m longer than before: the longer apron needs a longer collector
             float cLen = zExit - zFront;
             float pitchTan = Mathf.Tan(CollectorPitch * Mathf.Deg2Rad);
             float xC = ApronMinX - CollectorHalf;                             // centre line
@@ -331,14 +348,18 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             col.transform.localRotation = Quaternion.Euler(CollectorPitch, 0f, 0f);
             float cHyp = cLen / Mathf.Cos(CollectorPitch * Mathf.Deg2Rad);
             float hw = CollectorHalf;
-            MachineGeometry.Box(col.transform, "Collector Floor", new Vector3(0f, -0.05f, cHyp * 0.5f), Quaternion.identity, new Vector3(hw * 2f + 0.16f, 0.1f, cHyp), kit.wood);
-            MachineGeometry.Box(col.transform, "Collector Wall -X", new Vector3(-hw - 0.04f, 0.25f, cHyp * 0.5f), Quaternion.identity, new Vector3(0.08f, 0.6f, cHyp), kit.woodDark);
+            // The body of the collector is the tall housing the tipped loads need; its last stretch is a standard port, so the chute
+            // that takes it on meets exactly its own profile.
+            float bodyLen = cHyp - ExitPortLength;
+            MachineGeometry.Box(col.transform, "Collector Floor", new Vector3(0f, -0.05f, bodyLen * 0.5f), Quaternion.identity, new Vector3(hw * 2f + 0.16f, 0.1f, bodyLen), kit.wood);
+            MachineGeometry.Box(col.transform, "Collector Wall -X", new Vector3(-hw - 0.06f, 0.4f, bodyLen * 0.5f), Quaternion.identity, new Vector3(0.12f, 0.9f, bodyLen), kit.glass);
             float plateEnd = (zBack - zFront) / Mathf.Cos(CollectorPitch * Mathf.Deg2Rad);
-            MachineGeometry.Box(col.transform, "Collector Wall +X", new Vector3(hw + 0.04f, 0.25f, (plateEnd + cHyp) * 0.5f), Quaternion.identity, new Vector3(0.08f, 0.6f, cHyp - plateEnd), kit.woodDark);
-            MachineGeometry.Box(col.transform, "Collector Back", new Vector3(0f, 0.25f, -0.04f), Quaternion.identity, new Vector3(hw * 2f + 0.16f, 0.6f, 0.08f), kit.woodDark);
+            MachineGeometry.Box(col.transform, "Collector Wall +X", new Vector3(hw + 0.06f, 0.4f, (plateEnd + bodyLen) * 0.5f), Quaternion.identity, new Vector3(0.12f, 0.9f, bodyLen - plateEnd), kit.glass);
+            MachineConnectorBuilder.BuildPort(col.transform, "Exit Port", new[] { new Vector3(0f, 0f, bodyLen - 0.02f), new Vector3(0f, 0f, cHyp) }, kit, config);
+            MachineGeometry.Box(col.transform, "Collector Back", new Vector3(0f, 0.25f, -0.04f), Quaternion.identity, new Vector3(hw * 2f + 0.16f, 0.6f, 0.08f), kit.glass);
 
             // Supports to the studio floor.
-            foreach (float zf in new[] { 0.5f, 2.6f, 4.7f })
+            foreach (float zf in new[] { 0.5f, 3.6f, 6.7f })
             {
                 float zz = zFront + zf;
                 float topY = y0 - zf * pitchTan - 0.1f;

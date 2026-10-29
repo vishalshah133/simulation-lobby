@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationLobby.Simulations.MarbleMachine::SimulationLobby.Simulations.MarbleMachine.MachineConfig
   fixedTimestep: 0.01
   maxDurationSeconds: 900
-  intent: 'mach-001: 16,800 balls in 7 colours through a marble machine into a colour
-    sorter. Which colour fills its tube first? Tune tubeCapacity for a winner at
-    10:00-10:45.'
-  ballCount: 16800
+  intent: 'mach-001: 14,000 balls (2,000 of each of 7 colours) through a marble machine
+    into a colour sorter. Which colour fills its tube first? Tune tubeCapacity for
+    a winner at 10:00-10:45.'
+  ballCount: 14000
   ballRadius: 0.065
   ballMass: 0.03
   ballBounciness: 0.25
@@ -39,43 +39,29 @@ MonoBehaviour:
     color: {r: 0.58, g: 0.22, b: 0.88, a: 1}
   - name: PINK
     color: {r: 1, g: 0.38, b: 0.7, a: 1}
-  tubeCapacity: 1000
+  tubeCapacity: 100
   finaleFraction: 0.85
   outroSeconds: 14
-  holdSeconds: 6
+  holdSeconds: 20
   stages:
-  - label: Trickle
-    startSeconds: 6
-    ballsPerSecond: 6
-    flood: 0
-    phase: 1
-  - label: Steady
-    startSeconds: 90
-    ballsPerSecond: 13
-    flood: 0
-    phase: 2
-  - label: Flood
-    startSeconds: 330
+  - label: Gate open
+    startSeconds: 20
     ballsPerSecond: 0
     flood: 1
     phase: 3
-  - label: Steady
-    startSeconds: 365
-    ballsPerSecond: 13
-    flood: 0
-    phase: 2
-  chuteWidth: 0.9
+  chuteWidth: 1.8
   bucketWheelRpm: 6
   screwDegreesPerSecond: 330
-  waveAmplitude: 0.2
-  waveLength: 2
-  waveFrequency: 0.6
+  boosterSurfaceSpeed: 7
+  waveAmplitude: 0.24
+  waveLength: 3
+  waveFrequency: 0.9
   trapdoorCycleSeconds: 5
   trapdoorStaggerSeconds: 0.15
-  tipperThreshold: 60
-  skiJumpGap: 1.6
+  tipperThreshold: 200
+  skiJumpGap: 0.9
   pegWallSpinnerDegreesPerSecond: 90
-  sorterLanes: 3
+  sorterLanes: 2
   singulatorDegreesPerSecond: 270
   sorterFlapOpenSeconds: 0.1
   cannonIntervalSeconds: 0.2

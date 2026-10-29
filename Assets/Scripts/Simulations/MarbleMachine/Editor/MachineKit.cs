@@ -26,6 +26,10 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         public Material copper;
         /// <summary>Clear glass (transparent): silo, tubes, screw tube, peg-wall front. Keep a visible tint/edge.</summary>
         public Material glass;
+        /// <summary>Tube glass: almost no specular, so seven tall mirrors do not throw the key light at the camera.</summary>
+        public Material tubeGlass;
+        /// <summary>Matte-satin pale metal for large angled parts (splitter wedges) that would otherwise flash.</summary>
+        public Material satinMetal;
         /// <summary>Perforated metal / net (alpha-clipped): the ski jump's miss net, grates.</summary>
         public Material mesh;
         /// <summary>Saturated blue rubber: bumpers, roller ends (the one non-ball accent).</summary>
@@ -40,6 +44,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
         /// <summary>Unlit-ish emissive material the sorter tints per scan (instanced via MaterialPropertyBlock).</summary>
         public Material emissive;
+
+        /// <summary>Glowing yellow for the arrows painted on the speed-boost pads.</summary>
+        public Material boostArrow;
 
         public Mesh ballMesh;
     }

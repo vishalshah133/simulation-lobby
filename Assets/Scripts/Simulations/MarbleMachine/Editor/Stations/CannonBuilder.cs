@@ -12,14 +12,20 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     {
         const float RimHalf = 1.2f;
         const float FunnelDepth = 1.2f;
-        const float ThroatHalf = 0.25f;
+        /// <summary>Half the breech width: 0.25 at r 0.065; 1.5 r (0.3) for bigger balls so a 0.4 m racer drops through. Set in <see cref="Build"/>.</summary>
+        static float ThroatHalf = 0.25f;
         const float BreechBottom = -1.95f;
         const float DeckY = -2.2f;
         const float PivotHeight = 0.95f;
-        const float WallHeight = 0.55f; // ~4 ball diameters: a fast ball landing in the hopper can't hop out over the side
+        /// <summary>~4 ball diameters at r 0.065 (0.55); at least 5 r for bigger balls (1.0 at r 0.2): a fast ball landing in the hopper can't hop out over the side.</summary>
+        static float WallHeight = 0.55f;
 
         public static CannonStation Build(Transform parent, StationPlacement placement, MachineKit kit, MachineConfig config)
         {
+            ThroatHalf = Mathf.Max(0.25f, 1.5f * config.ballRadius);
+            WallHeight = Mathf.Max(0.55f, 5f * config.ballRadius);
+            // The barrel is decoration, but a racer leaves its muzzle visibly larger than the bore unless the barrel grows a little.
+            float bk = Mathf.Clamp(config.ballRadius / 0.1f, 1f, 1.4f);
             var root = new GameObject("Cannon");
             root.transform.SetParent(parent, false);
             root.transform.position = placement.entry;
@@ -37,11 +43,11 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 MachineGeometry.Box(t, "Rim Side Beam", new Vector3(s * RimHalf, -0.04f, 0f), Quaternion.identity, new Vector3(0.14f, 0.08f, RimHalf * 2f + 0.3f), kit.wood, false);
                 // Catch walls on the sides and the front; the back (-Z) stays open for the connectors.
                 MachineGeometry.Box(t, "Hopper Side Wall", new Vector3(s * (RimHalf + 0.03f), WallHeight * 0.5f, 0f), Quaternion.identity,
-                    new Vector3(0.06f, WallHeight, RimHalf * 2f + 0.12f), kit.wood);
+                    new Vector3(0.06f, WallHeight, RimHalf * 2f + 0.12f), kit.glass);
             }
 
             MachineGeometry.Box(t, "Hopper Front Wall", new Vector3(0f, WallHeight * 0.5f, RimHalf + 0.03f), Quaternion.identity,
-                new Vector3(RimHalf * 2f + 0.12f, WallHeight, 0.06f), kit.wood);
+                new Vector3(RimHalf * 2f + 0.12f, WallHeight, 0.06f), kit.glass);
 
             // Breech column and floor.
             float colTop = -FunnelDepth;
@@ -50,9 +56,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             for (int s = -1; s <= 1; s += 2)
             {
                 MachineGeometry.Box(t, "Breech Wall X", new Vector3(s * wallC, colTop - colH * 0.5f, 0f), Quaternion.identity,
-                    new Vector3(0.06f, colH, ThroatHalf * 2f + 0.12f), kit.terrazzo);
+                    new Vector3(0.06f, colH, ThroatHalf * 2f + 0.12f), kit.glass);
                 MachineGeometry.Box(t, "Breech Wall Z", new Vector3(0f, colTop - colH * 0.5f, s * wallC), Quaternion.identity,
-                    new Vector3(ThroatHalf * 2f + 0.12f, colH, 0.06f), kit.terrazzo);
+                    new Vector3(ThroatHalf * 2f + 0.12f, colH, 0.06f), kit.glass);
             }
 
             MachineGeometry.Box(t, "Breech Floor", new Vector3(0f, BreechBottom - 0.03f, 0f), Quaternion.identity,
@@ -101,12 +107,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             Transform pivot = MachineGeometry.Anchor(turret, "Barrel Pivot", new Vector3(0f, PivotHeight, 0f));
             Transform visual = MachineGeometry.Anchor(pivot, "Barrel Visual", Vector3.zero);
             Quaternion alongZ = Quaternion.Euler(90f, 0f, 0f);
-            MachineGeometry.Cylinder(visual, "Barrel", new Vector3(0f, 0f, 0.9f), alongZ, 0.2f, 2.4f, kit.castIron, false);
-            MachineGeometry.Cylinder(visual, "Breech Cap", new Vector3(0f, 0f, -0.32f), alongZ, 0.16f, 0.12f, kit.castIron, false);
-            MachineGeometry.Cylinder(visual, "Muzzle Ring", new Vector3(0f, 0f, 2.0f), alongZ, 0.26f, 0.2f, kit.brass, false);
+            MachineGeometry.Cylinder(visual, "Barrel", new Vector3(0f, 0f, 0.9f), alongZ, 0.2f * bk, 2.4f, kit.castIron, false);
+            MachineGeometry.Cylinder(visual, "Breech Cap", new Vector3(0f, 0f, -0.32f), alongZ, 0.16f * bk, 0.12f, kit.castIron, false);
+            MachineGeometry.Cylinder(visual, "Muzzle Ring", new Vector3(0f, 0f, 2.0f), alongZ, 0.26f * bk, 0.2f, kit.brass, false);
             for (int i = 0; i < 3; i++)
             {
-                MachineGeometry.Cylinder(visual, "Reinforce " + (i + 1), new Vector3(0f, 0f, 0.1f + i * 0.55f), alongZ, 0.235f, 0.07f, kit.chrome, false);
+                MachineGeometry.Cylinder(visual, "Reinforce " + (i + 1), new Vector3(0f, 0f, 0.1f + i * 0.55f), alongZ, 0.235f * bk, 0.07f, kit.chrome, false);
             }
 
             for (int s = -1; s <= 1; s += 2)

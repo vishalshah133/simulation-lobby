@@ -17,6 +17,11 @@ namespace SimulationLobby.Simulations.MarbleMachine
         [Tooltip("Axial distance between flight turns, metres (for logs and tuning).")]
         public float pitch = 0.6f;
 
+        [Tooltip("Radius of the flight's outer edge, metres. With Max Tip Speed it caps the turning rate.")]
+        public float tipRadius;
+        [Tooltip("Cap on the flight's edge speed, m/s (0 = no cap). A few big balls are dragged round by a fast flight instead of lifted by it.")]
+        public float maxTipSpeed;
+
         float _degPerSecond = 120f, _phaseDeg;
 
         public float AxialSpeed => pitch * _degPerSecond / 360f;
@@ -24,13 +29,20 @@ namespace SimulationLobby.Simulations.MarbleMachine
         public override void Initialize(MachineConfig config, SeededRandom rng)
         {
             _degPerSecond = config.screwDegreesPerSecond;
+            if (maxTipSpeed > 0f && tipRadius > 0.01f)
+            {
+                _degPerSecond = Mathf.Min(_degPerSecond, maxTipSpeed / tipRadius * Mathf.Rad2Deg);
+            }
+
             _phaseDeg = rng.Branch(404).NextFloat() * 360f;
         }
 
         public override void Step(float simTime, float dt)
         {
             if (rotor == null) return;
-            float theta = _phaseDeg + _degPerSecond * simTime;
+            // Unity yaw is positive from +Z toward +X, which moves a right-handed-in-(sin,cos) helix surface DOWN the axis, so
+            // the angle is negated: a positive configured rate drives the flight (and the balls) up the tube.
+            float theta = _phaseDeg - _degPerSecond * simTime;
             rotor.MoveRotation(transform.rotation * frameRotation * Quaternion.Euler(0f, theta, 0f));
         }
     }

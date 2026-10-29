@@ -250,6 +250,15 @@ namespace SimulationLobby.Presentation
             }
         }
 
+        /// <summary>Turns the clock off for formats that don't want one (the marble machine). Safe to call every frame.</summary>
+        public void HideTimer()
+        {
+            if (_timer != null && _timer.gameObject.activeSelf)
+            {
+                _timer.gameObject.SetActive(false);
+            }
+        }
+
         public void SetTimer(string text)
         {
             if (_timer != null && _timer.text != text)

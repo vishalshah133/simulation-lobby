@@ -97,6 +97,8 @@ namespace SimulationLobby.Simulations.MarbleMachine
 
             _firstGateU = _gates > 0 ? gateHingeU[0] : 0f;
             _scanned = new bool[Mathf.Max(64, config.ballCount)];
+            _filtered = new bool[Mathf.Max(64, config.ballCount)];
+            _flapColliders = null;
 
             _halfAcross = 0.05f;
             for (int i = 0; i < _lanes; i++) _halfAcross = Mathf.Max(_halfAcross, Mathf.Abs(laneCentresX[i]) + laneWidth * 0.5f + 0.05f);
@@ -117,6 +119,9 @@ namespace SimulationLobby.Simulations.MarbleMachine
             }
         }
 
+        Collider[] _flapColliders;
+        bool[] _filtered = new bool[0];
+
         public override void Step(float simTime, float dt)
         {
             if (singulator != null)
@@ -126,18 +131,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 singulator.MoveRotation(transform.rotation * Quaternion.Euler(angle, 0f, 0f));
             }
 
-            if (flapBodies == null) return;
-            float rate = dt / Mathf.Max(0.01f, flapOpenTime);
-            for (int i = 0; i < flapBodies.Length; i++)
-            {
-                _open[i] = Mathf.MoveTowards(_open[i], _target[i] ? 1f : 0f, rate);
-                if (Mathf.Approximately(_open[i], _applied[i])) continue;
-                _applied[i] = _open[i];
-                Quaternion q = Quaternion.Euler(flapOpenDegrees * _open[i], 0f, 0f);
-                Vector3 local = flapHinge[i] + q * (flapRestPos[i] - flapHinge[i]);
-                flapBodies[i].MovePosition(transform.TransformPoint(local));
-                flapBodies[i].MoveRotation(transform.rotation * q * flapRestRot[i]);
-            }
+            // Nothing else moves: the gates are fixed plates and the sorting is done by collision filtering (see StepSort).
         }
 
         public void StepSort(float simTime, IReadOnlyList<MachineBall> balls)
@@ -190,64 +184,33 @@ namespace SimulationLobby.Simulations.MarbleMachine
                     Scanned?.Invoke(b.colour, p);
                 }
 
-                // A ball already below the lane floor has fallen through a flap: it no longer holds any gate open or shut.
-                if (l.z < _firstGateU - 0.8f || l.y < -0.03f) continue;
-                if (_bn == _bu.Length)
+                // Sorting by collider: the gate plates under the lane never move. A ball ignores the plates of its own colour (in every
+                // lane), so it drops through its tube's window; every other ball meets a solid plate and just rolls on to its own.
+                // Set once, the first time the ball is in a lane; the filter stays for good, so a recycled ball is still sorted.
+                if (id >= _filtered.Length) Array.Resize(ref _filtered, id * 2 + 16);
+                if (!_filtered[id])
                 {
-                    Array.Resize(ref _bu, _bn * 2);
-                    Array.Resize(ref _bpu, _bn * 2);
-                    Array.Resize(ref _bc, _bn * 2);
-                    Array.Resize(ref _bl, _bn * 2);
+                    _filtered[id] = true;
+                    FilterBall(b);
                 }
+            }
+        }
 
-                float speed = b.body != null ? b.body.linearVelocity.magnitude : 0f;
-                _bu[_bn] = l.z;
-                _bpu[_bn] = l.z + speed * 0.08f; // look-ahead = flap travel time + one tick
-                _bc[_bn] = b.colour;
-                _bl[_bn] = lane;
-                _bn++;
+        void FilterBall(MachineBall b)
+        {
+            if (b.colour < 0 || b.colour >= _gates) return;
+            Collider ball = b.body != null ? b.body.GetComponent<Collider>() : b.GetComponent<Collider>();
+            if (ball == null) return;
+            if (_flapColliders == null)
+            {
+                _flapColliders = new Collider[flapBodies.Length];
+                for (int i = 0; i < flapBodies.Length; i++) _flapColliders[i] = flapBodies[i] != null ? flapBodies[i].GetComponent<Collider>() : null;
             }
 
             for (int lane = 0; lane < _lanes; lane++)
             {
-                for (int g = 0; g < _gates; g++)
-                {
-                    int f = lane * _gates + g;
-                    float h = gateHingeU[g];
-                    float end = h + flapLength;
-                    bool match = false, block = false;
-                    for (int j = 0; j < _bn; j++)
-                    {
-                        if (_bl[j] != lane) continue;
-                        float u = _bu[j], pu = _bpu[j];
-                        // A ball is "over" the flap while its centre is on it, or about to be. Tight margins: at 5 balls/s
-                        // per lane the next ball is 0.35 m or more behind, so a wide window would catch two at once.
-                        bool over = (u > h - 0.02f && u < end + 0.02f) || (pu > h && pu < end);
-                        if (!over) continue;
-                        if (_bc[j] == g) match = true;
-                        else block = true;
-                    }
-
-                    bool want;
-                    if (block)
-                    {
-                        want = false;
-                        _lastMatch[f] = -999f;
-                    }
-                    else if (match)
-                    {
-                        want = true;
-                        _lastMatch[f] = simTime;
-                    }
-                    else
-                    {
-                        want = simTime - _lastMatch[f] < _openHold;
-                    }
-
-                    if (want && !_target[f])
-                        RaisePulse(transform.TransformPoint(flapRestPos[f]), 0.3f);
-                    _target[f] = want;
-                }
+                Collider plate = _flapColliders[lane * _gates + b.colour];
+                if (plate != null) Physics.IgnoreCollision(ball, plate, true);
             }
         }
 

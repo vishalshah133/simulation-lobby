@@ -68,9 +68,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         {
             RenderSettings.skybox = null;
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.40f, 0.41f, 0.43f);
-            RenderSettings.ambientEquatorColor = new Color(0.36f, 0.36f, 0.38f);
-            RenderSettings.ambientGroundColor = new Color(0.28f, 0.28f, 0.29f);
+            RenderSettings.ambientSkyColor = new Color(0.54f, 0.55f, 0.57f);
+            RenderSettings.ambientEquatorColor = new Color(0.50f, 0.50f, 0.52f);
+            RenderSettings.ambientGroundColor = new Color(0.42f, 0.42f, 0.43f);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = cam.backgroundColor;
@@ -170,18 +170,18 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             root.position = b.center;
 
             // Key: from front-left and high (the camera looks along +Z); the only shadow caster. Soft shadows.
-            Light key = NewDirectional(root, "Key", new Color(1f, 0.97f, 0.92f), 0.85f, Quaternion.Euler(52f, 28f, 0f));
+            Light key = NewDirectional(root, "Key", new Color(1f, 0.97f, 0.92f), 0.65f, Quaternion.Euler(52f, 28f, 0f));
             key.shadows = LightShadows.Soft;
-            key.shadowStrength = 0.7f;
+            key.shadowStrength = 0.5f;
             key.shadowResolution = LightShadowResolution.VeryHigh;
             key.shadowBias = 0.8f;
             key.shadowNormalBias = 0.6f;
 
             // Fill: cool, from the right, no shadows.
-            NewDirectional(root, "Fill", new Color(0.80f, 0.88f, 1f), 0.25f, Quaternion.Euler(28f, -42f, 0f));
+            NewDirectional(root, "Fill", new Color(0.82f, 0.89f, 1f), 0.4f, Quaternion.Euler(28f, -42f, 0f));
 
             // Rim: from behind the machine, to give chrome and glass a bright edge.
-            NewDirectional(root, "Rim", new Color(1f, 0.98f, 0.94f), 0.35f, Quaternion.Euler(22f, 198f, 0f));
+            NewDirectional(root, "Rim", new Color(1f, 0.98f, 0.94f), 0.12f, Quaternion.Euler(22f, 198f, 0f));
         }
 
         static Light NewDirectional(Transform parent, string name, Color colour, float intensity, Quaternion rotation)
@@ -215,7 +215,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             probe.boxProjection = true;
             probe.size = b.size + new Vector3(40f, 20f, 40f);
             probe.clearFlags = ReflectionProbeClearFlags.SolidColor;
-            probe.backgroundColor = new Color(0.55f, 0.56f, 0.58f, 1f);
+            probe.backgroundColor = new Color(0.72f, 0.73f, 0.75f, 1f); // an even bright sky for chrome and glass to reflect
             probe.nearClipPlane = 0.1f;
             probe.farClipPlane = 250f;
             probe.importance = 10;
@@ -253,7 +253,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 AssetDatabase.CreateAsset(material, path);
             }
 
-            material.SetColor("_BaseColor", new Color(1.6f, 1.6f, 1.6f, 1f));
+            material.SetColor("_BaseColor", new Color(0.8f, 0.8f, 0.8f, 1f));
             material.SetFloat("_Cull", 0f);
             EditorUtility.SetDirty(material);
             return material;
@@ -275,8 +275,8 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             Tonemapping tonemapping = GetOrAdd<Tonemapping>(profile);
             tonemapping.mode.Override(TonemappingMode.Neutral);
             Bloom bloom = GetOrAdd<Bloom>(profile);
-            bloom.threshold.Override(1.8f);
-            bloom.intensity.Override(0.25f);
+            bloom.threshold.Override(2.4f);
+            bloom.intensity.Override(0.08f);
             bloom.scatter.Override(0.6f);
             Vignette vignette = GetOrAdd<Vignette>(profile);
             vignette.intensity.Override(0.15f);

@@ -9,20 +9,20 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     /// </summary>
     public static class TubeRackBuilder
     {
-        public const float InnerRadius = 0.6f;
+        public const float InnerRadius = 0.35f; // narrower for the 100-ball contest, so the pile is deep enough to read; the 0.9 m guide funnel above feeds it
         /// <summary>Top of the white floor disk, metres above the floor.</summary>
         public const float FloorTop = 0.09f;
         const float GlassBottom = 0.05f;
 
         /// <summary>Packing fraction of the settled pile: random close pack is ~0.64 in bulk, the glass wall (tube is only 9 balls wide) pulls it to ~0.60.</summary>
-        public const float PackingFraction = 0.60f;
+        public const float PackingFraction = 0.55f;
         /// <summary>Clear glass above the fill line: room for the pile cone under the falling stream and the post-win outro.</summary>
         public const float Headroom = 0.6f;
 
         /// <summary>
         /// Fill line height (world y): where <c>tubeCapacity</c> balls settle. Ball volume V = 4/3 pi r^3 (r 0.065: 1.150 L),
         /// pile volume = capacity * V / PackingFraction, tube area A = pi * InnerRadius^2 (1.131 m^2):
-        /// 1000 balls -> 1.150 m^3 / 0.60 = 1.917 m^3 -> 1.695 m of pile + the floor disk top (0.09) = 1.785 m.
+        /// 100 balls at radius 0.35 (area 0.385 m^2): 0.115 m^3 / 0.55 = 0.209 m^3 -> 0.54 m of pile + the floor disk top (0.09) = 0.63 m.
         /// </summary>
         public static float FillHeight(MachineConfig config)
         {
@@ -91,12 +91,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 if (glassMesh == null)
                 {
                     glass = MachineGeometry.MeshObject(tt, "Glass", MachineGeometry.OpenCylinder(InnerRadius, rimY - GlassBottom, 48, true),
-                        "TubeRack_Glass", kit.glass, true, false);
+                        "TubeRack_Glass", kit.tubeGlass, true, false);
                     glassMesh = glass.GetComponent<MeshFilter>().sharedMesh;
                 }
                 else
                 {
-                    glass = SharedMeshObject(tt, "Glass", glassMesh, kit.glass, true);
+                    glass = SharedMeshObject(tt, "Glass", glassMesh, kit.tubeGlass, true);
                 }
 
                 glass.transform.localPosition = new Vector3(0f, GlassBottom, 0f);

@@ -14,7 +14,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
         enum Mode
         {
             Opening,
-            Act1,
+            GateWatch,
             Tour,
             Scripted,
             Finale,
@@ -34,17 +34,35 @@ namespace SimulationLobby.Simulations.MarbleMachine
         [SerializeField] TourCameraRig _rig;
         [SerializeField] Camera _camera;
 
-        [Header("Opening and Act 1")]
-        [Min(1f)] public float openingHoldSeconds = 6f;
-        [Min(0.5f)] public float minStationDwell = 3.5f;
-        [Min(0.5f)] public float afterSorterSeconds = 14f;
+        [Header("Opening")]
+        [Tooltip("Length of the whole opening sequence (zoom out to the full track, zoom in on the silo, orbit it). The gate opens when it ends, so it must equal MachineConfig.holdSeconds.")]
+        [Min(8f)] public float openingSequenceSeconds = 20f;
+        [Tooltip("Pull back from the opening hero shot to a view of the entire track.")]
+        [Min(1f)] public float openingZoomOutSeconds = 5f;
+        [Min(0f)] public float openingWideHoldSeconds = 2f;
+        [Tooltip("Glide from the wide view in to the start of the silo orbit.")]
+        [Min(0.5f)] public float openingGlideInSeconds = 2.5f;
+
+        [Header("Gate shot")]
+        [Tooltip("The camera reaches the front of the gate this long before it opens.")]
+        [Min(0.5f)] public float gateLeadSeconds = 3f;
+        [Tooltip("How long the camera stays on the gate after it opens, before it starts following the lead ball.")]
+        [Min(1f)] public float gateWatchSeconds = 6f;
+        [Tooltip("Camera offset from the gate opening in the silo's frame: x to the side, y up, z out in front of the gate.")]
+        public Vector3 gateCameraOffset = new Vector3(3.2f, 2.6f, 6.5f);
 
         [Header("Tour")]
+        [Tooltip("Seconds spent on each station, in flow order.")]
+        public Vector2 stationDwellSeconds = new Vector2(5f, 10f);
         public Vector2 glideSeconds = new Vector2(2.5f, 4f);
         public Vector2 checkInEvery = new Vector2(45f, 60f);
         [Min(1f)] public float checkInDwell = 6f;
         [Min(1f)] public float leaderCheckInGap = 20f;
         [Min(1)] public int tourSeed = 77;
+        [Tooltip("A tour stop is only entered once its station holds this many balls (random in the range, drawn once per stop).")]
+        public Vector2 minBallsToVisit = new Vector2(100f, 150f);
+        [Tooltip("Safety: if the station never reaches the threshold, move on after this many sim seconds of waiting.")]
+        [Min(5f)] public float maxWaitSeconds = 60f;
 
         [Header("Finale and win")]
         [Min(5f)] public float finaleDollySeconds = 40f;
@@ -53,11 +71,11 @@ namespace SimulationLobby.Simulations.MarbleMachine
 
         [Header("Framing")]
         [Tooltip("Opening: how far the camera pushes in over the hold (1 = no push).")]
-        [Range(0.6f, 1f)] public float openingPushIn = 0.86f;
+        [Range(0.6f, 1f)] public float openingPushIn = 0.93f;
         [Tooltip("Opening: if framing silo + tubes needs more than this multiple of the tubes-only distance, drop the silo to the edge of frame.")]
-        [Min(1f)] public float openingMaxStretch = 1.9f;
+        [Min(1f)] public float openingMaxStretch = 2.8f;
         [Tooltip("Station shots never sit farther than this from their focus, so small balls stay readable.")]
-        [Min(2f)] public float maxStationDistance = 9f;
+        [Min(2f)] public float maxStationDistance = 13f;
         [Tooltip("Flood and mid-run wides frame this many stations from the silo, 3/4 elevated.")]
         [Min(1)] public int midWideStations = 3;
 
@@ -73,22 +91,28 @@ namespace SimulationLobby.Simulations.MarbleMachine
         Vector3 _openLook;
         Vector3 _openEndPos;
         Vector3 _openEndLook;
+        Vector3 _orbitCenter;
+        float _orbitRadius;
+        float _orbitHeight;
+        bool _orbitGlidedIn;
+        bool _waitingForBalls;
+        int _checkInThreshold = -1;
 
         // Recorded from events (FixedUpdate), consumed in Update.
         bool _leaderChanged;
-        bool _firstSortSeen;
         int _wonColour = -1;
 
-        // Act 1.
-        int _act1Index = 1;
         int _sorterIndex = -1;
         int _tubeRackIndex = -1;
         float _lastGlideTime;
         float _currentDwell;
-        float _sorterGlideTime = -1f;
 
         // Tour.
-        readonly List<int> _bag = new List<int>();
+        int _stationCursor = 1;
+        StopKind _pendingStop;
+        MachineStation _pendingStation;
+        int _gateThreshold = -1;
+        float _gateWaitStart;
         float _shotEnd;
         float _lastCheckIn;
         float _nextCheckIn;
@@ -133,7 +157,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
             if (_state != null)
             {
                 _state.LeaderChanged += OnLeaderChanged;
-                _state.BallSorted += OnBallSorted;
                 _state.Won += OnWon;
             }
         }
@@ -143,13 +166,11 @@ namespace SimulationLobby.Simulations.MarbleMachine
             if (_state != null)
             {
                 _state.LeaderChanged -= OnLeaderChanged;
-                _state.BallSorted -= OnBallSorted;
                 _state.Won -= OnWon;
             }
         }
 
         void OnLeaderChanged(int colour) { _leaderChanged = true; }
-        void OnBallSorted(int colour, Vector3 position) { _firstSortSeen = true; }
         void OnWon(int colour) { _wonColour = colour; }
 
         void Update()
@@ -176,15 +197,15 @@ namespace SimulationLobby.Simulations.MarbleMachine
             switch (_mode)
             {
                 case Mode.Opening:
-                    if (now >= openingHoldSeconds)
+                    UpdateOpening(stations, now);
+                    break;
+                case Mode.GateWatch:
+                    if (now >= openingSequenceSeconds + gateWatchSeconds)
                     {
-                        GlideToValve(stations[0], now);
-                        _mode = stations.Count > 1 ? Mode.Act1 : Mode.Tour;
+                        _mode = Mode.Tour;
+                        _shotEnd = now;
                     }
 
-                    break;
-                case Mode.Act1:
-                    UpdateAct1(stations, now);
                     break;
                 case Mode.Tour:
                     UpdateTour(stations, now);
@@ -202,6 +223,50 @@ namespace SimulationLobby.Simulations.MarbleMachine
             }
 
             _leaderChanged = false;
+        }
+
+        /// <summary>Silo orbit: a circle round the storage cylinder at a distance that fits it, starting on the camera side.</summary>
+        void ComputeOrbit(IReadOnlyList<MachineStation> stations)
+        {
+            Bounds b = stations[0] is ISilo silo && silo.StorageBounds.size.sqrMagnitude > 1e-4f ? silo.StorageBounds : stations[0].activityBounds;
+            _orbitCenter = b.center;
+            _orbitRadius = Mathf.Max(8f, FitDistance(Mathf.Max(b.size.x, b.size.z) + 2f, b.size.y + 3f, 1.05f));
+            _orbitHeight = b.center.y + _orbitRadius * 0.3f;
+        }
+
+        Vector3 OrbitPosition(float u)
+        {
+            float a = u * Mathf.PI * 2f;
+            return new Vector3(_orbitCenter.x + Mathf.Sin(a) * _orbitRadius, _orbitHeight, _orbitCenter.z - Mathf.Cos(a) * _orbitRadius);
+        }
+
+        /// <summary>
+        /// Opening: zoom out from the hero shot to the entire track, hold, glide in to the silo, orbit it once, then go to the
+        /// silo exit as the gate opens (the sequence ends when it does).
+        /// </summary>
+        void UpdateOpening(IReadOnlyList<MachineStation> stations, float now)
+        {
+            float glideInAt = openingZoomOutSeconds + openingWideHoldSeconds;
+            float orbitStart = glideInAt + openingGlideInSeconds;
+            float gateAt = openingSequenceSeconds - gateLeadSeconds;
+            if (now >= gateAt)
+            {
+                GlideToGate(stations[0], now);
+                _mode = Mode.GateWatch;
+                return;
+            }
+
+            if (!_orbitGlidedIn && now >= glideInAt)
+            {
+                _orbitGlidedIn = true;
+                _rig.SetDrift(0f, 0f);
+                _rig.GlideTo(OrbitPosition(0f), _orbitCenter, openingGlideInSeconds);
+            }
+            else if (_orbitGlidedIn && now >= orbitStart)
+            {
+                // One full turn, posed every frame so it is smooth and exact; ends where it started, on the camera side.
+                _rig.SnapTo(OrbitPosition((now - orbitStart) / Mathf.Max(0.5f, gateAt - orbitStart)), _orbitCenter);
+            }
         }
 
         void Begin(IReadOnlyList<MachineStation> stations, float now)
@@ -223,7 +288,8 @@ namespace SimulationLobby.Simulations.MarbleMachine
             ComputeWidePose(stations);
             ComputeOpeningPose(stations);
             _rig.SnapTo(_openPos, _openLook);
-            _rig.GlideTo(_openEndPos, _openEndLook, openingHoldSeconds);
+            ComputeOrbit(stations);
+            _rig.GlideTo(_widePos, _wideLook, openingZoomOutSeconds); // zoom out from the hero shot to the entire track
             _rig.SetDrift(0.15f, 0.2f);
 
             if (_sorterIndex < 0)
@@ -263,63 +329,10 @@ namespace SimulationLobby.Simulations.MarbleMachine
             }
 
             _lastHandledPhase = phase;
-            if (phase == MachinePhase.Flood)
-            {
-                StartFlood(now);
-            }
-            else if (phase == MachinePhase.Finale)
+            if (phase == MachinePhase.Finale)
             {
                 StartFinale(now);
             }
-        }
-
-        void StartFlood(float now)
-        {
-            if (_mode == Mode.Finale)
-            {
-                return;
-            }
-
-            IReadOnlyList<MachineStation> stations = _state.Stations;
-            _queue.Clear();
-
-            Bounds half = default;
-            bool any = false;
-            int count = Mathf.Min(midWideStations, stations.Count);
-            for (int i = 0; i < count; i++)
-            {
-                Bounds b = stations[i].activityBounds;
-                if (b.size.sqrMagnitude < 1e-4f)
-                {
-                    continue;
-                }
-
-                if (!any)
-                {
-                    half = b;
-                    any = true;
-                }
-                else
-                {
-                    half.Encapsulate(b);
-                }
-            }
-
-            if (any)
-            {
-                ThreeQuarterPose(half, 1.0f, 0.1f, out Vector3 floodPos, out Vector3 floodLook);
-                _queue.Add(new Shot { position = floodPos, look = floodLook, glide = 3f, dwell = 6f });
-            }
-
-            MachineStation bucket = FindStation("Bucket", 4);
-            MachineStation ski = FindStation("Ski", 5);
-            AddStationShot(bucket);
-            if (ski != bucket)
-            {
-                AddStationShot(ski);
-            }
-
-            StartQueue(Mode.Tour, now);
         }
 
         void StartFinale(float now)
@@ -415,69 +428,22 @@ namespace SimulationLobby.Simulations.MarbleMachine
             _shotEnd = now;
         }
 
-        // Act 1 -----------------------------------------------------------------------------------------------------
+        // Station tour ----------------------------------------------------------------------------------------------
 
-        void UpdateAct1(IReadOnlyList<MachineStation> stations, float now)
+        enum StopKind
         {
-            if (_act1Index <= _sorterIndex)
-            {
-                MachineStation next = stations[_act1Index];
-                float since = now - _lastGlideTime;
-                bool timeout = since >= _currentDwell;
-                bool entered = since >= minStationDwell && BallInside(next.activityBounds);
-                if (entered || timeout)
-                {
-                    GlideToStation(next, now);
-                    if (_act1Index == _sorterIndex)
-                    {
-                        _sorterGlideTime = now;
-                    }
-
-                    _act1Index++;
-                }
-
-                return;
-            }
-
-            // Past the sorter: wait for the first sort (or give up), then show the tubes and hand over to the tour.
-            if (_sorterGlideTime < 0f)
-            {
-                _sorterGlideTime = now;
-            }
-
-            bool sorted = _firstSortSeen && now - _lastGlideTime >= minStationDwell;
-            if (sorted || now - _sorterGlideTime >= afterSorterSeconds)
-            {
-                GlideToTubes(now);
-                _shotEnd = now + checkInDwell;
-                _lastCheckIn = now;
-                _nextCheckIn = now + Range(checkInEvery);
-                _mode = Mode.Tour;
-            }
+            None,
+            Station,
+            FrontView,
+            VortexExit
         }
 
-        bool BallInside(Bounds bounds)
-        {
-            IReadOnlyList<MachineBall> balls = _state.Balls;
-            if (balls == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < balls.Count; i++)
-            {
-                MachineBall ball = balls[i];
-                if (ball != null && !ball.counted && bounds.Contains(ball.transform.position))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // Tour ------------------------------------------------------------------------------------------------------
-
+        /// <summary>
+        /// Visits the stations in flow order: silo exit (gate shot), peg wall, a front view of wall + silo drop, vortex,
+        /// vortex exit, wave floor, then the rest, then the tubes and the lap starts again. A stop is only entered once
+        /// its station holds enough balls (random 100..150 per stop, drawn once, so it never flickers); after
+        /// <see cref="maxWaitSeconds"/> it moves on anyway. Tube check-ins can interrupt it and are never gated.
+        /// </summary>
         void UpdateTour(IReadOnlyList<MachineStation> stations, float now)
         {
             bool leaderWants = _leaderChanged && now - _lastCheckIn >= leaderCheckInGap && _state.LeaderIndex >= 0;
@@ -486,44 +452,178 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 return;
             }
 
-            if (leaderWants || now >= _nextCheckIn)
+            // Work out the next stop without committing to it.
+            StopKind kind = _pendingStop;
+            MachineStation station = _pendingStation;
+            int cursorAfter = _stationCursor;
+            if (kind == StopKind.None)
+            {
+                // Next stop in flow order; the tube rack and the cannon are skipped (the tubes get their own shot at the end of a lap).
+                while (cursorAfter < stations.Count && (cursorAfter == _tubeRackIndex || stations[cursorAfter] is CannonStation))
+                {
+                    cursorAfter++;
+                }
+
+                if (cursorAfter >= stations.Count)
+                {
+                    // End of a lap: show the bins only if they hold something, otherwise just start the next lap.
+                    _stationCursor = 1;
+                    _pendingStop = StopKind.None;
+                    _gateThreshold = -1;
+                    if (TubesReady())
+                    {
+                        GlideToTubes(now);
+                        _shotEnd = now + checkInDwell;
+                        _checkInThreshold = -1;
+                    }
+
+                    return;
+                }
+
+                station = stations[cursorAfter++];
+                kind = StopKind.Station;
+            }
+
+            // Gate: the stop's station must hold enough balls, otherwise stay on the current shot and re-check next frame.
+            MachineStation pegWall = FindStation("peg", 1);
+            MachineStation gateStation = kind == StopKind.FrontView ? pegWall : station;
+            if (_gateThreshold < 0)
+            {
+                _gateThreshold = Mathf.RoundToInt(Range(minBallsToVisit));
+                _gateWaitStart = now;
+            }
+
+            if (CountBallsIn(gateStation.activityBounds) < _gateThreshold && now - _gateWaitStart < maxWaitSeconds)
+            {
+                _waitingForBalls = true;
+                return;
+            }
+
+            _waitingForBalls = false;
+
+            // A tube check-in may only cut away once the next stop is ready, i.e. never while the camera is holding for balls: the gate
+            // is judged first, so a due check-in cannot fire in the frame the dwell ends and drag the camera to the bins.
+            // The bins get the same "never empty" rule as every station: a check-in (timed or on a lead change) only happens once enough
+            // balls have been sorted. Before that the timer simply keeps running and the camera carries on with the stations. This was the
+            // real reason the camera jumped to the sorter and bins around a minute in, while they were still empty.
+            if ((leaderWants || now >= _nextCheckIn) && TubesReady())
             {
                 GlideToTubes(now);
                 _shotEnd = now + checkInDwell;
                 _lastCheckIn = now;
                 _nextCheckIn = now + Range(checkInEvery);
+                _gateWaitStart = now;
+                _checkInThreshold = -1;
                 return;
             }
 
-            if (_bag.Count == 0)
+            // Commit.
+            _gateThreshold = -1;
+            _stationCursor = cursorAfter;
+            _pendingStop = StopKind.None;
+            _pendingStation = null;
+            switch (kind)
             {
-                for (int i = 0; i < stations.Count; i++)
-                {
-                    if (i != _tubeRackIndex)
+                case StopKind.FrontView:
+                    GlideToFrontView(stations, now);
+                    _shotEnd = now + Range(stationDwellSeconds);
+                    break;
+                case StopKind.VortexExit:
+                    GlideToExit(station, now);
+                    _shotEnd = now + Range(stationDwellSeconds);
+                    break;
+                default:
+                    GlideToStation(station, now);
+                    _shotEnd = now + Range(stationDwellSeconds);
+                    if (station is VortexFunnelStation)
                     {
-                        _bag.Add(i);
+                        _pendingStop = StopKind.VortexExit;
+                        _pendingStation = station;
                     }
-                }
+                    else if (station == pegWall)
+                    {
+                        _pendingStop = StopKind.FrontView;
+                        _pendingStation = station;
+                    }
 
-                for (int i = _bag.Count - 1; i > 0; i--)
-                {
-                    int j = _rng.Next(i + 1);
-                    int tmp = _bag[i];
-                    _bag[i] = _bag[j];
-                    _bag[j] = tmp;
-                }
+                    break;
             }
+        }
 
-            if (_bag.Count == 0)
+        /// <summary>True once enough balls have been sorted (a random 100..150, drawn once per check-in) for the bins to be worth showing.</summary>
+        bool TubesReady()
+        {
+            if (_checkInThreshold < 0)
             {
-                return;
+                _checkInThreshold = Mathf.RoundToInt(Range(minBallsToVisit));
             }
 
-            int pick = _bag[_bag.Count - 1];
-            _bag.RemoveAt(_bag.Count - 1);
-            MachineStation station = stations[pick];
-            GlideToStation(station, now);
-            _shotEnd = now + station.tourSeconds;
+            return _state.TotalSorted >= _checkInThreshold;
+        }
+
+        /// <summary>Active balls inside <paramref name="bounds"/>. Read-only; the ball list is the sim's dynamic balls.</summary>
+        int CountBallsIn(Bounds bounds)
+        {
+            IReadOnlyList<MachineBall> balls = _state.Balls;
+            int n = 0;
+            for (int i = 0; i < balls.Count; i++)
+            {
+                MachineBall b = balls[i];
+                if (b != null && !b.counted && bounds.Contains(b.transform.position))
+                {
+                    n++;
+                }
+            }
+
+            return n;
+        }
+
+        /// <summary>
+        /// Front view of the peg wall: the camera stands out in front of the board (on the side its face and glass point to, i.e. ahead
+        /// of the flow), a little to one side and above, looking back at the board and the silo exit behind it, so the balls dropping
+        /// out of the silo and the wall they land on are both in frame.
+        /// </summary>
+        void GlideToFrontView(IReadOnlyList<MachineStation> stations, float now)
+        {
+            MachineStation silo = stations[0];
+            MachineStation peg = FindStation("peg", 1);
+            Bounds region = peg.activityBounds;
+            Vector3 siloExit = silo.exit != null ? silo.exit.position : silo.activityBounds.center;
+            region.Encapsulate(siloExit);
+            region.Encapsulate(siloExit + Vector3.down * 1.5f);
+
+            // Station frame: forward is the flow direction, which the board's face looks toward.
+            Vector3 forward = peg.transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            const float azimuth = 0f; // straight on, not from the side
+            const float elevation = 24f * Mathf.Deg2Rad; // high enough to see the silo exit over the top of the board
+            Vector3 dir = (forward * Mathf.Cos(azimuth) + right * Mathf.Sin(azimuth)) * Mathf.Cos(elevation) + Vector3.up * Mathf.Sin(elevation);
+            float extent = Mathf.Max(region.size.x, region.size.z);
+            float fit = FitDistance(extent + 1f, region.size.y + 1f, 1.05f) + extent * 0.35f;
+            _rig.GlideTo(region.center + dir * fit, region.center, Range(glideSeconds));
+            _rig.SetLookTracking(null);
+            _rig.SetDrift(0.15f, 0.2f);
+            _lastGlideTime = now;
+        }
+
+        /// <summary>
+        /// Stands past the end of a station's exit, a little to one side and above, and faces back along the flow at the exit, so
+        /// the marbles coming off the end of the vortex spiral run toward the camera.
+        /// </summary>
+        void GlideToExit(MachineStation station, float now)
+        {
+            Vector3 exit = station.exit != null ? station.exit.position : station.activityBounds.center;
+            Vector3 forward = station.transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 look = exit - forward * 1.5f + Vector3.up * 0.2f;
+            Vector3 offset = station.transform.rotation * new Vector3(1.5f, 2.2f, 4.5f);
+            _rig.GlideTo(exit + offset, look, Range(glideSeconds));
+            _rig.SetLookTracking(null);
+            _rig.SetDrift(0.15f, 0.2f);
+            _lastGlideTime = now;
         }
 
         // Poses -----------------------------------------------------------------------------------------------------
@@ -532,9 +632,22 @@ namespace SimulationLobby.Simulations.MarbleMachine
         {
             Vector3 focus = station.cameraFocus != null ? station.cameraFocus.position : station.activityBounds.center;
             _rig.GlideTo(focus + LimitOffset(station.cameraOffset), focus, Range(glideSeconds));
+            _rig.SetLookTracking(null);
             _rig.SetDrift(0.2f, 0.25f);
             _lastGlideTime = now;
             _currentDwell = station.tourSeconds;
+        }
+
+        /// <summary>Front of the flood gate, a little to one side and above, so the balls pouring out are in frame.</summary>
+        void GlideToGate(MachineStation silo, float now)
+        {
+            Transform t = silo.transform;
+            Vector3 gate = silo is SiloStation s
+                ? t.TransformPoint(s.plateRestPosition + new Vector3(0f, 0.3f, -0.3f))
+                : silo.exit != null ? silo.exit.position : silo.activityBounds.center;
+            _rig.GlideTo(gate + t.rotation * gateCameraOffset, gate, gateLeadSeconds);
+            _rig.SetDrift(0.1f, 0.25f);
+            _lastGlideTime = now;
         }
 
         /// <summary>Valve opening: glide in on the outlet / star feeder so the first balls dropping are big on screen.</summary>
@@ -543,7 +656,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
             Vector3 focus = station.exit != null ? station.exit.position
                 : station.cameraFocus != null ? station.cameraFocus.position : station.activityBounds.center;
             Vector3 offset = LimitOffset(station.cameraOffset);
-            float dist = Mathf.Clamp(offset.magnitude, 2f, 4.5f);
+            float dist = Mathf.Clamp(offset.magnitude, 3.5f, 7f);
             Vector3 dir = offset.sqrMagnitude > 1e-4f ? offset.normalized : new Vector3(0f, 0.2f, -1f);
             _rig.GlideTo(focus + dir * dist, focus, 3f);
             _rig.SetDrift(0.12f, 0.25f);
@@ -554,6 +667,9 @@ namespace SimulationLobby.Simulations.MarbleMachine
         /// <summary>Caps a station camera offset so balls stay large enough on screen.</summary>
         Vector3 LimitOffset(Vector3 offset)
         {
+            // Never lower than ~27 degrees above the horizontal, so the balls on the track are seen from above.
+            float flat = new Vector2(offset.x, offset.z).magnitude;
+            offset.y = Mathf.Max(offset.y, flat * 0.5f);
             float m = offset.magnitude;
             return m > maxStationDistance ? offset * (maxStationDistance / m) : offset;
         }

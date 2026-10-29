@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6dd0759c67588b4598abe48807e9376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SimulationLobby.Simulations.MarbleMachine::SimulationLobby.Simulations.MarbleMachine.MachineRaceConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 900
+  intent: 'mach-002: 16 numbered marbles loop the marble machine 3 times. Which number
+    crosses the line first? Tune laps so a lap is 70-110 s and the winner lands at
+    5:00-7:00; tune skiJumpGap for 10-20% misses.'
+  ballCount: 16
+  ballRadius: 0.2
+  ballMass: 0.2
+  ballBounciness: 0.25
+  ballFriction: 0.3
+  ballSolverIterations: 6
+  maxBallSpeed: 14
+  colours:
+  - name: 1
+    color: {r: 0.92, g: 0.12, b: 0.14, a: 1}
+  - name: 2
+    color: {r: 0.12, g: 0.42, b: 0.95, a: 1}
+  - name: 3
+    color: {r: 1, g: 0.86, b: 0.1, a: 1}
+  - name: 4
+    color: {r: 0.15, g: 0.78, b: 0.25, a: 1}
+  - name: 5
+    color: {r: 1, g: 0.5, b: 0.05, a: 1}
+  - name: 6
+    color: {r: 0.58, g: 0.22, b: 0.88, a: 1}
+  - name: 7
+    color: {r: 0.1, g: 0.85, b: 0.85, a: 1}
+  - name: 8
+    color: {r: 1, g: 0.38, b: 0.7, a: 1}
+  - name: 9
+    color: {r: 0.55, g: 0.35, b: 0.15, a: 1}
+  - name: 10
+    color: {r: 0.95, g: 0.95, b: 0.95, a: 1}
+  - name: 11
+    color: {r: 0.05, g: 0.05, b: 0.1, a: 1}
+  - name: 12
+    color: {r: 0.6, g: 0.9, b: 0.2, a: 1}
+  - name: 13
+    color: {r: 0.1, g: 0.2, b: 0.55, a: 1}
+  - name: 14
+    color: {r: 0.75, g: 0.1, b: 0.45, a: 1}
+  - name: 15
+    color: {r: 0.98, g: 0.7, b: 0.55, a: 1}
+  - name: 16
+    color: {r: 0.45, g: 0.55, b: 0.6, a: 1}
+  tubeCapacity: 1
+  finaleFraction: 0.85
+  outroSeconds: 14
+  holdSeconds: 6
+  stages:
+  - label: Gate open
+    startSeconds: 20
+    ballsPerSecond: 0
+    flood: 1
+    phase: 3
+  chuteWidth: 1.8
+  bucketWheelRpm: 6
+  screwDegreesPerSecond: 330
+  boosterSurfaceSpeed: 7
+  waveAmplitude: 0.24
+  waveLength: 3
+  waveFrequency: 0.9
+  trapdoorCycleSeconds: 5
+  trapdoorStaggerSeconds: 0.15
+  tipperThreshold: 2
+  skiJumpGap: 1.8
+  pegWallSpinnerDegreesPerSecond: 90
+  sorterLanes: 2
+  singulatorDegreesPerSecond: 270
+  sorterFlapOpenSeconds: 0.1
+  cannonIntervalSeconds: 0.2
+  cannonLaunchAngle: 55
+  cannonJitter: 0.25
+  killPlaneY: -2
+  stallSeconds: 6
+  racerCount: 16
+  laps: 3
+  countdownSeconds: 3
+  gridColumns: 4
+  finaleOnLastLap: 1
+  targetSlopeDegrees: 12
+  screwLiftRise: 15.860903
+  boardRows: 5
+  lapBannerSeconds: 3

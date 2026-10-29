@@ -173,12 +173,8 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 _leaderboard.SetNote(i, ci + " / " + capacity);
             }
 
-            int seconds = Mathf.FloorToInt(_state.SimTime);
-            if (seconds != _lastSecond)
-            {
-                _lastSecond = seconds;
-                _leaderboard.SetTimer((seconds / 60) + ":" + (seconds % 60).ToString("00"));
-            }
+            // No clock on this HUD.
+            _leaderboard.HideTimer();
         }
 
         void UpdateBanners()

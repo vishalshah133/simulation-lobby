@@ -24,14 +24,14 @@ namespace SimulationLobby.Simulations.MarbleMachine
         [Header("Tilt cam (degrees of wheel angle from the bottom, going round; tilts are toward the back wall)")]
         public float scoopTiltDegrees = 6f;
         public float carryTiltDegrees = 25f;
-        public float dumpTiltDegrees = 110f;
+        public float dumpTiltDegrees = 150f;
         public float dumpReturnTiltDegrees = 40f;
         public float scoopStartDeg = -30f;
         public float scoopEndDeg = 10f;
         public float carryFullDeg = 40f;
-        public float dumpStartDeg = 160f;
-        public float dumpRampDegrees = 22f;
-        public float dumpHoldDegrees = 8f;
+        public float dumpStartDeg = 156f;
+        public float dumpRampDegrees = 18f;
+        public float dumpHoldDegrees = 16f;
         public float levelAgainDeg = 240f;
 
         float _phaseDeg, _degPerSecond = 36f;

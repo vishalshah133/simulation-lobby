@@ -55,10 +55,10 @@ namespace SimulationLobby.Simulations.MarbleMachine
     /// Contract file for mach-001: work packages read it, they don't add fields to it.
     /// </summary>
     [CreateAssetMenu(menuName = "Simulation Lobby/Marble Machine Config", fileName = "MachineConfig")]
-    public sealed class MachineConfig : SimulationConfig
+    public class MachineConfig : SimulationConfig
     {
         [Header("Balls")]
-        [Min(10)] public int ballCount = 16800;
+        [Min(10)] public int ballCount = 14000; // 2,000 of each of the 7 colours
         [Min(0.02f)] public float ballRadius = 0.065f;
         [Min(0.001f)] public float ballMass = 0.03f;
         [Range(0f, 1f)] public float ballBounciness = 0.25f;
@@ -81,7 +81,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
 
         [Header("Contest")]
         [Tooltip("Balls a tube needs to win. This is what sets the video's length.")]
-        [Min(1)] public int tubeCapacity = 1000;
+        [Min(1)] public int tubeCapacity = 100;
         [Tooltip("Leader's fill fraction at which the Finale phase starts.")]
         [Range(0.5f, 0.99f)] public float finaleFraction = 0.85f;
         [Tooltip("Seconds the run keeps going after the win, for the payoff and the outro pull-back.")]
@@ -89,32 +89,32 @@ namespace SimulationLobby.Simulations.MarbleMachine
 
         [Header("Flow schedule")]
         [Tooltip("Opening hold: the feeder is off and the scene sits still for the hook.")]
-        [Min(0f)] public float holdSeconds = 6f;
+        [Min(0f)] public float holdSeconds = 20f;
         public ReleaseStage[] stages =
         {
-            new ReleaseStage("Trickle", 6f, 6f, false, MachinePhase.Trickle),
-            new ReleaseStage("Steady", 90f, 13f, false, MachinePhase.Steady),
-            new ReleaseStage("Flood", 330f, 0f, true, MachinePhase.Flood),
-            new ReleaseStage("Steady", 365f, 13f, false, MachinePhase.Steady),
+            new ReleaseStage("Gate open", 20f, 0f, true, MachinePhase.Flood),
         };
 
         [Header("Geometry")]
-        [Tooltip("Width of every connector chute and station entry, metres.")]
-        [Min(0.3f)] public float chuteWidth = 0.9f;
+        [Tooltip("Inner width of the whole track: every connector chute and every station entry and exit port, metres. Station builders scale their lateral sizes by chuteWidth / 0.9.")]
+        [Min(0.3f)] public float chuteWidth = 1.8f;
 
         [Header("Mechanisms")]
         [Min(0.1f)] public float bucketWheelRpm = 6f;
         public float screwDegreesPerSecond = 330f;
-        [Min(0f)] public float waveAmplitude = 0.2f;
-        [Min(0.2f)] public float waveLength = 2f;
-        [Min(0f)] public float waveFrequency = 0.6f;
+        [Tooltip("Speed the boost pads (arrows on the helix entry and the trapdoor chute exit) push balls up to, m/s.")]
+        [Min(0f)] public float boosterSurfaceSpeed = 7f;
+        [Min(0f)] public float waveAmplitude = 0.24f;
+        [Min(0.2f)] public float waveLength = 3f;
+        [Min(0f)] public float waveFrequency = 0.9f;
         [Min(0.5f)] public float trapdoorCycleSeconds = 5f;
         [Min(0f)] public float trapdoorStaggerSeconds = 0.15f;
-        [Min(1)] public int tipperThreshold = 60;
-        [Min(0.2f)] public float skiJumpGap = 1.6f;
+        [Tooltip("Balls in a trough that make it tip. Troughs are twice as wide and twice as long as the original, so about four times the capacity.")]
+        [Min(1)] public int tipperThreshold = 200;
+        [Min(0.2f)] public float skiJumpGap = 0.9f;
         public float pegWallSpinnerDegreesPerSecond = 90f;
-        [Tooltip("Parallel single-file sorter lanes, side by side over the tube row. Throughput is roughly 5 balls/s per lane.")]
-        [Min(1)] public int sorterLanes = 3;
+        [Tooltip("Parallel sorter lanes, side by side over the tube row. Each is four balls wide (the sort is by collision filtering, not single file).")]
+        [Min(1)] public int sorterLanes = 2;
         public float singulatorDegreesPerSecond = 270f;
         [Min(0.05f)] public float sorterFlapOpenSeconds = 0.10f;
         [Min(0.05f)] public float cannonIntervalSeconds = 0.2f;

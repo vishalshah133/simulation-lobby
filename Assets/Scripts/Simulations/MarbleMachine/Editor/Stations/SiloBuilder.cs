@@ -24,25 +24,29 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         const float Radius = 2.0f;
         const float Height = 2.45f;
         const float ConeSlope = 0.7813f; // tan 38 degrees: steeper than 35 so the cone self-empties
-        const float ThroatRadius = 0.40f;
-        const float HousingRadius = 0.46f;
-        const float HousingHalfLength = 0.42f;
-        const float HubRadius = 0.18f;
+        // The outlet system (throat, feeder, flood opening, tray) is 2x the original; the storage cylinder is not, because it is sized
+        // by the 16,800-ball volume rather than by flow.
+        const float ThroatRadius = 0.80f;
+        const float HousingRadius = 0.92f;
+        const float HousingHalfLength = 0.84f;
+        const float HubRadius = 0.36f;
         const float VaneTipGap = 0.02f;
         const int Pockets = 6;
         const float SlotHalfAngle = 60f;
-        const float FloodHalfAngle = 20f;
-        const float FloodInnerRadius = 0.5f;
+        const float FloodHalfAngle = 14f; // ~0.97 m at the rim (was 7 degrees, 0.49 m): the chutes behind it are twice as wide now
+        const float FloodInnerRadius = 0.95f;
         const int ConeSegments = 36;
-        static readonly float[] ConeRings = { 2.0f, 1.6f, 1.25f, 0.95f, 0.7f, 0.5f, 0.4f };
+        static readonly float[] ConeRings = { 2.0f, 1.7f, 1.4f, 1.15f, 0.95f, 0.8f };
 
         // Catch tray under the feeder and the flood opening.
-        const float TrayTiltDegrees = 10f;
-        const float TrayHalf = 0.8f;
-        const float TrayZStart = -0.7f;
-        const float TrayZTaper = 2.1f;
-        const float TrayZEnd = 2.9f;
-        const float TrayWallHeight = 0.7f;
+        const float TrayTiltDegrees = 14f;
+        const float TrayHalf = 1.25f;
+        const float TrayZStart = -1.4f;
+        const float TrayZTaper = 2.2f;
+        const float TrayZEnd = 3.6f;
+        /// <summary>The last stretch of the tray is a standard track port, so the chute that takes it on meets an identical profile.</summary>
+        const float ExitPortLength = 0.7f;
+        const float TrayWallHeight = 1.3f; // tall: the first rush overshoots a low wall
 
         public static SiloStation Build(Transform parent, StationPlacement placement, MachineKit kit, MachineConfig config)
         {
@@ -114,22 +118,22 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 MachineGeometry.Box(housing.transform, "Side Plate", new Vector3(s * (HousingHalfLength + 0.016f), 0f, 0f),
                     Quaternion.identity, new Vector3(0.032f, plateSize, plateSize), kit.castIron);
                 MachineGeometry.Cylinder(housing.transform, "Bearing", new Vector3(s * (HousingHalfLength + 0.06f), 0f, 0f),
-                    Quaternion.Euler(0f, 0f, 90f), 0.1f, 0.06f, kit.brass, false);
+                    Quaternion.Euler(0f, 0f, 90f), 0.2f, 0.06f, kit.brass, false);
             }
 
             // Drive motor on the +X side.
-            MachineGeometry.Cylinder(housing.transform, "Motor", new Vector3(0.80f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f),
-                0.14f, 0.32f, kit.castIron, false);
-            MachineGeometry.Cylinder(housing.transform, "Motor Cap", new Vector3(0.98f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f),
-                0.09f, 0.04f, kit.brass, false);
+            MachineGeometry.Cylinder(housing.transform, "Motor", new Vector3(1.40f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f),
+                0.28f, 0.50f, kit.castIron, false);
+            MachineGeometry.Cylinder(housing.transform, "Motor Cap", new Vector3(1.69f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f),
+                0.18f, 0.08f, kit.brass, false);
 
             // Rotor: kinematic hub with 6 vanes (pocket maths in the class remarks).
             var rotor = MachineGeometry.Group(t, "Star Rotor");
             rotor.transform.localPosition = rotorPos;
             float vaneAxial = HousingHalfLength * 2f - 0.04f;
             MachineGeometry.Cylinder(rotor.transform, "Hub", Vector3.zero, Quaternion.Euler(0f, 0f, 90f), HubRadius, vaneAxial, kit.chrome);
-            MachineGeometry.Cylinder(rotor.transform, "Axle", Vector3.zero, Quaternion.Euler(0f, 0f, 90f), 0.05f, 1.3f, kit.chrome, false);
-            MachineGeometry.Cylinder(rotor.transform, "Gear", new Vector3(0.55f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f), 0.2f, 0.05f,
+            MachineGeometry.Cylinder(rotor.transform, "Axle", Vector3.zero, Quaternion.Euler(0f, 0f, 90f), 0.1f, 2.6f, kit.chrome, false);
+            MachineGeometry.Cylinder(rotor.transform, "Gear", new Vector3(1.1f, 0f, 0f), Quaternion.Euler(0f, 0f, 90f), 0.4f, 0.05f,
                 kit.brass, false);
             float vaneInner = HubRadius - 0.02f;
             float vaneOuter = HousingRadius - VaneTipGap;
@@ -145,23 +149,23 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
             Rigidbody rotorBody = MachineGeometry.MakeKinematic(rotor);
 
-            // Anti-bridging agitator: a slow kinematic bar sweeping the lower cone. Tip 0.7 m from the axis against a cone
-            // radius of 1.10 m at its height: normal gap 0.25 m (3.9 r), so it can't pinch a ball against the wall.
+            // Anti-bridging agitator: a slow kinematic bar sweeping the lower cone. Tip 1.2 m from the axis against a cone
+            // radius of 1.5 m at its height: normal gap 0.3 m (4.6 r), so it can't pinch a ball against the wall.
             float agitatorY = coneBottomY + 0.55f;
             var agitator = MachineGeometry.Group(t, "Agitator");
             agitator.transform.localPosition = new Vector3(0f, agitatorY, 0f);
-            MachineGeometry.Box(agitator.transform, "Agitator Bar", Vector3.zero, Quaternion.identity, new Vector3(1.4f, 0.05f, 0.05f), kit.chrome);
-            MachineGeometry.Cylinder(agitator.transform, "Agitator Hub", Vector3.zero, Quaternion.identity, 0.07f, 0.12f, kit.chrome);
+            MachineGeometry.Box(agitator.transform, "Agitator Bar", Vector3.zero, Quaternion.identity, new Vector3(2.4f, 0.05f, 0.05f), kit.chrome);
+            MachineGeometry.Cylinder(agitator.transform, "Agitator Hub", Vector3.zero, Quaternion.identity, 0.12f, 0.12f, kit.chrome);
             Rigidbody agitatorBody = MachineGeometry.MakeKinematic(agitator);
 
-            // Flood gate: sliding plate under the wedge opening (wedge half width 0.73 m at the rim; plate half width 0.8 m).
-            float plateZ0 = 0.47f, plateZ1 = 2.1f;
+            // Flood gate: sliding plate under the wedge opening (wedge half width 0.25 m at the rim; plate half width 1.15 m).
+            float plateZ0 = 0.94f, plateZ1 = 2.4f;
             var plate = MachineGeometry.Box(t, "Flood Plate", new Vector3(0f, plateTopY - 0.02f, (plateZ0 + plateZ1) * 0.5f),
                 Quaternion.identity, new Vector3(TrayHalf * 2f, 0.04f, plateZ1 - plateZ0), kit.brass);
             Rigidbody plateBody = MachineGeometry.MakeKinematic(plate);
             // Guide rails the plate slides in (decoration).
-            MachineGeometry.Box(t, "Gate Rail", new Vector3(1.3f, plateTopY - 0.07f, (plateZ0 + plateZ1) * 0.5f), Quaternion.identity,
-                new Vector3(3.2f, 0.04f, 0.06f), kit.chrome, false);
+            MachineGeometry.Box(t, "Gate Rail", new Vector3(1.7f, plateTopY - 0.07f, (plateZ0 + plateZ1) * 0.5f), Quaternion.identity,
+                new Vector3(4.4f, 0.04f, 0.06f), kit.chrome, false);
 
             // Catch tray under the feeder and the flood opening, sloping down toward +Z, narrowing to the chute width at the lip.
             float tan = Mathf.Tan(TrayTiltDegrees * Mathf.Deg2Rad);
@@ -178,29 +182,34 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             for (int s = -1; s <= 1; s += 2)
             {
                 MachineGeometry.Box(t, "Tray Wall", trayPoint(s * (TrayHalf + 0.03f), zMid, TrayWallHeight * 0.5f), trayRot,
-                    new Vector3(0.06f, TrayWallHeight, len), kit.brick);
+                    new Vector3(0.06f, TrayWallHeight, len), kit.glass);
             }
 
             MachineGeometry.Box(t, "Tray Back", trayPoint(0f, TrayZStart - 0.03f, TrayWallHeight * 0.5f), trayRot,
-                new Vector3(TrayHalf * 2f + 0.12f, TrayWallHeight, 0.06f), kit.brick);
+                new Vector3(TrayHalf * 2f + 0.12f, TrayWallHeight, 0.06f), kit.glass);
 
             // Guide walls converge from the full tray width to the chute width, so the stream lands in the connector.
-            float exitHalf = config.chuteWidth * 0.5f + 0.02f;
+            float exitHalf = config.chuteWidth * 0.5f + 0.06f; // the glass guide is 0.12 thick, so its inner face lands on the chute's inner face
+            float taperEnd = TrayZEnd - ExitPortLength;
             float dx = TrayHalf - exitHalf;
-            float dz = (TrayZEnd - TrayZTaper) / cos;
+            float dz = (taperEnd - TrayZTaper) / cos;
             float guideLen = Mathf.Sqrt(dx * dx + dz * dz);
             float guideYaw = Mathf.Atan2(dx, dz) * Mathf.Rad2Deg;
             for (int s = -1; s <= 1; s += 2)
             {
-                MachineGeometry.Box(t, "Tray Guide", trayPoint(s * (TrayHalf + exitHalf) * 0.5f, (TrayZTaper + TrayZEnd) * 0.5f, TrayWallHeight * 0.5f),
-                    trayRot * Quaternion.Euler(0f, -s * guideYaw, 0f), new Vector3(0.06f, TrayWallHeight, guideLen), kit.brick);
+                MachineGeometry.Box(t, "Tray Guide", trayPoint(s * (TrayHalf + exitHalf) * 0.5f, (TrayZTaper + taperEnd) * 0.5f, TrayWallHeight * 0.5f),
+                    trayRot * Quaternion.Euler(0f, -s * guideYaw, 0f), new Vector3(0.06f, TrayWallHeight, guideLen), kit.glass);
             }
+
+            // Exit port: the tray's last stretch, swept with the connector's own profile.
+            MachineConnectorBuilder.BuildPort(t, "Exit Port", new[] { new Vector3(0f, trayY(taperEnd), taperEnd), new Vector3(0f, trayY(TrayZEnd), TrayZEnd) },
+                kit, config, TrayWallHeight);
 
             float exitY = trayY(TrayZEnd) + 0.05f;
             var exit = MachineGeometry.Anchor(t, "Exit", new Vector3(0f, exitY, TrayZEnd));
 
             // Tray support columns, each topping out just under the floor at its own z.
-            Vector2[] cols = { new Vector2(-0.78f, -0.6f), new Vector2(0.78f, -0.6f), new Vector2(-0.78f, TrayZEnd - 0.1f), new Vector2(0.78f, TrayZEnd - 0.1f) };
+            Vector2[] cols = { new Vector2(-1.0f, -1.1f), new Vector2(1.0f, -1.1f), new Vector2(-1.0f, TrayZEnd - 0.1f), new Vector2(1.0f, TrayZEnd - 0.1f) };
             for (int i = 0; i < cols.Length; i++)
             {
                 float top = trayY(cols[i].y) - 0.08f;
@@ -213,12 +222,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             station.displayName = "Silo";
             station.entry = MachineGeometry.Anchor(t, "Entry", Vector3.zero);
             station.exit = exit;
-            station.cameraFocus = MachineGeometry.Anchor(t, "Camera Focus", new Vector3(0f, rotorY + 0.6f, 0.3f));
-            station.cameraOffset = placement.Rotation * new Vector3(-5.0f, 1.4f, -5.6f);
+            station.cameraFocus = MachineGeometry.Anchor(t, "Camera Focus", new Vector3(0f, coneBottomY * 0.5f - 0.2f, 0.3f));
+            station.cameraOffset = placement.Rotation * new Vector3(-4.5f, 3.2f, -9.5f);
             station.tourSeconds = 8f;
             float boundsTop = 0.4f, boundsBottom = exitY - 0.6f;
-            station.activityBounds = WorldBounds(t, new Bounds(new Vector3(0f, (boundsTop + boundsBottom) * 0.5f, 0.3f),
-                new Vector3(4.8f, boundsTop - boundsBottom, 5.4f)));
+            station.activityBounds = WorldBounds(t, new Bounds(new Vector3(0f, (boundsTop + boundsBottom) * 0.5f, 0.8f),
+                new Vector3(4.8f, boundsTop - boundsBottom, 6.8f)));
             station.innerRadius = Radius;
             station.storageBottomLocalY = -Height;
             station.coneBottomLocalY = coneBottomY;
@@ -226,7 +235,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             station.coneSlope = ConeSlope;
             station.storageTopLocalY = -0.1f;
             station.pockets = Pockets;
-            station.ballsPerPocket = 20f;
+            station.ballsPerPocket = 120f;
             station.outletLocalY = rotorY - HousingRadius - 0.1f;
             station.rotorBody = rotorBody;
             station.rotorRestPosition = rotor.transform.localPosition;
@@ -237,20 +246,19 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             station.plateBody = plateBody;
             station.plateRestPosition = plate.transform.localPosition;
             station.plateRestRotation = plate.transform.localRotation;
-            station.plateOpenOffset = new Vector3(1.7f, 0f, 0f);
+            station.plateOpenOffset = new Vector3(2.3f, 0f, 0f);
 
             // Tray volume for the flood back-pressure count: starts just past the housing (z 0.5) so pockets don't count.
-            float trayCountZ0 = 0.5f;
+            float trayCountZ0 = 1.0f;
             float trayCountY0 = trayY(TrayZEnd) - 0.1f;
             float trayCountY1 = trayY(trayCountZ0) + TrayWallHeight;
             station.trayLocal = new Bounds(
                 new Vector3(0f, (trayCountY0 + trayCountY1) * 0.5f, (trayCountZ0 + TrayZEnd) * 0.5f),
                 new Vector3(TrayHalf * 2f, trayCountY1 - trayCountY0, TrayZEnd - trayCountZ0));
-            station.trayCapacity = 300;
 
             Debug.Log($"[mach] Silo: cylinder r {Radius:0.00} x {Height:0.00} m, cone {Radius - ThroatRadius:0.00} m of radius down to a " +
                       $"{ThroatRadius * 2f:0.00} m throat ({Mathf.Atan(ConeSlope) * Mathf.Rad2Deg:0} deg), rotor y {rotorY:0.00}, " +
-                      $"exit lip {-exitY:0.00} m below the top (budget 5.5), flood plate top y {plateTopY:0.00}.");
+                      $"exit lip {-exitY:0.00} m below the top, flood plate top y {plateTopY:0.00}.");
             return station;
         }
 
@@ -373,6 +381,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             mesh.SetUVs(0, uvs);
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
+            MachineGeometry.FixDegenerateNormals(mesh);
             mesh.RecalculateBounds();
             return mesh;
         }

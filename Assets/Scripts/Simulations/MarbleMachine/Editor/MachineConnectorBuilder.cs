@@ -11,14 +11,19 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     {
         public const float MinSlopeDegrees = 5f;
         /// <summary>Shortest chute wall height for a ball radius: 5.5 r, never under 0.34 m.</summary>
-        public static float WallHeightFor(float radius) => Mathf.Max(0.34f, radius * 5.5f);
-        public const float MaxSlopeDegrees = 25f;
-        public const float WallThickness = 0.05f;
-        public const float FloorThickness = 0.07f;
+        public static float WallHeightFor(float radius) => Mathf.Max(0.7f, radius * 5.5f);
+        public const float MaxSlopeDegrees = 30f;
+        /// <summary>Walls grow outward from the ball channel, so the inner width is unchanged. A ball at 12 m/s covers 0.12 m per physics step: thin walls let it through.</summary>
+        public const float WallThickness = 0.16f;
+        public const float FloorThickness = 0.16f;
         const float SampleSpacing = 0.25f;
         const float PostSpacing = 2.5f;
+        /// <summary>Station exit anchors sit 5 cm above the lip floor; starting the chute that much lower removes the step a ball would have to climb.</summary>
+        const float StartDip = 0.06f;
+        /// <summary>The chute reaches back under the previous station and forward into the next, so its walls overlap theirs and leave no seam.</summary>
+        const float OverlapBack = 0.35f;
+        const float OverlapForward = 0.25f;
 
-        static int _wallCounter;
 
         /// <summary>Warnings logged by the most recent <see cref="Build"/> calls; the scene builder resets and reads it.</summary>
         public static int WarningCount;
@@ -26,7 +31,6 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         /// <summary>Resets the wall-material alternation and warning count at the start of a scene build.</summary>
         public static void BeginScene()
         {
-            _wallCounter = 0;
             WarningCount = 0;
         }
 
@@ -47,7 +51,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         }
 
         public static GameObject Build(Transform parent, string name, Vector3 from, Vector3 to, MachineKit kit,
-            MachineConfig config, IList<Vector3> via = null)
+            MachineConfig config, IList<Vector3> via = null, float[] boostFractions = null)
         {
             var root = new GameObject(name);
             if (parent != null)
@@ -78,31 +82,59 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
                 float span = Mathf.Max(1e-5f, cumulative[seg] - cumulative[seg - 1]);
                 Vector2 p = Vector2.Lerp(smooth[seg - 1], smooth[seg], Mathf.Clamp01((s - cumulative[seg - 1]) / span));
-                float y = Mathf.Lerp(from.y, to.y, total > 1e-4f ? s / total : 0f);
+                float y = Mathf.Lerp(from.y - StartDip, to.y, total > 1e-4f ? s / total : 0f);
                 centre.Add(root.transform.InverseTransformPoint(new Vector3(p.x, y, p.y)));
+            }
+
+            if (centre.Count >= 2)
+            {
+                Vector3 dirIn = centre[1] - centre[0];
+                dirIn.y = 0f;
+                Vector3 dirOut = centre[centre.Count - 1] - centre[centre.Count - 2];
+                dirOut.y = 0f;
+                // The overlaps carry the chute's own slope on (a flat tail would stall the balls), within a few cm of the stations.
+                float slopeIn = dirIn.sqrMagnitude > 1e-6f ? (centre[1].y - centre[0].y) / dirIn.magnitude : 0f;
+                float slopeOut = dirOut.sqrMagnitude > 1e-6f
+                    ? (centre[centre.Count - 1].y - centre[centre.Count - 2].y) / dirOut.magnitude : 0f;
+                if (dirIn.sqrMagnitude > 1e-6f)
+                {
+                    Vector3 start = centre[0];
+                    centre.Insert(0, start - dirIn.normalized * OverlapBack + Vector3.up * Mathf.Min(-slopeIn * OverlapBack, 0.04f));
+                }
+
+                if (dirOut.sqrMagnitude > 1e-6f)
+                {
+                    Vector3 end = centre[centre.Count - 1];
+                    centre.Add(end + dirOut.normalized * OverlapForward + Vector3.up * Mathf.Max(slopeOut * OverlapForward, -0.04f));
+                }
             }
 
             CheckSlope(name, from, to, total);
 
-            float width = config != null ? config.chuteWidth : 0.9f;
+            float width = config != null ? config.chuteWidth : BaselineWidth;
             float radius = config != null ? config.ballRadius : 0.065f;
             // Flood: dense streams ride up the walls on bends, so walls stand at least 5.5 r (0.36 m at r 0.065).
-            float wallHeight = Mathf.Max(0.34f, radius * 5.5f);
-            string safe = Safe(name);
+            float wallHeight = WallHeightFor(radius);
+            // The chute right under the silo takes the first rush of the whole pile, which overshoots a normal wall.
+            if (name.IndexOf("Silo to", System.StringComparison.OrdinalIgnoreCase) >= 0) wallHeight = Mathf.Max(wallHeight, 1.3f);
+            // Steep runs carry fast balls up the walls on bends: stand them taller.
+            float runSlope = Mathf.Atan2(Mathf.Max(0f, from.y - to.y), Mathf.Max(0.01f, total)) * Mathf.Rad2Deg;
+            if (runSlope > 10f) wallHeight = Mathf.Max(wallHeight, 1.0f);
+            AddChannel(root.transform, "Conn", Safe(name), centre, width, wallHeight, kit, null, null);
 
-            Mesh floorMesh = Sweep(centre, new[]
+            // Speed-boost pads at the given fractions of the run, lying on the floor along the local direction of travel.
+            if (boostFractions != null && config != null && centre.Count > 4)
             {
-                Loop(new Vector2(-width * 0.5f - WallThickness, -FloorThickness), new Vector2(width * 0.5f + WallThickness, 0f))
-            });
-            var floor = MachineGeometry.MeshObject(root.transform, "Floor", floorMesh, $"Conn_{safe}_Floor", kit.asphalt);
-
-            Mesh wallMesh = Sweep(centre, new[]
-            {
-                Loop(new Vector2(-width * 0.5f - WallThickness, 0f), new Vector2(-width * 0.5f, wallHeight)),
-                Loop(new Vector2(width * 0.5f, 0f), new Vector2(width * 0.5f + WallThickness, wallHeight))
-            });
-            Material wallMaterial = (_wallCounter++ % 2 == 0) ? kit.wood : kit.brick;
-            MachineGeometry.MeshObject(root.transform, "Walls", wallMesh, $"Conn_{safe}_Walls", wallMaterial);
+                for (int k = 0; k < boostFractions.Length; k++)
+                {
+                    float fraction = boostFractions[k];
+                    int i = Mathf.Clamp(Mathf.RoundToInt(Mathf.Clamp01(fraction) * (centre.Count - 1)), 2, centre.Count - 3);
+                    Vector3 fwd = (centre[i + 1] - centre[i - 1]).normalized;
+                    Vector3 side = Vector3.Cross(Vector3.up, fwd).normalized;
+                    Vector3 up = Vector3.Cross(fwd, side).normalized;
+                    BoostPadBuilder.Build(root.transform, "Boost Pad " + (k + 1), centre[i], Quaternion.LookRotation(fwd, up), 0.8f, kit, config);
+                }
+            }
 
             // Chrome posts to the studio floor (y = 0), every ~2.5 m of run.
             int posts = Mathf.Max(1, Mathf.FloorToInt(total / PostSpacing));
@@ -110,7 +142,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             {
                 float s = (k + 0.5f) * total / posts;
                 int index = Mathf.Clamp(Mathf.RoundToInt(s / total * (count - 1)), 0, count - 1);
-                Vector3 world = root.transform.TransformPoint(centre[index]);
+                Vector3 world = root.transform.TransformPoint(centre[Mathf.Clamp(index + 1, 0, centre.Count - 1)]);
                 float top = world.y - FloorThickness;
                 if (top < 0.2f)
                 {
@@ -122,6 +154,83 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             }
 
             return root;
+        }
+
+        /// <summary>The chute width the station builders were authored against, before the 2x widening (they scale their lateral sizes by <see cref="WidthScale"/>).</summary>
+        public const float BaselineWidth = 0.9f;
+
+        /// <summary>How much wider the track is than the authored baseline: 2 at <c>chuteWidth</c> 1.8.</summary>
+        public static float WidthScale(MachineConfig config) => config != null ? config.chuteWidth / BaselineWidth : 1f;
+
+        /// <summary>
+        /// A station's own entry or exit stretch, swept with exactly the profile a connector has (width, wall height, wall and floor
+        /// thickness, materials). Points are in <paramref name="parent"/>'s local space and the floor's top surface follows them, so the
+        /// joint with the chute that meets it has no step, no gap and no change of width. Pass <paramref name="bankDegrees"/> (one per
+        /// point, no resampling) for a banked bend, and <paramref name="floorPhysics"/> where the floor must keep its speed.
+        /// </summary>
+        public static GameObject BuildPort(Transform parent, string name, IList<Vector3> centreLocal, MachineKit kit, MachineConfig config,
+            float wallHeight = 0f, IList<float> bankDegrees = null, PhysicsMaterial floorPhysics = null)
+        {
+            var root = new GameObject(name);
+            root.transform.SetParent(parent, false);
+            List<Vector3> centre = bankDegrees == null ? Subdivide(centreLocal) : new List<Vector3>(centreLocal);
+            float wh = wallHeight > 0f ? wallHeight : WallHeightFor(config.ballRadius);
+            AddChannel(root.transform, "Port", Safe(HierarchyName(parent) + "_" + name), centre, config.chuteWidth, wh, kit, bankDegrees, floorPhysics);
+            return root;
+        }
+
+        /// <summary>
+        /// The parent chain as one name, so every port saves its meshes under its own asset name. Two stations both have a group called
+        /// "Hopper" (screw lift and sorter): with the parent's name alone their entry ports overwrote each other's mesh asset and the
+        /// screw lift's port came out empty, which let the balls fall through at the end of its chute.
+        /// </summary>
+        static string HierarchyName(Transform t)
+        {
+            var parts = new List<string>();
+            for (Transform c = t; c != null; c = c.parent)
+            {
+                if (c.name == "Stations" || c.name == "Machine" || c.name == "__probe") continue;
+                parts.Insert(0, c.name);
+            }
+
+            return string.Join("_", parts);
+        }
+
+        /// <summary>Splits each segment into pieces no longer than the sample spacing, keeping every authored vertex.</summary>
+        static List<Vector3> Subdivide(IList<Vector3> pts)
+        {
+            var result = new List<Vector3> { pts[0] };
+            for (int i = 1; i < pts.Count; i++)
+            {
+                int pieces = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(pts[i], pts[i - 1]) / SampleSpacing));
+                for (int k = 1; k <= pieces; k++)
+                {
+                    result.Add(Vector3.Lerp(pts[i - 1], pts[i], k / (float)pieces));
+                }
+            }
+
+            return result;
+        }
+
+        static void AddChannel(Transform root, string prefix, string safe, List<Vector3> centre, float width, float wallHeight, MachineKit kit,
+            IList<float> bank, PhysicsMaterial floorPhysics)
+        {
+            Mesh floorMesh = Sweep(centre, new[]
+            {
+                Loop(new Vector2(-width * 0.5f - WallThickness, -FloorThickness), new Vector2(width * 0.5f + WallThickness, 0f))
+            }, bank);
+            var floor = MachineGeometry.MeshObject(root, "Floor", floorMesh, $"{prefix}_{safe}_Floor", kit.asphalt);
+            if (floorPhysics != null)
+            {
+                floor.GetComponent<MeshCollider>().sharedMaterial = floorPhysics;
+            }
+
+            Mesh wallMesh = Sweep(centre, new[]
+            {
+                Loop(new Vector2(-width * 0.5f - WallThickness, 0f), new Vector2(-width * 0.5f, wallHeight)),
+                Loop(new Vector2(width * 0.5f, 0f), new Vector2(width * 0.5f + WallThickness, wallHeight))
+            }, bank);
+            MachineGeometry.MeshObject(root, "Walls", wallMesh, $"{prefix}_{safe}_Walls", kit.glass);
         }
 
         // ------------------------------------------------------------------ path
@@ -155,8 +264,16 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         }
 
         /// <summary>Chaikin corner cutting that keeps both end points, so the chute still meets the lip and the entry exactly.</summary>
+        /// <summary>When above zero, corners are true arcs of this radius (see <see cref="ChutePath"/>) instead of Chaikin cuts. mach-002 sets it; mach-001 leaves it 0.</summary>
+        public static float FilletRadius = 0f;
+
         static List<Vector2> Smooth(List<Vector2> input)
         {
+            if (FilletRadius > 0f && input.Count >= 3)
+            {
+                return ChutePath.Fillet(input, FilletRadius);
+            }
+
             List<Vector2> pts = input;
             for (int pass = 0; pass < 3 && pts.Count > 2; pass++)
             {
@@ -224,7 +341,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         }
 
         /// <summary>Sweeps closed (side, up) profile loops along the centreline: a thick extruded channel part with outward normals.</summary>
-        static Mesh Sweep(IList<Vector3> centre, IList<Vector2[]> loops)
+        static Mesh Sweep(IList<Vector3> centre, IList<Vector2[]> loops, IList<float> bank = null)
         {
             var verts = new List<Vector3>();
             var normals = new List<Vector3>();
@@ -249,6 +366,11 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 }
 
                 side.Normalize();
+                if (bank != null && i < bank.Count)
+                {
+                    side = Quaternion.AngleAxis(bank[i], fwd) * side;
+                }
+
                 sides[i] = side;
                 ups[i] = Vector3.Cross(fwd, side).normalized;
                 run[i] = i == 0 ? 0f : run[i - 1] + Vector3.Distance(centre[i], centre[i - 1]);

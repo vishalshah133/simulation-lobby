@@ -41,13 +41,29 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             kit.asphalt = EnsureLit("Machine_Asphalt", m => Opaque(m, Color.white, asphalt, 0f, 0.12f));
             kit.terrazzo = EnsureLit("Machine_Terrazzo", m => Opaque(m, Color.white, terrazzo, 0f, 0.55f));
             kit.brick = EnsureLit("Machine_Brick", m => Opaque(m, Color.white, brick, 0f, 0.1f));
-            kit.chrome = EnsureLit("Machine_Chrome", m => Opaque(m, new Color(0.88f, 0.89f, 0.92f), null, 1f, 0.92f));
+            kit.chrome = EnsureLit("Machine_Chrome", m => Opaque(m, new Color(0.88f, 0.89f, 0.92f), null, 1f, 0.8f));
             kit.castIron = EnsureLit("Machine_CastIron", m => Opaque(m, new Color(0.17f, 0.17f, 0.19f), null, 0.6f, 0.35f));
-            kit.copper = EnsureLit("Machine_Copper", m => Opaque(m, new Color(0.85f, 0.46f, 0.30f), null, 1f, 0.7f));
-            kit.brass = EnsureLit("Machine_Brass", m => Opaque(m, new Color(0.86f, 0.68f, 0.30f), null, 1f, 0.65f));
+            kit.copper = EnsureLit("Machine_Copper", m => Opaque(m, new Color(0.85f, 0.46f, 0.30f), null, 1f, 0.55f));
+            kit.brass = EnsureLit("Machine_Brass", m => Opaque(m, new Color(0.86f, 0.68f, 0.30f), null, 1f, 0.5f));
             kit.rubber = EnsureLit("Machine_Rubber", m => Opaque(m, new Color(0.10f, 0.32f, 0.85f), null, 0f, 0.4f));
-            kit.whiteLacquer = EnsureLit("Machine_WhiteLacquer", m => Opaque(m, new Color(0.93f, 0.93f, 0.91f), null, 0f, 0.8f));
+            kit.whiteLacquer = EnsureLit("Machine_WhiteLacquer", m => Opaque(m, new Color(0.93f, 0.93f, 0.91f), null, 0f, 0.5f));
             kit.glass = EnsureLit("Machine_Glass", Glass);
+            kit.tubeGlass = EnsureLit("Machine_TubeGlass", m =>
+            {
+                Glass(m);
+                m.SetColor("_BaseColor", new Color(0.86f, 0.92f, 0.97f, 0.14f));
+                m.SetFloat("_Smoothness", 0.2f);
+                m.SetFloat("_SpecularHighlights", 0f);
+                m.SetFloat("_EnvironmentReflections", 0f);
+                m.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                m.EnableKeyword("_ENVIRONMENTREFLECTIONS_OFF");
+            });
+            kit.satinMetal = EnsureLit("Machine_SatinMetal", m =>
+            {
+                Opaque(m, new Color(0.62f, 0.63f, 0.66f), null, 0.35f, 0.25f);
+                m.SetFloat("_SpecularHighlights", 0f);
+                m.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            });
             kit.mesh = EnsureLit("Machine_Mesh", m =>
             {
                 Opaque(m, Color.white, mesh, 0.7f, 0.5f);
@@ -67,6 +83,14 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 m.enableInstancing = true;
             });
 
+            kit.boostArrow = EnsureLit("Machine_BoostArrow", m =>
+            {
+                Opaque(m, new Color(1f, 0.82f, 0.05f), null, 0f, 0.3f);
+                m.EnableKeyword("_EMISSION");
+                m.SetColor("_EmissionColor", new Color(1f, 0.7f, 0f) * 2.2f);
+                m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+            });
+
             int count = config != null ? config.ColourCount : 0;
             kit.ballMaterials = new Material[count];
             for (int i = 0; i < count; i++)
@@ -75,7 +99,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 string safe = Sanitize(config.colours[i].name);
                 kit.ballMaterials[i] = EnsureLit($"Ball_{i}_{safe}", m =>
                 {
-                    Opaque(m, colour, null, 0f, 0.85f);
+                    Opaque(m, colour, null, 0f, 0.45f); // satin: a glossy ball puts a bright glint on every one of 16,800
                     m.enableInstancing = true;
                 });
             }
@@ -83,6 +107,29 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             kit.ballMesh = BallMesh();
             AssetDatabase.SaveAssets();
             return kit;
+        }
+
+        /// <summary>
+        /// mach-002: one glossy GPU-instanced URP Lit material per racer, saved as <c>Racer_NN.mat</c> (NN = racer number) from the
+        /// config's colours. Updated in place on re-runs, so scene references survive. Separate from the kit's satin ball materials.
+        /// </summary>
+        public static Material[] EnsureRacerMaterials(MachineConfig config, float smoothness = 0.92f)
+        {
+            Directory.CreateDirectory(MaterialFolder);
+            int count = config != null ? config.ColourCount : 0;
+            var result = new Material[count];
+            for (int i = 0; i < count; i++)
+            {
+                Color colour = config.colours[i].color;
+                result[i] = EnsureLit($"Racer_{i + 1:00}", m =>
+                {
+                    Opaque(m, colour, null, 0f, smoothness);
+                    m.enableInstancing = true;
+                });
+            }
+
+            AssetDatabase.SaveAssets();
+            return result;
         }
 
         // ------------------------------------------------------------------ materials
@@ -122,13 +169,13 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         static void Glass(Material m)
         {
             // Transparent URP Lit with premultiplied alpha so the specular survives the low alpha: a visible edge and glints.
-            m.SetColor("_BaseColor", new Color(0.82f, 0.90f, 0.96f, 0.18f));
+            m.SetColor("_BaseColor", new Color(0.82f, 0.90f, 0.96f, 0.2f));
             m.SetTexture("_BaseMap", null);
             m.SetFloat("_Metallic", 0f);
-            m.SetFloat("_Smoothness", 0.95f);
+            m.SetFloat("_Smoothness", 0.55f); // a soft sheen, not a mirror: sharp glints off the key light were the glare
             m.SetFloat("_Surface", 1f);
             m.SetFloat("_Blend", 0f);
-            m.SetFloat("_BlendModePreserveSpecular", 1f);
+            m.SetFloat("_BlendModePreserveSpecular", 0f);
             m.SetFloat("_SrcBlend", (float)BlendMode.One);
             m.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
             m.SetFloat("_SrcBlendAlpha", (float)BlendMode.One);

@@ -17,11 +17,11 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
     /// </remarks>
     public static class SorterBuilder
     {
-        const float HopperTiltDeg = 15f;
+        public const float HopperTiltDegrees = 15f;
         const float SideAngleDeg = 36f;
-        const float LaneSlopeDeg = 4f;
-        const float TubeSpacing = 1.5f;
-        const float FlapLength = 0.26f;
+        const float LaneSlopeDeg = 6f;
+        const float TubeSpacing = 2.0f; // the wider guide funnels (0.9 m radius) must not touch
+        const float FlapLength = 0.7f; // a long window: a ball dropping through it clears the far edge for sure
         const float FloorThickness = 0.05f;
         const float RailHeight = 0.22f;
         const float CageHeight = 0.8f;
@@ -31,9 +31,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         const float WheelTipRadius = 0.28f;
         const float WheelHubRadius = 0.05f;
         const int PaddleCount = 8;
-        const float FunnelHeight = 0.26f;
-        const float FunnelBottomRadius = 0.42f;
-        const float FunnelTopRadius = 0.56f;
+        const float FunnelHeight = 0.55f;
+        const float FunnelBottomRadius = 0.30f; // inside the 0.35 m tube
+        const float FunnelTopRadius = 0.90f; // catches every lane and the whole window
         const float FunnelBelowFloor = 0.09f;
         const float FirstTubeU = 3.2f;
         const float LanePitch = 0.30f;
@@ -51,11 +51,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             float d = 2f * r;
             int n = config.ColourCount;
             int lanes = Mathf.Max(1, config.sorterLanes);
-            float laneW = 1.3f * d;
+            float laneW = 4.5f * d; // 0.585 m: four balls abreast. The colour sort is by collision filtering and needs no single file; five single-file
+            // lanes (0.195 m) passed ~15 balls/s against a machine delivering far more, so the pile stayed in the hopper
             float pitch = Mathf.Max(LanePitch, laneW + d);
             float gap = pitch - laneW;
             float totalHalf = (lanes - 1) * 0.5f * pitch + laneW * 0.5f + OuterRail;
-            float hw = Mathf.Max(config.chuteWidth * 0.5f + 0.2f, totalHalf + 0.15f);
+            float hw = Mathf.Max(config.chuteWidth * 0.5f + 0.06f, totalHalf + 0.15f); // mouth walls are 0.12 thick, so their inner face lands on the chute's
             float convLen = (hw - totalHalf) / Mathf.Tan(SideAngleDeg * Mathf.Deg2Rad);
             float hopperEnd = StraightEnd + convLen;
             float lastCentreU = FirstTubeU + (n - 1) * TubeSpacing;
@@ -71,7 +72,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             var t = root.transform;
             float rootY = t.position.y;
 
-            Quaternion hopperRot = Quaternion.Euler(HopperTiltDeg, 0f, 0f);
+            Quaternion hopperRot = Quaternion.Euler(HopperTiltDegrees, 0f, 0f);
             Quaternion laneRot = Quaternion.Euler(LaneSlopeDeg, 0f, 0f);
             Vector3 p0 = hopperRot * new Vector3(0f, 0f, hopperEnd);
             System.Func<float, float, float, Vector3> lanePos = (x, y, u) => p0 + laneRot * new Vector3(x, y, u);
@@ -80,13 +81,18 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             var hopper = MachineGeometry.Group(t, "Hopper");
             hopper.transform.localRotation = hopperRot;
             var ht = hopper.transform;
+            // Entry port: the track's own profile, lying in the hopper's tilted plane, so the chute that arrives at the same slope is
+            // collinear with it and the balls keep their speed across the joint.
+            MachineConnectorBuilder.BuildPort(ht, "Entry Port", new[] { new Vector3(0f, 0f, -0.9f), new Vector3(0f, 0f, 0.3f) }, kit, config);
             float hopperLen = hopperEnd + 0.1f;
             MachineGeometry.Box(ht, "Hopper Floor", new Vector3(0f, -0.03f, -0.1f + hopperLen * 0.5f), Quaternion.identity,
                 new Vector3(2f * hw + 0.12f, 0.06f, hopperLen), kit.woodDark);
             for (int s = -1; s <= 1; s += 2)
             {
-                Wall(ht, "Mouth Wall", new Vector2(s * hw, -0.1f), new Vector2(s * hw, StraightEnd), HopperWall, 0.04f, kit.wood);
-                Wall(ht, "V Wall", new Vector2(s * hw, StraightEnd), new Vector2(s * totalHalf, hopperEnd), HopperWall, 0.04f, kit.wood);
+                Wall(ht, "Mouth Wall", new Vector2(s * hw, -0.1f), new Vector2(s * hw, StraightEnd), HopperWall, 0.04f, kit.glass);
+                // The glass is thickened to 0.12 about its centre line, so the line ends 0.06 outside the outer rail: its inner face then
+                // lands on the rail's, instead of cutting 0.02 m into the two outer lane mouths (the lane is only 0.195 m wide).
+                Wall(ht, "V Wall", new Vector2(s * hw, StraightEnd), new Vector2(s * (totalHalf + 0.06f), hopperEnd), HopperWall, 0.04f, kit.glass);
             }
 
             // Splitter wedges between lane mouths: a solid ridge, so balls fall to either side and none can rest on top.
@@ -98,12 +104,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 if (wedgeMesh == null)
                 {
                     wedge = MachineGeometry.MeshObject(ht, "Splitter Wedge", WedgeMesh(gap, StraightEnd, hopperEnd, RailHeight),
-                        "Sorter_Wedge", kit.chrome, true, true);
+                        "Sorter_Wedge", kit.satinMetal, true, true);
                     wedgeMesh = wedge.GetComponent<MeshFilter>().sharedMesh;
                 }
                 else
                 {
-                    wedge = SharedMeshObject(ht, "Splitter Wedge", wedgeMesh, kit.chrome);
+                    wedge = SharedMeshObject(ht, "Splitter Wedge", wedgeMesh, kit.satinMetal);
                     var mc = wedge.AddComponent<MeshCollider>();
                     mc.sharedMesh = wedgeMesh;
                     mc.convex = true;
@@ -149,12 +155,36 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
             railX.Add(laneX[lanes - 1] + laneW * 0.5f + OuterRail * 0.5f);
             railW.Add(OuterRail);
+            Mesh ridgeMesh = null;
             for (int k = 0; k < railX.Count; k++)
             {
-                MachineGeometry.Box(lt, "Rail", new Vector3(railX[k], (RailHeight - FloorThickness) * 0.5f, laneLength * 0.5f), Quaternion.identity,
-                    new Vector3(railW[k], RailHeight + FloorThickness, laneLength), k == 0 || k == railX.Count - 1 ? kit.chrome : kit.woodDark);
-                MachineGeometry.Box(lt, "Wheel Cage", new Vector3(railX[k], CageHeight * 0.5f, WheelU + 0.1f), Quaternion.identity,
-                    new Vector3(Mathf.Min(railW[k], 0.05f), CageHeight, 0.95f), kit.chrome);
+                bool outer = k == 0 || k == railX.Count - 1;
+                if (outer)
+                {
+                    MachineGeometry.Box(lt, "Rail", new Vector3(railX[k], (RailHeight - FloorThickness) * 0.5f, laneLength * 0.5f), Quaternion.identity,
+                        new Vector3(railW[k], RailHeight + FloorThickness, laneLength), kit.chrome);
+                    continue;
+                }
+
+                // Dividers are peaked, not flat: a flat top exactly one ball wide let balls perch on it at the lane mouths and stay there.
+                // Shoulders stand 0.12 m (1.8 r) so a ball in the lane is still held, then the sides slope up to the ridge.
+                GameObject ridge;
+                if (ridgeMesh == null)
+                {
+                    ridge = MachineGeometry.MeshObject(lt, "Divider", RidgeMesh(railW[k], laneLength, RailHeight + FloorThickness, 0.12f + FloorThickness),
+                        "Sorter_DividerRidge", kit.woodDark, true, true);
+                    ridgeMesh = ridge.GetComponent<MeshFilter>().sharedMesh;
+                }
+                else
+                {
+                    ridge = SharedMeshObject(lt, "Divider", ridgeMesh, kit.woodDark);
+                    var rc = ridge.AddComponent<MeshCollider>();
+                    rc.sharedMesh = ridgeMesh;
+                    rc.convex = true;
+                    rc.sharedMaterial = MachineGeometry.WallPhysics;
+                }
+
+                ridge.transform.localPosition = new Vector3(railX[k], -FloorThickness, 0f);
             }
 
             // ---- Singulator: one kinematic paddle wheel, a pocket set per lane. ----
@@ -166,17 +196,9 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             var wheelBody = MachineGeometry.MakeKinematic(wheel);
             float padW = laneW - 0.02f;
             float padLen = WheelTipRadius - WheelHubRadius;
-            for (int l = 0; l < lanes; l++)
-            {
-                for (int k = 0; k < PaddleCount; k++)
-                {
-                    Quaternion q = Quaternion.Euler(k * 360f / PaddleCount, 0f, 0f);
-                    Vector3 pp = q * new Vector3(0f, 0f, WheelHubRadius + padLen * 0.5f);
-                    MachineGeometry.Box(wt, "Paddle " + l + "." + k, new Vector3(laneX[l], pp.y, pp.z), q, new Vector3(padW, 0.03f, padLen), kit.copper);
-                }
-
-                MachineGeometry.Cylinder(wt, "Hub", new Vector3(laneX[l], 0f, 0f), Quaternion.Euler(0f, 0f, 90f), WheelHubRadius, padW, kit.brass);
-            }
+            // The paddles and hubs are gone. They metered balls into single file, but the colour sort no longer depends on spacing
+            // (it is done by collision filtering), and a rotating blade right behind the lane mouths was where the pile jammed.
+            // Only the axle and gears remain, as decoration above the lanes with no colliders.
 
             float axleLen = 2f * totalHalf + 0.5f;
             MachineGeometry.Cylinder(wt, "Axle", Vector3.zero, Quaternion.Euler(0f, 0f, 90f), 0.02f, axleLen, kit.chrome, false);
@@ -231,6 +253,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             var hingeLocal = new Vector3[lanes * n];
             var drops = new Transform[n];
             Mesh funnelMesh = null;
+            Mesh neckMesh = null;
             var dropRoot = MachineGeometry.Group(t, "Drop Points");
             for (int i = 0; i < n; i++)
             {
@@ -260,18 +283,55 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 {
                     funnel = MachineGeometry.MeshObject(t, "Guide Funnel",
                         MachineGeometry.Lathe(new[] { new Vector2(FunnelBottomRadius, 0f), new Vector2(FunnelTopRadius, FunnelHeight) }, 40, true),
-                        "Sorter_Funnel", kit.chrome, true, false);
+                        "Sorter_Funnel", kit.glass, true, false);
                     funnelMesh = funnel.GetComponent<MeshFilter>().sharedMesh;
                 }
                 else
                 {
-                    funnel = SharedMeshObject(t, "Guide Funnel", funnelMesh, kit.chrome);
+                    funnel = SharedMeshObject(t, "Guide Funnel", funnelMesh, kit.glass);
                     var mc = funnel.AddComponent<MeshCollider>();
                     mc.sharedMesh = funnelMesh;
                     mc.sharedMaterial = MachineGeometry.WallPhysics;
                 }
 
                 funnel.transform.localPosition = new Vector3(0f, coneTop - FunnelHeight, c.z);
+
+                // Boost zone: a trigger the shape of the funnel (the convex hull of its own mesh) that pushes balls toward the axis and
+                // down as soon as they are inside, so they drop into the bin faster.
+                var zone = new GameObject("Funnel Boost");
+                zone.transform.SetParent(funnel.transform, false);
+                var zoneCollider = zone.AddComponent<MeshCollider>();
+                zoneCollider.sharedMesh = funnelMesh;
+                zoneCollider.convex = true;
+                zoneCollider.isTrigger = true;
+                zone.AddComponent<FunnelBoost>();
+
+                // Neck: the lane slopes, so every funnel but the last hangs well above its tube's rim, and balls leaving the funnel
+                // could bounce out through that gap and land outside the tube. A solid sleeve (a unit-height cylinder stretched to
+                // fit) runs from the funnel's mouth down to 0.12 m inside the glass, and its radius is the funnel's own mouth radius,
+                // which is smaller than the tube's, so it fits inside the tube and closes the gap completely.
+                float neckBottom = TubeRackBuilder.TubeHeight(config) - rootY - 0.12f;
+                float neckTop = coneTop - FunnelHeight + 0.02f;
+                if (neckTop - neckBottom > 0.02f)
+                {
+                    GameObject neck;
+                    if (neckMesh == null)
+                    {
+                        neck = MachineGeometry.MeshObject(t, "Funnel Neck", MachineGeometry.OpenCylinder(FunnelBottomRadius, 1f, 32, true),
+                            "Sorter_FunnelNeck", kit.glass, true, false);
+                        neckMesh = neck.GetComponent<MeshFilter>().sharedMesh;
+                    }
+                    else
+                    {
+                        neck = SharedMeshObject(t, "Funnel Neck", neckMesh, kit.glass);
+                        var nc = neck.AddComponent<MeshCollider>();
+                        nc.sharedMesh = neckMesh;
+                        nc.sharedMaterial = MachineGeometry.WallPhysics;
+                    }
+
+                    neck.transform.localPosition = new Vector3(0f, neckBottom, c.z);
+                    neck.transform.localScale = new Vector3(1f, neckTop - neckBottom, 1f);
+                }
                 drops[i] = MachineGeometry.Anchor(dropRoot.transform, "Drop " + config.colours[i].name, new Vector3(0f, coneTop - FunnelHeight - 0.02f, c.z));
             }
 
@@ -368,14 +428,77 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             var c0 = new Vector3(baseWidth * 0.5f, 0f, z1);
             var r1 = new Vector3(0f, height * 0.25f, z0);
             var r2 = new Vector3(0f, height, z1);
-            var verts = new List<Vector3> { a0, b0, c0, r1, r2 };
-            var tris = new List<int> { 0, 1, 4, 0, 4, 3, 0, 3, 4, 0, 4, 2, 1, 2, 4 };
-            int count = tris.Count;
-            for (int i = 0; i < count; i += 3)
+            // Flat-shaded faces with their own vertices, each wound outward. (The old version welded the vertices and added a
+            // reversed copy of every triangle, so the vertex normals summed to zero and the lit result blew out to a white blob.)
+            var verts = new List<Vector3>();
+            var tris = new List<int>();
+            Vector3 centre = (a0 + b0 + c0 + r1 + r2) * 0.2f;
+            void Face(Vector3 p, Vector3 q, Vector3 r)
             {
-                tris.Add(tris[i]);
-                tris.Add(tris[i + 2]);
-                tris.Add(tris[i + 1]);
+                Vector3 normal = Vector3.Cross(q - p, r - p);
+                if (Vector3.Dot(normal, (p + q + r) / 3f - centre) < 0f)
+                {
+                    Vector3 t = q;
+                    q = r;
+                    r = t;
+                }
+
+                int i = verts.Count;
+                verts.Add(p); verts.Add(q); verts.Add(r);
+                tris.Add(i); tris.Add(i + 1); tris.Add(i + 2);
+            }
+
+            Face(a0, b0, r1); Face(b0, r2, r1);   // left slope
+            Face(a0, r1, c0); Face(c0, r1, r2);   // right slope
+            Face(b0, c0, r2);                     // back
+            Face(a0, c0, b0);                     // underside
+            var mesh = new Mesh();
+            mesh.SetVertices(verts);
+            mesh.SetTriangles(tris, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>
+        /// Divider cross-section extruded along z: vertical sides up to <paramref name="shoulder"/>, then sloping to a ridge at
+        /// <paramref name="height"/>. Bottom at y 0. Convex.
+        /// </summary>
+        static Mesh RidgeMesh(float width, float length, float height, float shoulder)
+        {
+            float h = width * 0.5f;
+            Vector2[] profile = { new Vector2(-h, 0f), new Vector2(h, 0f), new Vector2(h, shoulder), new Vector2(0f, height), new Vector2(-h, shoulder) };
+            var verts = new List<Vector3>();
+            var tris = new List<int>();
+
+            // Flat-shaded side faces (own vertices) and the two end caps, each wound outward.
+            Vector3 centre = new Vector3(0f, height * 0.4f, length * 0.5f);
+            void Face(Vector3 a, Vector3 b, Vector3 c)
+            {
+                if (Vector3.Dot(Vector3.Cross(b - a, c - a), (a + b + c) / 3f - centre) < 0f)
+                {
+                    Vector3 tmp = b;
+                    b = c;
+                    c = tmp;
+                }
+
+                int i = verts.Count;
+                verts.Add(a); verts.Add(b); verts.Add(c);
+                tris.Add(i); tris.Add(i + 1); tris.Add(i + 2);
+            }
+
+            for (int i = 0; i < profile.Length; i++)
+            {
+                Vector2 p = profile[i], q = profile[(i + 1) % profile.Length];
+                Vector3 a0 = new Vector3(p.x, p.y, 0f), b0 = new Vector3(q.x, q.y, 0f), a1 = new Vector3(p.x, p.y, length), b1 = new Vector3(q.x, q.y, length);
+                Face(a0, b0, b1);
+                Face(a0, b1, a1);
+            }
+
+            for (int i = 1; i < profile.Length - 1; i++)
+            {
+                Face(new Vector3(profile[0].x, profile[0].y, 0f), new Vector3(profile[i].x, profile[i].y, 0f), new Vector3(profile[i + 1].x, profile[i + 1].y, 0f));
+                Face(new Vector3(profile[0].x, profile[0].y, length), new Vector3(profile[i].x, profile[i].y, length), new Vector3(profile[i + 1].x, profile[i + 1].y, length));
             }
 
             var mesh = new Mesh();

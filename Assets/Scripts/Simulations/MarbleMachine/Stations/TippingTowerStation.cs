@@ -9,9 +9,11 @@ namespace SimulationLobby.Simulations.MarbleMachine
     /// </summary>
     public sealed class TippingTowerStation : MachineStation
     {
-        const float TipSeconds = 0.35f;
-        const float HoldSeconds = 0.35f;
-        const float ReturnSeconds = 0.45f;
+        // Tip speed is a trade: the trough's back end rises at 0.75 m x angular speed, and 0.35 s launched balls ~6 m/s straight
+        // up, while 1.1 s throttled the flow too much. 0.7 s over an 85 deg tip peaks at ~2.5 m/s: balls ride the floor.
+        const float TipSeconds = 1.2f;
+        const float HoldSeconds = 0.3f;
+        const float ReturnSeconds = 0.9f;
 
         [Tooltip("One kinematic trough per tier, top to bottom. The body sits at the pivot (the pour lip).")]
         public Rigidbody[] bodies;
@@ -26,17 +28,28 @@ namespace SimulationLobby.Simulations.MarbleMachine
         public Vector3 catchCentre = new Vector3(-0.4f, 0.2f, 0f);
         public Vector3 catchHalfExtents = new Vector3(0.38f, 0.2f, 0.33f);
 
+        [Header("Small-pack mode")]
+        [Tooltip("Applies only when the configured threshold is at most this: a trough holding at least one ball for maxWaitSeconds tips anyway, " +
+                 "so a lone racer (or the last one) is never parked forever waiting for company. Above it the tower behaves exactly as in mach-001.")]
+        [Min(1)] public int patientTipMaxThreshold = 4;
+        [Min(0.1f)] public float maxWaitSeconds = 1.5f;
+
         int _threshold = 25;
+        bool _patient;
+        float[] _occupiedSince;   // sim time the trough first held a ball since it last returned, or -1
         int[] _state;          // 0 resting, 1 tipping, 2 holding, 3 returning
         float[] _stateStart;
-        readonly Collider[] _buffer = new Collider[192];
+        readonly Collider[] _buffer = new Collider[512];
 
         public override void Initialize(MachineConfig config, SeededRandom rng)
         {
             _threshold = Mathf.Max(1, config.tipperThreshold);
+            _patient = _threshold <= patientTipMaxThreshold;
             int n = bodies != null ? bodies.Length : 0;
             _state = new int[n];
             _stateStart = new float[n];
+            _occupiedSince = new float[n];
+            for (int i = 0; i < n; i++) _occupiedSince[i] = -1f;
         }
 
         public override void Step(float simTime, float dt)
@@ -50,9 +63,19 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 switch (_state[i])
                 {
                     case 0:
-                        if (Count(i) >= _threshold)
+                        int inside = Count(i);
+                        bool patientTip = false;
+                        if (_patient)
                         {
-                            RaisePulse(transform.TransformPoint(pivotLocal[i]), Count(i) / (_threshold * 2f));
+                            if (inside <= 0) _occupiedSince[i] = -1f;
+                            else if (_occupiedSince[i] < 0f) _occupiedSince[i] = simTime;
+                            else patientTip = simTime - _occupiedSince[i] >= maxWaitSeconds;
+                        }
+
+                        if (inside >= _threshold || patientTip)
+                        {
+                            RaisePulse(transform.TransformPoint(pivotLocal[i]), Mathf.Max(inside, 1) / (_threshold * 2f));
+                            _occupiedSince[i] = -1f;
                             SetState(i, 1, simTime);
                             el = 0f;
                             goto case 1;

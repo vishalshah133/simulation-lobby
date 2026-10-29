@@ -30,29 +30,65 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         const string ConfigPath = ConfigFolder + "/MachineConfig_001.asset";
 
         // Connector geometry: how far the chute runs straight out of a lip and straight into a catch zone.
-        const float LipDrop = 0.12f;
-        const float LipAhead = 0.12f;
-        const float EntryClearance = 0.05f;
-        const float LeadLength = 0.5f;
-        const float ApproachLength = 0.5f;
-        /// <summary>Shallowest connector slope (chutes at r 0.065 roll fine at 5 degrees).</summary>
-        const float TargetSlopeDegrees = 5f;
+        // The track is continuous: a chute starts exactly at the previous station's exit lip (no drop, no gap) and ends exactly at
+        // the next station's entry port (same width, same floor level), so these three are zero. The straights are long enough
+        // that the smoothed bends stay wider than the 2x-wide channel (a bend tighter than half the width folds its inner wall).
+        internal const float LipDrop = 0f;
+        internal const float LipAhead = 0f;
+        internal const float EntryClearance = 0f;
+        internal const float LeadLength = 1.5f;
+        internal const float ApproachLength = 1.5f;
+        /// <summary>The tipping tower takes its stream along a longer straight, so the last bend is well clear of the first trough.</summary>
+        const float TowerApproachLength = 2.8f;
+        /// <summary>The authored offset table was laid out for the 0.9 m track; the 1.8 m track and its bigger stations need more room.</summary>
+        const float OffsetScale = 1.5f;
+
+        /// <summary>
+        /// The ski jump's outlet runs straight on past the recycle cannon (which sits just ahead of the ski jump, on the tower's side of
+        /// the line) before it turns toward the tower; a diagonal from the exit cuts through the cannon's deck, hopper and turret.
+        /// </summary>
+        internal const float SkiLeadLength = 9.5f;
+
+        /// <summary>mach-002 sets this (>= 0) while it builds, to shorten the ski outlet; stays -1 (mach-001 value) otherwise.</summary>
+        internal static float SkiLeadOverride = -1f;
+
+        /// <summary>Straight run out of every station except the ski jump, or -1 for the default. The race sets it longer so corners can have a real radius.</summary>
+        internal static float LeadAllOverride = -1f;
+
+        internal static float LeadFor(string stationName) => stationName == "Ski Jump" ? (SkiLeadOverride >= 0f ? SkiLeadOverride : SkiLeadLength) : (LeadAllOverride > 0f ? LeadAllOverride : LeadLength);
+
+        /// <summary>Straight run into a screw lift's hopper, or -1 for the default. The race sets it long: a short straight leaves a ~90 degree corner of about 0.5 m radius, which folds the inner wall of the 2.1 m wide chute and throws fast racers off.</summary>
+        internal static Dictionary<string, float> ApproachOverrides;
+
+        internal static float ApproachFor(string stationName)
+        {
+            if (ApproachOverrides != null && stationName != null && ApproachOverrides.TryGetValue(stationName, out float over))
+            {
+                return over;
+            }
+
+            return stationName == "Tipping Tower" ? TowerApproachLength : ApproachLength;
+        }
+        /// <summary>Shallowest connector slope. Was 5; 8 lifts the silo several metres and hands every station a faster stream.</summary>
+        const float TargetSlopeDegrees = 8f;
+        /// <summary>The ski jump's outlet is a long run that must hand the first tipper a fast stream.</summary>
+        internal const float SkiOutletSlopeDegrees = 16f;
         /// <summary>Steepest slope the height planner allows between stations before it lifts the next one.</summary>
-        const float MaxPlanSlopeDegrees = 18f;
-        const float MaxSlopeBeforeDogleg = 22f;
-        const float OverlapMargin = 0.6f;
+        internal const float MaxPlanSlopeDegrees = 24f;
+        internal const float MaxSlopeBeforeDogleg = 28f;
+        internal const float OverlapMargin = 0.9f;
 
         /// <summary>Tallest permitted ball-carrying point (the silo top), metres.</summary>
-        const float HeightBudget = 11f;
+        const float HeightBudget = 40f; // steeper connectors and bigger stations lift the whole chain; this only flags runaway growth
         /// <summary>Clear gap between the end of the tube row and the silo wall, so the opening shot holds both.</summary>
         const float SiloGap = 1.6f;
         /// <summary>The cannon deck hangs 2.3 m under its hopper rim (CannonBuilder), so the rim must stay above this.</summary>
-        const float CannonMinRimY = 2.4f;
+        internal const float CannonMinRimY = 2.4f;
 
         /// <summary>The sorter's tube rack hangs off its right-hand side (local +X); the camera is on world -Z, so the sorter heads +X.</summary>
         const float SorterYaw = 90f;
 
-        sealed class Spec
+        internal sealed class Spec
         {
             public string name;
             public float yaw;
@@ -87,7 +123,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         /// </summary>
         static List<Spec> Layout(MachineConfig config)
         {
-            return new List<Spec>
+            var specs = new List<Spec>
             {
                 new Spec { name = "Silo", yaw = 0f, offset = Vector2.zero, minEntryY = 0f, build = (p, pl, k, c) => SiloBuilder.Build(p, pl, k, c) },
                 new Spec { name = "Peg Wall", yaw = 0f, offset = new Vector2(0f, 1.6f), minEntryY = 0.3f, build = (p, pl, k, c) => PegWallBuilder.Build(p, pl, k, c) },
@@ -101,6 +137,13 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 new Spec { name = "Helix Slide", yaw = 90f, offset = new Vector2(2.0f, 0f), minEntryY = 0.3f, build = (p, pl, k, c) => HelixSlideBuilder.Build(p, pl, k, c) },
                 new Spec { name = "Sorter", yaw = SorterYaw, offset = new Vector2(2.2f, 0f), minEntryY = 4f, build = (p, pl, k, c) => SorterBuilder.Build(p, pl, k, c) },
             };
+
+            foreach (Spec spec in specs)
+            {
+                spec.offset *= OffsetScale;
+            }
+
+            return specs;
         }
 
         // ------------------------------------------------------------------ menu
@@ -263,7 +306,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
         // ------------------------------------------------------------------ probes
 
-        struct Probe
+        internal struct Probe
         {
             public Bounds rel;          // renderer bounds relative to the entry anchor (a station standing on the floor reaches y = 0)
             public Vector3 exitOffset;  // exit anchor minus entry anchor
@@ -271,12 +314,14 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             public bool reachesFloor;
             public float activityMinRel; // lowest ball-carrying y relative to the entry anchor (negative = below)
             public float recycleRelY;     // recycle exit y relative to the entry (0 if the station has none)
+            public float entryLift;       // entry anchor y above the placement entry (a station that wants its chute to end higher)
             public Vector2 rackCentreRel; // sorter only: tube row centre (xz) relative to the entry
+            public Vector3 recycleOffset; // recycle exit position minus the entry anchor (zero if the station has none)
         }
 
         const float ProbeHeight = 20f;
 
-        static Probe ProbeStation(Spec spec, MachineKit kit, MachineConfig config, bool isSorter)
+        internal static Probe ProbeStation(Spec spec, MachineKit kit, MachineConfig config, bool isSorter)
         {
             var holder = new GameObject("__probe").transform;
             var placement = new StationPlacement(new Vector3(0f, ProbeHeight, 0f), spec.yaw);
@@ -310,7 +355,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             return probe;
         }
 
-        static Probe Measure(Transform holder, MachineStation station, StationPlacement placement)
+        internal static Probe Measure(Transform holder, MachineStation station, StationPlacement placement)
         {
             Bounds world = RendererBounds(holder);
             var probe = new Probe
@@ -323,6 +368,12 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             if (station.recycleExit != null && station.recycleExit != station.exit)
             {
                 probe.recycleRelY = station.recycleExit.position.y - placement.entry.y;
+                probe.recycleOffset = station.recycleExit.position - placement.entry;
+            }
+
+            if (station.entry != null)
+            {
+                probe.entryLift = station.entry.position.y - placement.entry.y;
             }
 
             if (station.exit != null)
@@ -340,13 +391,13 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             return probe;
         }
 
-        static Vector2 YawDirection(float yaw)
+        internal static Vector2 YawDirection(float yaw)
         {
             float r = yaw * Mathf.Deg2Rad;
             return new Vector2(Mathf.Sin(r), Mathf.Cos(r));
         }
 
-        static Bounds RendererBounds(Transform root)
+        internal static Bounds RendererBounds(Transform root)
         {
             bool any = false;
             var bounds = new Bounds(root.position, Vector3.zero);
@@ -368,7 +419,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
         // ------------------------------------------------------------------ planning
 
-        static Rect Footprint(Probe probe, Vector2 entryXZ, float margin)
+        internal static Rect Footprint(Probe probe, Vector2 entryXZ, float margin)
         {
             Vector2 centre = entryXZ + new Vector2(probe.rel.center.x, probe.rel.center.z);
             Vector2 half = new Vector2(probe.rel.extents.x + margin, probe.rel.extents.z + margin);
@@ -416,7 +467,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             // 5. Close the loop: the left-edge pair (tower, trapdoors) shifts so the trapdoor exit sits 3 m left of and 3.5 m
             //    behind the screw entry. The ski-jump and trapdoor-to-screw connectors absorb the difference.
             Vector2 trapExit = xz[trap] + new Vector2(probes[trap].exitOffset.x, probes[trap].exitOffset.z);
-            Vector2 wanted = xz[screw] + new Vector2(-3.0f, 3.5f);
+            Vector2 wanted = xz[screw] + new Vector2(-4.5f, 5.25f);
             Vector2 shift = wanted - trapExit;
             for (int i = tower; i <= trap; i++)
             {
@@ -449,7 +500,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             return entries;
         }
 
-        static Vector2 PushClear(int i, Vector2 start, Vector2 dir, Vector2[] xz, bool[] placed, Probe[] probes, string name)
+        internal static Vector2 PushClear(int i, Vector2 start, Vector2 dir, Vector2[] xz, bool[] placed, Probe[] probes, string name)
         {
             Vector2 e = start;
             int guard = 0;
@@ -466,7 +517,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             return e;
         }
 
-        static bool OverlapsEarlier(int i, Vector2 entry, Vector2[] xz, bool[] placed, Probe[] probes)
+        internal static bool OverlapsEarlier(int i, Vector2 entry, Vector2[] xz, bool[] placed, Probe[] probes)
         {
             Rect mine = Footprint(probes[i], entry, OverlapMargin * 0.5f);
             for (int j = 0; j < xz.Length; j++)
@@ -482,12 +533,46 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         }
 
         /// <summary>The polyline a chain connector follows (horizontal only): straight out of the lip, a straight run into the catch zone.</summary>
-        static void ChainPath(Vector3 exitPos, Vector2 exitDir, Vector3 entryPos, float entryYaw, out Vector3 from, out Vector3 to, out List<Vector3> via)
+        internal static void ChainPath(Vector3 exitPos, Vector2 exitDir, Vector3 entryPos, float entryYaw, out Vector3 from, out Vector3 to, out List<Vector3> via,
+            float approachLength = ApproachLength, float leadLength = LeadLength)
         {
             Vector2 inDir = YawDirection(entryYaw);
             from = exitPos + new Vector3(exitDir.x, 0f, exitDir.y) * LipAhead + Vector3.down * LipDrop;
-            Vector3 lead = from + new Vector3(exitDir.x, 0f, exitDir.y) * LeadLength;
-            Vector3 approach = entryPos - new Vector3(inDir.x, 0f, inDir.y) * ApproachLength;
+            Vector3 dirOut = new Vector3(exitDir.x, 0f, exitDir.y);
+            Vector3 dirIn = new Vector3(inDir.x, 0f, inDir.y);
+            Vector3 lead = from + dirOut * leadLength;
+            Vector3 approach = entryPos - dirIn * approachLength;
+            if (approachLength > ApproachLength || leadLength > LeadLength)
+            {
+                // Long straights give corners a big radius, but the approach point must still lie AHEAD of the lead point, or the path
+                // doubles back on itself (a hairpin the walls fold at). Shorten the straights, approach first, until they fit.
+                Vector3 chord = entryPos - from;
+                chord.y = 0f;
+                bool fitted = false;
+                for (float a = approachLength; a >= ApproachLength - 0.01f && !fitted; a -= 0.5f)
+                {
+                    for (float l = leadLength; l >= LeadLength - 0.01f && !fitted; l -= 0.5f)
+                    {
+                        Vector3 ap = entryPos - dirIn * a;
+                        Vector3 ld = from + dirOut * l;
+                        Vector3 mid = ap - ld;
+                        mid.y = 0f;
+                        if (Vector3.Dot(mid, chord) > 0f && mid.magnitude > 1.2f)
+                        {
+                            approach = ap;
+                            lead = ld;
+                            fitted = true;
+                        }
+                    }
+                }
+
+                if (!fitted)
+                {
+                    lead = from + dirOut * LeadLength;
+                    approach = entryPos - dirIn * ApproachLength;
+                }
+            }
+
             to = entryPos + Vector3.up * EntryClearance;
             via = new List<Vector3> { lead, approach };
         }
@@ -505,12 +590,21 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             int n = specs.Count;
             float tanMin = Mathf.Tan(TargetSlopeDegrees * Mathf.Deg2Rad);
             float tanMax = Mathf.Tan(MaxPlanSlopeDegrees * Mathf.Deg2Rad);
+            var tanMinOf = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                // The helix hands the sorter its stream: that chute runs at the sorter hopper's own tilt, so it is collinear with the
+                // hopper's entry port and the balls meet no change of slope (and lose no speed) at the joint.
+                tanMinOf[i] = specs[i].name == "Ski Jump" ? Mathf.Tan(SkiOutletSlopeDegrees * Mathf.Deg2Rad)
+                    : specs[i].name == "Helix Slide" ? Mathf.Tan(SorterBuilder.HopperTiltDegrees * Mathf.Deg2Rad) : tanMin;
+            }
+
             var y = new float[n];
             lengths = new float[n];
             floors = new float[n];
             for (int i = 0; i < n; i++)
             {
-                float depth = Mathf.Clamp(-probes[i].activityMinRel, 0f, 3.5f);
+                float depth = Mathf.Clamp(-probes[i].activityMinRel, 0f, 8f);
                 floors[i] = Mathf.Max(specs[i].minEntryY, depth + 0.1f);
                 y[i] = floors[i];
             }
@@ -528,9 +622,10 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             for (int i = 0; i < n - 1; i++)
             {
                 Vector3 exitPos = entries[i] + new Vector3(probes[i].exitOffset.x, 0f, probes[i].exitOffset.z);
-                ChainPath(exitPos, probes[i].exitDir, entries[i + 1], specs[i + 1].yaw, out Vector3 from, out Vector3 to, out List<Vector3> via);
+                ChainPath(exitPos, probes[i].exitDir, entries[i + 1], specs[i + 1].yaw, out Vector3 from, out Vector3 to, out List<Vector3> via,
+                    ApproachFor(specs[i + 1].name), LeadFor(specs[i].name));
                 lengths[i] = MachineConnectorBuilder.HorizontalLength(from, to, via);
-                a[i] = probes[i].exitOffset.y - LipDrop - EntryClearance;
+                a[i] = probes[i].exitOffset.y - LipDrop - EntryClearance - probes[i + 1].entryLift;
             }
 
             for (int iter = 0; iter < 400; iter++)
@@ -538,7 +633,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 bool changed = false;
                 for (int i = 0; i < n - 1; i++)
                 {
-                    float back = y[i + 1] - a[i] + lengths[i] * tanMin;
+                    float back = y[i + 1] - a[i] + lengths[i] * tanMinOf[i];
                     if (back > y[i] + 1e-4f)
                     {
                         y[i] = back;
@@ -567,27 +662,30 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             slopes = new float[n];
             for (int i = 0; i < n - 1; i++)
             {
-                float drop = y[i] + probes[i].exitOffset.y - LipDrop - (y[i + 1] + EntryClearance);
+                float drop = y[i] + probes[i].exitOffset.y - LipDrop - (y[i + 1] + EntryClearance + probes[i + 1].entryLift);
                 slopes[i] = Mathf.Atan2(drop, Mathf.Max(0.01f, lengths[i])) * Mathf.Rad2Deg;
             }
         }
 
         // ------------------------------------------------------------------ connectors
 
-        static void BuildConnector(Transform parent, string name, Transform exit, MachineStation owner, Transform entry, float entryYaw,
+        internal static void BuildConnector(Transform parent, string name, Transform exit, MachineStation owner, Transform entry, float entryYaw,
             MachineKit kit, MachineConfig config)
         {
             Vector3 f = exit.forward;
             Vector2 dir = new Vector2(f.x, f.z);
             dir = dir.sqrMagnitude > 0.25f ? dir.normalized : YawDirection(owner.transform.eulerAngles.y);
-            ChainPath(exit.position, dir, entry.position, entryYaw, out Vector3 from, out Vector3 to, out List<Vector3> via);
+            ChainPath(exit.position, dir, entry.position, entryYaw, out Vector3 from, out Vector3 to, out List<Vector3> via,
+                ApproachFor(entry.GetComponentInParent<MachineStation>() != null ? entry.GetComponentInParent<MachineStation>().displayName : (entry.parent != null ? entry.parent.name : string.Empty)), LeadFor(owner != null ? owner.displayName : string.Empty));
             Lengthen(from, to, via, config);
-            MachineConnectorBuilder.Build(parent, name, from, to, kit, config, via);
+            // The long straight out of the ski jump gets three speed-boost pads.
+            float[] boosts = name.IndexOf("Ski Jump to Tipping Tower", System.StringComparison.OrdinalIgnoreCase) >= 0 ? new[] { 0.10f, 0.20f, 0.30f } : null;
+            MachineConnectorBuilder.Build(parent, name, from, to, kit, config, via, boosts);
             _connectorTracks.Add(new ConnectorTrack { name = name, from = from, to = to, via = via, owner = owner });
         }
 
         /// <summary>If the drop is steep for the run, add an S-bend (a dog-leg) so the slope stays under the limit.</summary>
-        static void Lengthen(Vector3 from, Vector3 to, List<Vector3> via, MachineConfig config)
+        internal static void Lengthen(Vector3 from, Vector3 to, List<Vector3> via, MachineConfig config)
         {
             for (int tries = 0; tries < 6; tries++)
             {
@@ -604,13 +702,13 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 Vector3 along = b - a;
                 along.y = 0f;
                 Vector3 side = along.sqrMagnitude < 1e-4f ? Vector3.right : Vector3.Cross(Vector3.up, along.normalized);
-                float amp = 1.6f * (1 + tries / 2) * (tries % 2 == 0 ? 1f : -1f);
+                float amp = 3.2f * (1 + tries / 2) * (tries % 2 == 0 ? 1f : -1f);
                 via.Insert(1, mid + side * amp);
                 via.Insert(2, mid - side * amp);
             }
         }
 
-        struct ConnectorTrack
+        internal struct ConnectorTrack
         {
             public string name;
             public Vector3 from;
@@ -619,7 +717,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             public MachineStation owner;
         }
 
-        static readonly List<ConnectorTrack> _connectorTracks = new List<ConnectorTrack>();
+        internal static readonly List<ConnectorTrack> _connectorTracks = new List<ConnectorTrack>();
 
         // ------------------------------------------------------------------ cannon
 
@@ -644,10 +742,10 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                 side = -side;
             }
 
-            const float run = 3.2f;
+            const float run = 4.5f;
             float tan = Mathf.Tan(TargetSlopeDegrees * Mathf.Deg2Rad);
             Vector2 exitXZ = new Vector2(feeder.position.x, feeder.position.z);
-            Vector2 cannonXZ = exitXZ + outDir * run + side * 0.8f;
+            Vector2 cannonXZ = exitXZ + outDir * run + side * 1.2f;
             float rimY = feeder.position.y - LipDrop - run * tan - EntryClearance;
             if (rimY < CannonMinRimY)
             {
@@ -687,7 +785,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
 
         // ------------------------------------------------------------------ camera + HUD
 
-        static void PlaceEstablishingShot(Camera cam, TourCameraRig rig, Bounds b)
+        internal static void PlaceEstablishingShot(Camera cam, TourCameraRig rig, Bounds b)
         {
             float vHalf = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
             float hHalf = Mathf.Atan(Mathf.Tan(vHalf) * (16f / 9f));
@@ -700,7 +798,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             rig.SnapTo(position, look);
         }
 
-        static void MoveBoardToRight(LeaderboardHud hud)
+        internal static void MoveBoardToRight(LeaderboardHud hud)
         {
             Transform board = hud.transform.Find("Board");
             if (board == null)
@@ -735,7 +833,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
         {
             config.fixedTimestep = 1f / 100f;
             config.maxDurationSeconds = 900f;
-            config.intent = "mach-001: 16,800 balls in 7 colours through a marble machine into a colour sorter. " +
+            config.intent = "mach-001: 14,000 balls (2,000 of each of 7 colours) through a marble machine into a colour sorter. " +
                             "Which colour fills its tube first? Tune tubeCapacity for a winner at 10:00-10:45.";
         }
 
@@ -792,7 +890,7 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
             }
         }
 
-        static bool PolylineEntersBounds(ConnectorTrack c, Bounds bounds)
+        internal static bool PolylineEntersBounds(ConnectorTrack c, Bounds bounds)
         {
             // Skip the two stations the chute joins: it starts and ends inside their catch zones.
             bool startsHere = (c.from - bounds.ClosestPoint(c.from)).sqrMagnitude < 4f;
@@ -882,6 +980,6 @@ namespace SimulationLobby.Simulations.MarbleMachine.EditorTools
                       $"silo entry y {entries[0].y:0.0}.");
         }
 
-        static string Fmt(Vector3 v) => $"({v.x:0.0}, {v.y:0.0}, {v.z:0.0})";
+        internal static string Fmt(Vector3 v) => $"({v.x:0.0}, {v.y:0.0}, {v.z:0.0})";
     }
 }

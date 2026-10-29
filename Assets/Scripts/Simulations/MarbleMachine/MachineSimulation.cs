@@ -35,6 +35,18 @@ namespace SimulationLobby.Simulations.MarbleMachine
         public Material[] ballMaterials;
 
         [Header("Performance")]
+        [Tooltip("Every ball is a real rigidbody from frame one (asleep until the pile is disturbed). Slow in real time, so render offline " +
+                 "at a fixed timestep. Off: only Active Silo Target balls are physical and the rest is a frozen picture woken in chunks.")]
+        public bool simulateAllBalls = true;
+        [Tooltip("All-balls mode: the pile is held rigid (kinematic) until the gate opens, then released from the bottom up at this " +
+                 "speed, m/s. A fully live 29-layer pile compresses and sprays balls out of the silo; a rising front doesn't.")]
+        [Min(0.05f)] public float pileReleaseSpeed = 0.35f;
+        [Tooltip("Moving balls cast shadows onto the track. Thousands of casters through a high-resolution soft shadow map are a " +
+                 "big cost; turn on for final renders.")]
+        public bool castBallShadows = false;
+        [Tooltip("Most physics steps run in one frame. When the machine is too heavy for real time the video slows down smoothly " +
+                 "instead of stuttering through a burst of catch-up steps.")]
+        [Range(1, 8)] public int maxStepsPerFrame = 3;
         [Tooltip("Dynamic balls kept in the silo and cone. The rest of the starting stack is frozen and woken a chunk at a time.")]
         [Min(50)] public int activeSiloTarget = 350;
         [Tooltip("Hard cap on moving balls: no new balls wake above it, and the flood gate eases shut as it nears.")]
@@ -45,6 +57,12 @@ namespace SimulationLobby.Simulations.MarbleMachine
         [Min(0.1f)] public float stackLowerSpeed = 0.4f;
         [Tooltip("Mass-normalised sleep energy for balls. 0.01 is about 0.14 m/s: queued balls sleep, rolling ones don't.")]
         [Min(0f)] public float ballSleepThreshold = 0.01f;
+
+        // Balls still packed in the silo are kept cheap (low-poly, no shadow, discrete collision, no interpolation, checked
+        // every PileStride ticks) until the first tick they are seen outside it.
+        const int PileStride = 8;
+        int _releaseCursor;
+        float _releaseFront;
 
         const float StallSpeedSqr = 0.02f * 0.02f;
         const int StallStride = 10;
@@ -80,8 +98,18 @@ namespace SimulationLobby.Simulations.MarbleMachine
         int[] _colourOf;
         MachineBall[] _ballOf;
         MeshRenderer[] _rendererOf;
+        SphereCollider[] _colliderOf;
+        int _colliderCursor;
+        float _restoreMaxDelta = -1f;
+        const int PileColliderMargin = 4;
         float[] _slowSince;
         bool[] _outPassed;
+        bool[] _inPile;
+        int[] _lossByStation;
+        int[] _stuckByStation;
+        float _nextLossReport;
+        Mesh _lowMesh;
+        bool _swapMesh;
         float _visualScale;
         PhysicsMaterial _ballPhysics;
 
@@ -198,6 +226,9 @@ namespace SimulationLobby.Simulations.MarbleMachine
             _rng = new SeededRandom(seed);
             _recorder = new RunRecorder(FormatSlug, seed, config, _rng);
 
+            if (_restoreMaxDelta < 0f) _restoreMaxDelta = Time.maximumDeltaTime;
+            Time.maximumDeltaTime = Mathf.Max(0.02f, config.fixedTimestep * maxStepsPerFrame);
+
             if (_config == null)
             {
                 Debug.LogError("[MachineSimulation] Config is not a MachineConfig.", this);
@@ -308,6 +339,8 @@ namespace SimulationLobby.Simulations.MarbleMachine
 
             ProcessBalls();
             SettleCounted();
+            ReleasePile(fixedDelta);
+            ReportDiagnostics();
             UpdateStack(fixedDelta);
             UpdateFeedTrim();
             UpdateContest();
@@ -320,6 +353,11 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 IsComplete = true;
                 _recorder.Finish(CompletionReason.Finished);
             }
+        }
+
+        void OnDestroy()
+        {
+            if (_restoreMaxDelta > 0f) Time.maximumDeltaTime = _restoreMaxDelta;
         }
 
         /// <summary>Draws the frozen stack and the settled tube balls (instanced; presentation only).</summary>
@@ -464,6 +502,16 @@ namespace SimulationLobby.Simulations.MarbleMachine
             var settledCap = new int[colours];
             for (int c = 0; c < colours; c++) settledCap[c] = Mathf.Max(64, _config.tubeCapacity);
             Mesh lowMesh = ballMeshLow != null ? ballMeshLow : BuildLowPolyBall();
+            _lowMesh = lowMesh;
+            // Swapping meshes keeps the sphere collider (it scales with the transform), so only do it when both meshes are the same size.
+            float lowR = Mathf.Max(lowMesh.bounds.extents.x, lowMesh.bounds.extents.y, lowMesh.bounds.extents.z);
+            _swapMesh = Mathf.Abs(lowR - meshRadius) < 0.01f * meshRadius;
+            _inPile = new bool[placed];
+            _lossByStation = null;
+            _stuckByStation = null;
+            _releaseCursor = 0;
+            _releaseFront = float.NegativeInfinity;
+            _nextLossReport = 0f;
             var drawBounds = new Bounds(centre, new Vector3(400f, 400f, 400f));
             _frozenSlot = new int[placed];
             _frozen = new BallBatch(colours, frozenCap, lowMesh, ballMaterials, _frozenSlot, drawBounds, ShadowCastingMode.Off);
@@ -475,6 +523,8 @@ namespace SimulationLobby.Simulations.MarbleMachine
             _riderCursor = 0;
             _ballOf = new MachineBall[placed];
             _rendererOf = new MeshRenderer[placed];
+            _colliderOf = new SphereCollider[placed];
+            _colliderCursor = 0;
             _slowSince = new float[placed];
             _outPassed = new bool[placed];
             _activeIndex = new int[placed];
@@ -482,27 +532,162 @@ namespace SimulationLobby.Simulations.MarbleMachine
             _settleCursor = 0;
 
             // Only the bottom of the stack is dynamic; the rest is a frozen instanced block woken from the bottom up.
-            int dynamicBalls = Mathf.Min(placed, activeSiloTarget);
+            int dynamicBalls = simulateAllBalls ? placed : Mathf.Min(placed, activeSiloTarget);
             _latticeCursor = 0;
             for (int i = 0; i < placed; i++) _slowSince[i] = -1f;
             for (int i = 0; i < dynamicBalls; i++)
             {
                 MachineBall b = CreateBall(i, positions[i]);
                 AddActive(b);
+                // The lattice is in static equilibrium: start asleep so the hold costs nothing, and the pile wakes by contact.
+                if (simulateAllBalls) MakePileBall(b);
             }
 
             _latticeCursor = dynamicBalls;
             Vector3 lowExt = lowMesh.bounds.extents;
             Vector3 scale3 = Vector3.one * (r / Mathf.Max(0.001f, lowExt.x, lowExt.y, lowExt.z));
-            for (int i = dynamicBalls; i < placed; i++)
+            // In all-balls mode the pile is drawn from the instanced batch too (a handful of draw calls instead of 16,800
+            // renderers); a ball gets its own renderer back the moment it is released.
+            for (int i = simulateAllBalls ? 0 : dynamicBalls; i < placed; i++)
             {
                 _frozenSlot[i] = _frozen.Add(_colourOf[i], i, Matrix4x4.TRS(positions[i], Quaternion.identity, scale3));
             }
+
+            if (simulateAllBalls) EnablePileColliders(PileColliderMargin);
 
             _siloActive = dynamicBalls;
             _stackOffset = _appliedOffset = 0f;
             _nextWake = 0f;
             CreateCap(r);
+        }
+
+        /// <summary>Index of the station whose activity bounds are closest to the point.</summary>
+        int NearestStation(Vector3 at, out float distance)
+        {
+            int nearest = 0;
+            float best = float.MaxValue;
+            for (int i = 0; i < stations.Count; i++)
+            {
+                if (stations[i] == null) continue;
+                float d = stations[i].activityBounds.SqrDistance(at);
+                if (d < best)
+                {
+                    best = d;
+                    nearest = i;
+                }
+            }
+
+            distance = Mathf.Sqrt(best);
+            return nearest;
+        }
+
+        /// <summary>Diagnostics: where balls leave the machine. Logs the first few falls; <see cref="ReportDiagnostics"/> tallies.</summary>
+        void LogLoss(Vector3 at)
+        {
+            int nearest = NearestStation(at, out float away);
+            if (_lossByStation == null || _lossByStation.Length != stations.Count) _lossByStation = new int[stations.Count];
+            _lossByStation[nearest]++;
+            if (_lost <= 25)
+            {
+                Debug.Log($"[mach] ball fell off near '{stations[nearest].displayName}' ({away:0.0} m from its bounds) at {at} t={_simTime:0.0}s");
+            }
+        }
+
+        void CountStuck(Vector3 at)
+        {
+            int nearest = NearestStation(at, out _);
+            if (_stuckByStation == null || _stuckByStation.Length != stations.Count) _stuckByStation = new int[stations.Count];
+            _stuckByStation[nearest]++;
+        }
+
+        /// <summary>Every 30 s of sim time: throughput, falls and stuck-ball nudges, each by nearest station.</summary>
+        void ReportDiagnostics()
+        {
+            if (_simTime < _nextLossReport) return;
+            _nextLossReport = _simTime + 30f;
+            var sb = new System.Text.StringBuilder($"[mach] t={_simTime:0}s sorted={_totalSorted} active={_active.Count} lost={_lost} nudged={_nudges}");
+            AppendTally(sb, " | fell off:", _lossByStation);
+            AppendTally(sb, " | stuck (nudged):", _stuckByStation);
+            Debug.Log(sb.ToString());
+        }
+
+        void AppendTally(System.Text.StringBuilder sb, string label, int[] tally)
+        {
+            sb.Append(label);
+            if (tally == null) return;
+            for (int i = 0; i < tally.Length && i < stations.Count; i++)
+            {
+                if (tally[i] > 0) sb.Append($" {stations[i].displayName}={tally[i]}");
+            }
+        }
+
+        void MakePileBall(MachineBall b)
+        {
+            _inPile[b.id] = true;
+            Rigidbody rb = b.body;
+            rb.isKinematic = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            rb.interpolation = RigidbodyInterpolation.None;
+            MeshRenderer mr = _rendererOf[b.id];
+            mr.shadowCastingMode = ShadowCastingMode.Off;
+            if (_swapMesh) mr.GetComponent<MeshFilter>().sharedMesh = _lowMesh;
+            mr.enabled = false;
+            _colliderOf[b.id].enabled = false;
+        }
+
+        /// <summary>A kinematic ball never moves, so only the layers near the release front need colliders at all.</summary>
+        void EnablePileColliders(int layersAhead)
+        {
+            int upTo = Mathf.Min(_layerCount, _releaseCursor + layersAhead);
+            while (_colliderCursor < upTo)
+            {
+                for (int id = _layerStart[_colliderCursor]; id < _layerStart[_colliderCursor + 1]; id++)
+                {
+                    if (_colliderOf[id] != null) _colliderOf[id].enabled = true;
+                }
+
+                _colliderCursor++;
+            }
+        }
+
+        /// <summary>Once the gate is open, frees the pile layer by layer from the bottom up (see <see cref="pileReleaseSpeed"/>).</summary>
+        void ReleasePile(float dt)
+        {
+            if (!simulateAllBalls || _releaseCursor >= _layerCount || _appliedFlood != 1) return;
+            if (float.IsNegativeInfinity(_releaseFront)) _releaseFront = _layerY[0];
+            _releaseFront += pileReleaseSpeed * dt;
+            while (_releaseCursor < _layerCount && _layerY[_releaseCursor] <= _releaseFront)
+            {
+                for (int id = _layerStart[_releaseCursor]; id < _layerStart[_releaseCursor + 1]; id++)
+                {
+                    MachineBall b = _ballOf[id];
+                    if (b == null || !_inPile[id]) continue;
+                    Rigidbody rb = b.body;
+                    rb.isKinematic = false;
+                    rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                    rb.linearVelocity = Vector3.zero;
+                    b.lastMovingTime = _simTime;
+                    _frozen.Remove(b.colour, _frozenSlot[id]);
+                    _rendererOf[id].enabled = true;
+                }
+
+                _releaseCursor++;
+            }
+
+            EnablePileColliders(PileColliderMargin);
+        }
+
+        void ReleaseFromPile(MachineBall b)
+        {
+            _inPile[b.id] = false;
+            Rigidbody rb = b.body;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.solverIterations = _config.ballSolverIterations;
+            MeshRenderer mr = _rendererOf[b.id];
+            mr.shadowCastingMode = castBallShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+            if (_swapMesh) mr.GetComponent<MeshFilter>().sharedMesh = ballMesh;
+            b.lastMovingTime = _simTime;
         }
 
         MachineBall CreateBall(int id, Vector3 position)
@@ -515,10 +700,12 @@ namespace SimulationLobby.Simulations.MarbleMachine
             go.AddComponent<MeshFilter>().sharedMesh = ballMesh;
             var renderer = go.AddComponent<MeshRenderer>();
             renderer.sharedMaterial = ballMaterials[_colourOf[id]];
+            if (!castBallShadows) renderer.shadowCastingMode = ShadowCastingMode.Off;
 
             var col = go.AddComponent<SphereCollider>();
             col.radius = Mathf.Max(0.001f, ballMesh.bounds.extents.x, ballMesh.bounds.extents.y, ballMesh.bounds.extents.z);
             col.sharedMaterial = _ballPhysics;
+            _colliderOf[id] = col;
 
             var rb = go.AddComponent<Rigidbody>();
             rb.mass = _config.ballMass;
@@ -668,16 +855,23 @@ namespace SimulationLobby.Simulations.MarbleMachine
             float outletBottom = _outletY - 0.6f;
             Vector3 axis = silo.transform.position;
             int siloCount = 0;
-            int trayCount = 0;
 
             for (int a = 0; a < _active.Count;)
             {
                 MachineBall b = _active[a];
+                if (_inPile[b.id] && ((b.id + _tick) % PileStride) != 0)
+                {
+                    siloCount++;
+                    a++;
+                    continue;
+                }
+
                 Rigidbody rb = b.body;
                 Vector3 p = rb.position;
 
                 if (p.y < killY)
                 {
+                    Vector3 lostAt = p;
                     Vector3 drop = hopper + new Vector3(_dropRng.NextFloat(-0.4f, 0.4f), _dropRng.NextFloat(0f, 0.3f),
                         _dropRng.NextFloat(-0.4f, 0.4f));
                     rb.position = drop;
@@ -688,6 +882,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
                     _outPassed[b.id] = false;
                     _slowSince[b.id] = -1f;
                     _lost++;
+                    LogLoss(lostAt);
                     a++;
                     continue;
                 }
@@ -719,6 +914,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 }
 
                 bool inSilo = _siloZone.Contains(p);
+                if (!inSilo && _inPile[b.id]) ReleaseFromPile(b);
                 if (inSilo)
                 {
                     siloCount++;
@@ -735,7 +931,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
                     }
                 }
 
-                if (_trayBounds.Contains(p)) trayCount++;
 
                 if (hold)
                 {
@@ -784,6 +979,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
                             rb.AddForce(kick, ForceMode.VelocityChange);
                             b.lastMovingTime = _simTime;
                             _nudges++;
+                            CountStuck(p);
                         }
                     }
                 }
@@ -792,7 +988,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
             }
 
             _siloActive = siloCount;
-            silo.ReportLoad(trayCount, _active.Count, maxActiveBalls);
         }
 
         bool OnLid(Vector3 p)

@@ -5,7 +5,7 @@ namespace SimulationLobby.Simulations.MarbleMachine
 {
     /// <summary>
     /// The silo: a glass cylinder over a terrazzo cone. A star feeder (rotary valve) meters balls out under the
-    /// outlet and a sliding flood gate dumps everything at once. Entry is the open top; the exit is the tray lip
+    /// outlet and a sliding gate opens once and the balls simply roll out. Entry is the open top; the exit is the tray lip
     /// far below. All motion is posed from sim time (rotor angle integrated in <see cref="Step"/>).
     /// </summary>
     /// <remarks>
@@ -57,11 +57,9 @@ namespace SimulationLobby.Simulations.MarbleMachine
         public Vector3 plateOpenOffset = new Vector3(1.7f, 0f, 0f);
         [Min(0.1f)] public float floodSlideSeconds = 0.6f;
 
-        [Header("Tray (flood back-pressure)")]
-        [Tooltip("Local box over the catch tray, clear of the feeder housing. Balls inside count as queued.")]
+        [Header("Tray")]
+        [Tooltip("Local box over the catch tray, clear of the feeder housing. The simulation treats balls inside as in transit.")]
         public Bounds trayLocal = new Bounds(new Vector3(0f, -4.7f, 1.7f), new Vector3(1.6f, 0.8f, 2.4f));
-        [Tooltip("Balls the tray holds comfortably; the flood gate eases shut as the tray fills toward this.")]
-        [Min(10)] public int trayCapacity = 300;
 
         float _targetDegreesPerSecond;
         float _degreesPerSecond;
@@ -69,9 +67,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
         float _agitatorAngle;
         bool _floodOpen;
         float _floodT;
-        int _trayBalls;
-        int _activeBalls;
-        int _activeCap;
 
         public float InnerRadius => innerRadius;
 
@@ -139,17 +134,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
             }
         }
 
-        /// <summary>
-        /// Back-pressure input from the simulation (tick order: it reports after its ball pass, the next Step reads it).
-        /// While the flood gate is open it eases shut as the tray fills or too many balls are moving.
-        /// </summary>
-        public void ReportLoad(int trayBalls, int activeBalls, int activeCap)
-        {
-            _trayBalls = trayBalls;
-            _activeBalls = activeBalls;
-            _activeCap = activeCap;
-        }
-
         /// <summary>0 = closed, 1 = fully open.</summary>
         public float FloodOpenFraction => _floodT;
 
@@ -161,9 +145,6 @@ namespace SimulationLobby.Simulations.MarbleMachine
             _targetDegreesPerSecond = 0f;
             _floodOpen = false;
             _floodT = 0f;
-            _trayBalls = 0;
-            _activeBalls = 0;
-            _activeCap = 0;
             Pose();
         }
 
@@ -176,17 +157,9 @@ namespace SimulationLobby.Simulations.MarbleMachine
                 _agitatorAngle = Mathf.Repeat(_agitatorAngle + agitatorDegreesPerSecond * dt, 360f);
             }
 
-            // Flood opens fast (the slam) but eases shut slowly when the tray or the whole machine is backed up.
-            float want = 0f;
-            if (_floodOpen)
-            {
-                want = 1f;
-                if (trayCapacity > 0) want = Mathf.Min(want, Mathf.Clamp01((trayCapacity - _trayBalls) / (0.4f * trayCapacity)));
-                if (_activeCap > 0) want = Mathf.Min(want, Mathf.Clamp01((_activeCap - _activeBalls) / (0.2f * _activeCap)));
-            }
-
-            float rate = want > _floodT ? 1f / floodSlideSeconds : 0.5f / floodSlideSeconds;
-            _floodT = Mathf.MoveTowards(_floodT, want, dt * rate);
+            // The gate just opens and stays open: the balls roll out under gravity, nothing meters or throttles them.
+            float want = _floodOpen ? 1f : 0f;
+            _floodT = Mathf.MoveTowards(_floodT, want, dt / floodSlideSeconds);
             Pose();
         }
 
