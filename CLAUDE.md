@@ -196,6 +196,45 @@ same scene.
   lives in `Presentation` and stays format-agnostic ("left side", "right side", "a question"); a thin
   binder in the format pushes values into it, because `Presentation` must never reference a format.
 
+## Camera movement (learned on `mach-002`, rejected four times before it was smooth)
+
+A camera that follows physics bodies looks choppy unless every input to it is smooth by construction. The `mach-002` rework
+(`plans/videos/mach-002-camera-rework.md`, `RaceCameraCore`/`CourseTrack`/`CameraSpring`) fixed what four hand-tuned versions could not.
+Reuse these rules for any new follow camera:
+
+- **Never aim at raw body positions.** Marbles bounce, tumble in helices and swap rank every frame, so a target built from them steps by
+  metres. Follow a smoothed position along the course (arc length on a pre-smoothed rail) and add only a heavily filtered offset
+  toward the real bodies.
+- **Take heading from the course tangent, never from per-frame velocity.** Differenced velocity makes the camera orbit with every
+  helix and vortex swirl.
+- **One pose state, critically damped springs, hard limits.** Position, yaw, pitch and distance each get their own spring with a velocity
+  and acceleration cap, so no input can cause a jerk. Never run separate `SmoothDamp`s with different time constants per shot: a
+  `SmoothDamp` on a step target accelerates instantly (a 15 m step with a 1.2 s time constant is about 40 m/s², which reads as a lurch).
+- **Blend, never switch.** Set pieces (a lift, a jump, a funnel) are zones defined as ranges along the course, blended in and out over
+  1.5-3 s in pose space with smoothstep weights and a minimum dwell. Hysteresis on the leader: it only changes when another body has led by
+  a margin for a second or so. Bodies that teleport or fly (a recycle cannon) are excluded from the focus for several seconds.
+- **No per-frame obstruction clamp.** A sphere-cast that pulls the camera in at a fixed speed pops constantly in a machine full of glass
+  and walls, and it is what pulled the camera too close. Choose the side and elevation per zone up front; let obstruction only nudge
+  pitch and distance through the same rate-limited springs; ignore glass; never move the camera position directly.
+- **Distance from the spread, not from a guess.** Fit the framing to the pack's extent with the real FOV and aspect, so followers stay
+  visible; clamp it (here 11-32 m for 0.4 m marbles on a 50 m machine). A 0.4 m marble is about 57 px at 11 m and 20 px at 32 m on 1080p.
+- **Frame-rate independent.** Step the filters in fixed substeps (about 120 Hz) from a clamped `dt`, with exact critically damped
+  solutions while no limit binds, and build the target from the end-of-frame filter state (building it from the start-of-frame state adds
+  a dt-dependent lag that shows as jerk under irregular editor frames). Offline 60 fps capture then replays identically.
+- **Keep the math a pure class.** `RaceCameraCore` has no MonoBehaviour, `Physics` or `Time`, so it can be run over a recorded or
+  synthetic trace. A thin `MonoBehaviour` feeds it `IRaceState` and applies the pose. Presentation reads, never writes.
+- **Prove smoothness with numbers, not by eye.** Run the offline harness (Simulation Lobby ▸ Tools ▸ Race Camera Smoothness Test) at 60 fps,
+  30 fps and jittery frame times and require: 0 pops, max turn rate <= 25 deg/s, max acceleration <= 10 m/s², jerk p99 <= 40 m/s³, the
+  leader in the safe area >= 97% of frames, all of the top 3 in frame >= 85%. The first version passing these also looked smooth live.
+- **Tune from the course, not from one clip.** The real course turns about 2 deg per metre; a yaw cap of 11 deg/s was needed where the plan's
+  18 deg/s kept saturating. Re-run the harness on several seeds after any change.
+
+Related 3D lessons from the same build: **size every station for the real marble** (`mach` was authored for 0.13 m balls; a 0.4 m
+racer needs gaps, throats and pitches rescaled), **fillet chute corners to a radius over half the chute width** (a tighter bend folds the
+inner wall into a hole), and **test with a stream of fast balls in an isolated physics scene**
+(`SceneManager.CreateScene(..., LocalPhysicsMode.Physics3D)` plus `PhysicsScene.Simulate`; `TrackContinuityTest` does this for chutes)
+instead of waiting for the user to spot a jam. The game freezes while the Unity window is unfocused, so live state can be read but not sampled over time.
+
 ## Content guidelines
 
 Every video is judged by one thing: **can a viewer who swiped in 2 seconds ago, sound off, follow it?**
@@ -272,6 +311,7 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `fall` | Freefall Symphony — a marble falls through worlds and every bounce plays the next note of a song; pads are solved from the music (`building`, 3D, hypnotic/sound-on) | Long + Short cuts |
 | `press` | Hydraulic press — every crushed ball splits in 2; how many balls before the press stops, as it gets 2× stronger (`built`, experiment) | Short |
 | `royale` | Color Rumble — four colours in one spinning ring; the EXIT drops marbles out, the gold x2 arc clones them; last colour standing wins (`built`, experiment) | Short |
+| `bell` | Bell Curve Drop — marbles through a coin-flip peg board pile into a bell curve; 100 vs 1,000 vs a rigged board (`built`, maths) | Short |
 | `mach` | Marble Machine — a giant 3D marble machine loop (lifts, drops, a ski jump, a colour sorter); which colour fills its glass tube first? (`building`, 3D, style from @ball_simulations) | Long |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.

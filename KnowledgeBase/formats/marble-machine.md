@@ -35,3 +35,25 @@ lift as a `race` return leg). Don't copy them.
 - PhysX cost with ~1,500 balls in motion: is the editor preview watchable, and how long does an offline 11-min render take?
 - Do the stations hand off cleanly at 5,000 balls, or does the flood jam the machine (spectacle vs. a stall)?
 - Shorts: does a single-station 9:16 crop carry on its own?
+
+## Continuous track, 2x wide (2026-10-25)
+
+- `chuteWidth` is 1.8 (was 0.9). Every connector and every station entry/exit is that width, built by
+  `MachineConnectorBuilder.BuildPort` in the connector's exact profile (same walls, floor, materials), and chutes now start
+  and end flush at the lips (`LipDrop/LipAhead/EntryClearance` = 0). Stations scale lateral sizes with it.
+- Connector slope floor is 8 degrees (was 5), so the planner lifts the silo several metres; `HeightBudget` is 40.
+- Silo storage cylinder, bucket-wheel radius, sorter lanes and the tube rack were **not** doubled (see the retro question:
+  the sorter, ~5 balls/s per lane, is now the throughput bottleneck).
+- Screw lift has two helical ribs per pitch on the glass and a high-friction tube (`GripPhysics`), so balls don't slide back.
+- Trapdoor rows are leaf pairs hinged on the side walls; `tipperThreshold` is 200 for the 4x-capacity troughs.
+- Untested in Unity: rebuild the scene and read the `[mach]` station table and warnings first.
+
+## Sorter by collision filter, 100-ball contest, boosters (2026-10-25)
+
+- The sorter has no moving valves: a ball ignores the gate plates of its own colour (`Physics.IgnoreCollision`, set once), so it
+  falls through its tube's window; other colours roll on over solid plates. Windows are 0.7 m long.
+- `tubeCapacity` is 100. Tubes are 0.35 m radius with a 0.9 m guide funnel above each (tube spacing 2.0 m).
+- `RollerBank` boosters (kinematic rollers, `boosterSurfaceSpeed` 7 m/s) sit on the helix exit run and the trapdoor chute exit.
+  The helix to sorter chute is planned at the hopper's 15 degree tilt so it is collinear with the sorter's entry port.
+- Camera: opening zooms out to the whole track, glides in and orbits the silo (config `holdSeconds` is 20 to fit it); while the next
+  stop waits for 100-150 balls the camera stays put and no tube check-in fires.

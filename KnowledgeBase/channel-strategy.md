@@ -25,6 +25,26 @@ What makes this category work on YouTube:
 > (*10-18 read*). **Proposed 10-20:** keep the two-track balance and don't make long form the priority track; v15's
 > push hasn't repeated in three tries (*10-20 read*). **Proposed 10-24:** point the experiment lane at a breakout
 > (a new shape), since every Short now lands in the same band; read conv-003's day 3 before the next maths pick (*10-24 read*).
+> **Proposed 10-27:** long form is showing legs for the first time since v15 (`elim` 573 and growing ~115/day, `mach` 406 at day 2), and both are
+> 5-10 min marble-centric videos rather than 15-20 min `terr`. Keep the two-track balance, but lean the next long-form slot toward that
+> shape (5-10 min, marble-centric, one clear question). Hold any priority change until v26's day 7 (11-01) and Studio's average view duration (*10-27 read*).
+> **Proposed 10-27 (second note):** `@Satisfying2DSims`' ~8-10 min compilations of its own proven Shorts got 40K-1M views each in its first
+> months (Shorts median 5.7K at the time). That makes a *"N Most Satisfying Simulations"* compilation of our best Shorts (clack, conv, press,
+> royale, brach, esc) a candidate for the long-form lane, once we have more proven Shorts than ~20. One channel only, so this stays a lead
+> and the earlier "compilations get nothing" rule is left in place (*10-27 reference note*).
+
+> **Proposed 10-29:** `mach` (5:33, 3D) reached 1,090 at ~4d (~340/day, accelerating), tracking v15's curve a day behind. With `elim` growing
+> ~85/day, that is two 5-10 min marble videos with legs against the 15-20 min `terr` pair and `surv` lava with none. Proposal: **make long form
+> the lead track for the next two weeks' build slots** (not just keep the balance), with `mach` as the template (3D studio look, 5-10 min, one
+> contest question), and keep Shorts on the 2:1 mix. It stays *proposed* until v26's day 7 (11-01) and Studio's average view duration are in.
+> The decided cadence is untouched (*10-29 read*).
+
+**Progress, 2026-10-29:** subs **61**, 34.6K public views. The 16:9 drip is **~490 views/day** (from ~170 on 10-24), mostly `mach`. At a 3-min
+average view the watch-hour bar is ~1.6x off pace (from ~5x), but it rests on one video and the real gauge (Studio) is unread. Subs are still
+~9x short on pace (~0.5/day against ~9/day), so subs bind on every route and long form isn't converting them any better (0.09% this window).
+The 02-01 date still doesn't hold.
+
+**Progress, 2026-10-27:** subs **60**, 33.4K public views, 16:9 drip lifted slightly by `elim` and `mach`; the table below is the 10-24 baseline and the verdict is unchanged (~100x short on Shorts views, ~3x short on subs).
 
 **Progress, 2026-10-24 02:45Z** (100 days to 2027-02-01; public numbers only, the real gauges are in Studio):
 
@@ -191,6 +211,15 @@ made. Neither touches the decided cadence or the MIKAN changes.
   watch-hour route is ~5x off pace, so it isn't a 02-01 plan on either route.
 - **Subs converted at ~0.25%**, the best window so far. One window, so not a finding; check Studio's subs per video to
   see which upload drove it before reading anything into it.
+
+**10-29 read (proposed, leads only, `learnings.md` → *10-29 update*).** Nothing here overrides a decision.
+- **Long form has a template candidate.** `mach` is the second long upload to get a push (1,090 at ~4d, v15 had 1,039 at 3.2d), and it is
+  5:33, 3D, with a one-line contest. `elim` (9:51) is a slower drip. The shape that fails is 15-20 min country/lava `terr`/`surv`. Proposal:
+  next long builds copy `mach`'s shape (3D, 5-10 min, colour contest, one question). *Lead, n=2.*
+- **Subs are the bar long form doesn't fix.** 61 subs and 0.09% conversion this window. Even at the watch-hour pace, 1,000 subs binds. Check
+  Studio's subs-per-video for v26 before assuming long form helps here.
+- **Compilation (v28) is unread.** 10 views at ~1d. Decide nothing until day 3 (10-31); the "compilations get nothing" rule stands.
+- **Shorts: no change.** Band holds at n=8; the 10-24 proposal (judge the experiment lane on breakouts) stands.
 
 ## Audience and the pick mechanic
 

@@ -627,6 +627,71 @@ Others flat (±15). **Day-7 finals: v19 90, v20 2,970. v17 ~2,950 and v18 ~205 m
   ~3/day, against the ~9.4/day the 1K-by-02-01 line needs.
 - **Run rate ~1,190 views/day**, the revival average. Three Shorts in four days gave about the same rate as one did.
 
+## 10-27 update
+
+Pull 2026-10-27: **60 subs · 27 videos · 33,393 views** (per-video sum; endpoint 32,922). ~3 days since the 10-24 pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-24 | Like% |
+|---|---|---|---|---|---|---|
+| 27 | bell | Do 1,000 Marbles Make a BELL Curve? (Short) | ~2d | 1,189 | new | 1.35% |
+| 26 | mach | 14,000 Marbles in a Giant Marble Machine (5:33, long-form) | ~2d | 406 | new | 0.25% |
+| 25 | conv | How Many of 1000 Balls Hit the Dot? (conv-003) | ~4d | 1,423 | +102 | 1.55% |
+| 24 | royale | 4 Colors, 1 Exit, 1 x2 (royale-001) | ~6d | 1,313 | +80 | 1.22% |
+| 23 | press | Every Crushed Ball Splits in 2 (press-001) | 7d | 1,434 | +9 | 1.53% |
+| 22 | elim | 16 Marbles, 6 Races (elim-001, 9:51, long-form) | ~8d | **573** | **+344** | 0.52% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~15d | 2,769 | +164 | 0.4% |
+
+Others flat (±25). Day-7 final: v23 1,434. v21 and v22 snapshots were missed.
+
+- **The Short band still holds** *(validated, n=7)*. press 1,434, royale 1,313, conv-003 1,423, bell 1,189 (day 2, may climb a little),
+  brach 1,246. Seven Shorts in a row at 1.2-1.4K. The format and topic aren't moving the number; only conv-002, clack and v4 broke it.
+- **Long form is showing legs for the first time since v15** *(lead, n=2)*. v22 (`elim`) grew 229 → 573 in 3 days (~115/day), and v26
+  (`mach`) has 406 at ~2d, the best day-2 of any long-form upload except v15 (~800 at 2.3d). Both are 5-10 min marble-centric
+  videos, unlike the 15-20 min `terr` pair. Two videos is not a trend, and the 0.25-0.5% like rates are low. Watch v26 on 10-30.
+- **Subs 58 → 60 (+2)** over ~2.4K new views (~0.08%), back to the old rate; the 10-24 conversion was a one-window spike.
+- **Run rate ~800 views/day on existing videos plus new uploads**; slightly down from ~1,190/day.
+- Retention is unreadable from the API; v22's growth would need Studio to say whether it's watched.
+
+## 10-27 reference note: compilations (@Satisfying2DSims)
+
+Full pull of its 23 long-form uploads (details in `reference-channels.md` → *@Satisfying2DSims: its compilations*).
+- **Compilations are 13% of its views but ~5-30x its Shorts median per upload** *(validated within one channel, n=23)*: 8-10 min
+  "N Most Satisfying Simulations" videos, 40-130K typical, 1.03M and 714K at the top. Most were built from clips already published.
+- **This qualifies, not overturns, "compilations get nothing"** *(lead)*. The 7-view Bouncy Physics case stands, but S2DS shows the
+  format works once a library of proven Shorts exists. Our library is ~20 Shorts, with ~7 in the 1.2-1.4K band and 3 at ~3K.
+- Single reference channel; a rule on this needs a second one. See the *Multi-channel evidence* rule.
+
+## 10-29 update
+
+Pull 2026-10-29: **61 subs · 28 videos · 34,556 views** (per-video sum; endpoint 34,245). ~2 days since the 10-27 pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-27 | Like% |
+|---|---|---|---|---|---|---|
+| 28 | compilation | 10 Most Satisfying Simulations (8:08, long-form) | ~1d | 10 | new | 10.0% (1 like) |
+| 27 | bell | Do 1,000 Marbles Make a BELL Curve? (Short) | ~4d | 1,299 | +110 | 1.62% |
+| 26 | mach | 14,000 Marbles in a Giant Marble Machine (5:33, long-form) | ~4d | **1,090** | **+684** | 0.46% |
+| 25 | conv | How Many of 1000 Balls Hit the Dot? (conv-003) | ~6d | 1,430 | +7 | 1.61% |
+| 24 | royale | 4 Colors, 1 Exit, 1 x2 | ~8d | 1,317 | +4 | 1.21% |
+| 22 | elim | 16 Marbles, 6 Races (9:51, long-form) | ~10d | 743 | +170 | 0.54% |
+| 15 | terr | Which Color Takes the Board? (15:15, long-form) | ~17d | 2,876 | +107 | 0.42% |
+
+Others flat (±15). Day-7 reads: v24 ~1,317 (recorded late), v25 due 10-30 (1,430 now).
+
+- **`mach` is the second long-form upload to get a real push** *(lead, n=2 with v15)*. 406 at ~2d, 1,090 at ~4d, ~340/day and
+  accelerating. v15 had 819 at 2.3d and 1,039 at 3.2d, so mach tracks it a day or so behind. It's 5:33, 3D, marble-centric, with a
+  one-line question (which colour fills first?). Like% rose from 0.25% to 0.46%, still low. The 10-27 guess (5-10 min marble
+  videos, not 15-20 min `terr`) now has two of its candidates growing: `elim` ~85/day, `mach` ~340/day.
+- **Long form is 2 for 6 at "a real push" (v15, v26), 1 more with a drip (v22).** v18 (country) and v19 (lava) are the two that
+  did nothing. Don't read it as a rule: v26 and v22 differ in format, and Studio's average view duration is still unread.
+- **The 16:9 drip is ~490 views/day**, up from ~170/day on 10-24 (mach ~340, elim ~85, terr ~55, rest ~10). The watch-hour route
+  needs ~800/day at a 3-min average view, so it's ~1.6x off pace, from ~5x. It rests on one new video, so it can fade.
+- **The compilation (v28) has 10 views at ~1d**, the same as v22 (7 at 1.1d). Too early to say anything; the 10-27 S2DS lead
+  (compilations work once a library exists) stays untested. **Read it on 10-31 (day 3).**
+- **The Short band holds** *(validated, n=8)*. bell is 1,299 at day 4, the top of the band but not above it. Eight Shorts in a
+  row at 1.2-1.4K. Only conv-002, clack and v4 have broken it.
+- **Subs 60 → 61 (+1)** over ~1.2K new views (~0.09%), the old rate. ~0.5/day, against ~9/day needed.
+- **Run rate ~580 views/day** (+1,163 in ~2d), with mach carrying more than half of it.
+
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
 - **Every older video went flat on the same day (10-03 → 10-04)**, including v4, which had been
