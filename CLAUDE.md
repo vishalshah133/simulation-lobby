@@ -186,6 +186,10 @@ same scene.
   a slot-chip label, a drum face) is a world-space **TextMeshPro** (3D) decal parented to that object, so it stays
   perspective-correct and sized to its object. Screen-projected labels over busy 3D boards overlapped in `terr` v2.
   Legacy `TextMesh` stays banned, and HUD text (captions, scores, clocks, bars) stays on the canvas.
+- **Keep the bottom 15% of the frame (288 px at 1080x1920) empty.** Instagram and Shorts overlay comments, captions
+  and the channel name there. Put the least useful line at the bottom or leave it out; anything the viewer must read
+  goes above that line. (`twin` keeps its top and bottom panels but lifts the bottom one 288 px and shortens the
+  board; older formats still use the default bottom panel and should be relaid out when next touched.)
 - Keeping the arena clear between the two panels is the point — the ball must never be behind text.
 - **Versus scores use a `HorizontalLayoutGroup` with `childControlWidth`, `childControlHeight`,
   `childForceExpandWidth` and `childForceExpandHeight` all on.** Equal-width sides keep the score
@@ -313,6 +317,9 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `royale` | Color Rumble — four colours in one spinning ring; the EXIT drops marbles out, the gold x2 arc clones them; last colour standing wins (`built`, experiment) | Short |
 | `bell` | Bell Curve Drop — marbles through a coin-flip peg board pile into a bell curve; 100 vs 1,000 vs a rigged board (`built`, maths) | Short |
 | `mach` | Marble Machine — a giant 3D marble machine loop (lifts, drops, a ski jump, a colour sorter); which colour fills its glass tube first? (`building`, 3D, style from @ball_simulations) | Long |
+| `hall` | Haunted Pumpkin — ghosts break nested jack-o'-lantern rings, each break may split the ghost, bats out before the candle dies; guess the song (`built, not yet played`, 2D, Halloween experiment) | Short |
+| `trip` | Trippy Coaster — one cart through seven shader-painted worlds (neon gate, UV tunnel, kaleidoscope, inverted sky, liquid light, fractal bloom, singularity); no riders, no scares (`built, not yet played`, 3D, hypnotic/sound-on) | Long + Short cuts |
+| `twin` | Twin Drop — two marbles released through a peg board, exactly the same or a gap of 1 cm down to one atom; SAME SLOT vs DIFFERENT tally (the butterfly effect) (`built, not yet played`, 2D, maths) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 

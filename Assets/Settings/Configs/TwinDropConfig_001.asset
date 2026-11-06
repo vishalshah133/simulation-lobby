@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54141e3ad795ab94e9d541a7213717a7, type: 3}
+  m_Name: TwinDropConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.TwinDrop::SimulationLobby.Simulations.TwinDrop.TwinDropConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 282.6
+  intent: 'twin-001 butterfly effect as a peg board. Two marbles, blue and red, are
+    released through the same board: first from exactly the same spot (always the
+    same slot), then with a gap of 1 cm, a hair, a bacterium, a molecule and an atom.
+    The tally shows SAME SLOT vs DIFFERENT. Seed only picks the release positions.'
+  rows: 12
+  spacing: 1
+  rowSpacing: 0.7
+  halfWidth: 5
+  topRowY: 9
+  pegRadius: 0.1
+  ballRadius: 0.22
+  gravity: 36
+  restitution: 0.8
+  bins: 10
+  metersPerUnit: 0.1
+  releaseRange: 1
+  releaseHeight: 1.2
+  maxFallSeconds: 20
+  firstHoldSeconds: 3
+  roundHoldSeconds: 1.8
+  pairHoldSeconds: 0.8
+  resultHoldSeconds: 1.1
+  endCardSeconds: 6
+  title: TWO MARBLES. SAME DROP.
+  question: SAME SLOT OR DIFFERENT?
+  sameName: SAME SLOT
+  apartName: DIFFERENT
+  sameResult: SAME SLOT!
+  apartResult: DIFFERENT SLOTS!
+  endTitle: THE BUTTERFLY EFFECT
+  endQuestion: '{apart} OF {n} PAIRS LANDED APART. EVEN WITH AN ATOM''S GAP.'
+  endWhy: EVERY PEG MAGNIFIES THE TINIEST DIFFERENCE
+  rounds:
+  - gapMeters: 0
+    gapLabel: EXACTLY THE SAME
+    holdCaption: PERFECT TWINS. SAME SLOT?
+    pairs: 2
+  - gapMeters: 0.01
+    gapLabel: 1 CENTIMETRE APART
+    holdCaption: NOW RELEASED 1 CM APART...
+    pairs: 2
+  - gapMeters: 0.0001
+    gapLabel: A HAIR'S WIDTH APART
+    holdCaption: A HAIR'S WIDTH...
+    pairs: 2
+  - gapMeters: 0.000001
+    gapLabel: A BACTERIA'S WIDTH APART
+    holdCaption: TOO SMALL TO SEE...
+    pairs: 2
+  - gapMeters: 0.000000001
+    gapLabel: ONE MOLECULE APART
+    holdCaption: ONE MOLECULE...
+    pairs: 2
+  - gapMeters: 0.0000000001
+    gapLabel: ONE ATOM APART
+    holdCaption: ONE SINGLE ATOM...
+    pairs: 2
