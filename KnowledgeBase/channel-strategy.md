@@ -39,6 +39,20 @@ What makes this category work on YouTube:
 > contest question), and keep Shorts on the 2:1 mix. It stays *proposed* until v26's day 7 (11-01) and Studio's average view duration are in.
 > The decided cadence is untouched (*10-29 read*).
 
+**Progress, 2026-11-11:** subs **71** (+1 in 5 days), 42.4K public views, ~82 days to 2027-02-01. Long form is 11 videos and 9,985 views; the long-form drip is
+~260/day including new uploads (needs ~850 at a 3-min average view, ~3.3x off, from 1.8x), because both new uploads (`twin` 209, `trip` 18) are weak and
+the lift is only `mach-001` (3,414). Subs need ~11.3/day and run ~0.2/day. Shorts views are ~100x off pace. The 02-01 date still doesn't hold. Studio's
+watch hours and avg view duration remain unread.
+
+> **Proposed 2026-11-11 (a lead, not a decision):** the new reference pulls point the same way as `mach-001`. @chinawalk88's marble loops (11-17M, count in
+> title, 4-5 min) and @onlinevisualtimer's search-term timers (1.0M views in 9 weeks) both win on a visible count or a long loop, while our no-contest mood
+> videos (`trip` 18, `coast` 199) do worst. Proposal: for the next long-form slots, build count/loop spectacles or a contest, not mood rides, and try one
+> 5-min marble-run timer as an experiment. Nothing above is changed; stays *proposed* until you confirm.
+
+**Progress, 2026-11-06:** subs **70** (+9 in 8 days), 40.9K public views, ~87 days to 2027-02-01. 16:9 views ~8.7K; the long-form drip is ~450/day
+(needs ~800 at a 3-min average view, so ~1.8x off), carried by `mach-001` (2,788), the compilation (825) and `elim` (1,052). Subs need ~10.7/day and
+run ~1.1/day (~10x off). Shorts views are still ~100x off pace. The 02-01 date still doesn't hold. Studio's watch hours and avg view duration remain unread.
+
 **Progress, 2026-10-29:** subs **61**, 34.6K public views. The 16:9 drip is **~490 views/day** (from ~170 on 10-24), mostly `mach`. At a 3-min
 average view the watch-hour bar is ~1.6x off pace (from ~5x), but it rests on one video and the real gauge (Studio) is unread. Subs are still
 ~9x short on pace (~0.5/day against ~9/day), so subs bind on every route and long form isn't converting them any better (0.09% this window).
@@ -211,6 +225,15 @@ made. Neither touches the decided cadence or the MIKAN changes.
   watch-hour route is ~5x off pace, so it isn't a 02-01 plan on either route.
 - **Subs converted at ~0.25%**, the best window so far. One window, so not a finding; check Studio's subs per video to
   see which upload drove it before reading anything into it.
+
+**11-06 read (proposed, leads only, `learnings.md` → *11-06 update*).** Nothing here overrides a decision.
+- **The 10-29 proposal (make long form the lead track, `mach` as the template) is only half-supported.** `mach-001` reached 2,788, but `mach-002`
+  (the race version) is 521 at 8d and `coast` 168 at 5d. Proposed change to it: keep the two-track balance, and narrow the long-form template to
+  *the count spectacle* ("N thousand marbles, which colour wins?"), not "3D marble video". Hold the lead-track call until Studio's avg view duration is in.
+- **Compilation is now a live long-form candidate.** 825 views at 9d after sitting at 10 on day 1. A second compilation (e.g. best maths Shorts) is a cheap
+  test, no new simulation to build. Lead, n=1; the "compilations get nothing" rule is flagged as contradicted, not removed.
+- **Shorts: no change.** Ten in the band; the Halloween experiment (`hall`) and the song-guess hook (`brk`) did not break out.
+- **Subs:** best window yet (+9, ~0.14%), still ~10x short of pace.
 
 **10-29 read (proposed, leads only, `learnings.md` → *10-29 update*).** Nothing here overrides a decision.
 - **Long form has a template candidate.** `mach` is the second long upload to get a push (1,090 at ~4d, v15 had 1,039 at 3.2d), and it is

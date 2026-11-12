@@ -1,0 +1,305 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c1d5746b7a0784a9c2a1202ff6ebe0, type: 3}
+  m_Name: TimerTrackLayout_001
+  m_EditorClassIdentifier: SimulationLobby.Shared::SimulationLobby.Shared.Tracks.TrackLayout
+  version: 2004
+  startWidth: 2
+  gateDistance: 3.5
+  runOutLength: 12
+  pegWallClearance: 0.4
+  defaultRailHeight: 0.55
+  sections:
+  - label: Start pen
+    kind: 0
+    length: 7
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 7
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Lip
+    kind: 0
+    length: 4
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 15
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Plunge
+    kind: 0
+    length: 8
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 24
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Foot
+    kind: 0
+    length: 4
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 15
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Ease
+    kind: 0
+    length: 5
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 8
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Catch run
+    kind: 0
+    length: 18
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bend 1
+    kind: 1
+    length: 0
+    radius: 8
+    arcDegrees: 180
+    slopeDegrees: 7
+    bankDegrees: 16
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Run 1
+    kind: 0
+    length: 22
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bend 2
+    kind: 1
+    length: 0
+    radius: 8
+    arcDegrees: -180
+    slopeDegrees: 7
+    bankDegrees: 16
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Flare A
+    kind: 0
+    length: 4
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 4.2
+    railHeight: 0
+    railless: 0
+  - label: Funnel lane A
+    kind: 0
+    length: 6
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Peg field A
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Exit A
+    kind: 0
+    length: 5
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 2
+    railHeight: 0
+    railless: 0
+  - label: Run 2
+    kind: 0
+    length: 16
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bend 3
+    kind: 1
+    length: 0
+    radius: 8
+    arcDegrees: 180
+    slopeDegrees: 9
+    bankDegrees: 8
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Helix
+    kind: 1
+    length: 0
+    radius: 8
+    arcDegrees: -360
+    slopeDegrees: 7
+    bankDegrees: 16
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Run 3
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Flare B
+    kind: 0
+    length: 4
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 4.2
+    railHeight: 0
+    railless: 0
+  - label: Funnel lane B
+    kind: 0
+    length: 6
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Peg field B
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Exit B
+    kind: 0
+    length: 5
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 2
+    railHeight: 0
+    railless: 0
+  - label: Run 4
+    kind: 0
+    length: 15
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Bend 4
+    kind: 1
+    length: 0
+    radius: 8
+    arcDegrees: -180
+    slopeDegrees: 9
+    bankDegrees: 8
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Home straight
+    kind: 0
+    length: 24
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  - label: Run-out
+    kind: 0
+    length: 12
+    radius: 0
+    arcDegrees: 0
+    slopeDegrees: 5.5
+    bankDegrees: 0
+    widthEnd: 0
+    railHeight: 0
+    railless: 0
+  obstacles:
+  - label: Pegs pyramid A
+    kind: 0
+    section: 11
+    offset: 0.5
+    length: 0
+    count: 3
+    spacing: 1.2
+    size: 0.11
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs plinko A
+    kind: 1
+    section: 11
+    offset: 4.8
+    length: 0
+    count: 6
+    spacing: 1.2
+    size: 0.11
+    speed: 0
+    lane: 0
+    lateral: 0
+  - label: Pegs plinko B
+    kind: 1
+    section: 19
+    offset: 0.5
+    length: 0
+    count: 10
+    spacing: 1.2
+    size: 0.11
+    speed: 0
+    lane: 0
+    lateral: 0

@@ -80,7 +80,7 @@ documentation — no unverified-research caveat needed for this section.
 | Channel | Subs | Total views | Category | Verdict |
 |---|---|---|---|---|
 | `@AlgoMarblerYT` | 110K | 50.0M | 2D (Algodoo) mass-marble chaos — "N marbles vs. object" | Alive, steady mid-2025 through Dec 2025 uploads in the 90K–700K range |
-| `@Satisfying2DSims` | 18K | 19.6M | 2D physics, `esc`-style (channel bio literally describes our exact mechanic — grow/bounce/fill + collision-triggered melody) | Small but **brand-new** (created 2026-07), posting daily; views 1K–31K, much smaller scale than the others here |
+| `@Satisfying2DSims` | 25.9K (10-27; was 18K) | 33.0M (was 19.6M) | 2D physics, `esc`-style (channel bio literally describes our exact mechanic — grow/bounce/fill + collision-triggered melody) | Small but **brand-new** (created 2026-07), posting daily; views 1K–31K, much smaller scale than the others here |
 | `@RenderZen` | 38.8K | 132.5M | 3D Blender — "perfect fit" shape-insertion puzzles | Alive, one video spiked to 2.1M (rest of the batch 55K–233K) — high variance around one repeated title template. **Full pass below** ([RenderZen](#renderzen--youtubecomrenderzen)) |
 | `@MusicMarble3D` | 973K | 1.83B | 3D Blender — marble runs playing a recognizable nursery-rhyme melody | Huge and alive — 1M–5M+ on recent uploads, all 9–11s long |
 | `@moreballs` | 195K | 103.9M | 3D Blender — long-form marble elimination races (capture-the-flag, compilations) | Alive but **long-form only** (16–43 min), 30K–270K range — a completely different production model from Shorts |
@@ -224,6 +224,31 @@ are partly volume, since at 3/day some Shorts will hit by chance. Bucket medians
 keywords, not from watching the videos.
 
 ---
+
+## @Satisfying2DSims: its compilations (data pulled 2026-10-27)
+
+Full pull, 392 uploads, created 2026-07-06 (~4 months old), 25.9K subs, 33.0M views. 369 Shorts (median 32s) and **23 long-form videos**.
+Only the long form is new to these notes; its Shorts model is covered in *2D pass* above.
+
+| | Count | Views | Share |
+|---|---|---|---|
+| Shorts | 369 | 28.8M | 87% |
+| Long form (all but 2 are 8-10 min compilations; 2 are 1-hour) | 23 | 4.2M | 13% |
+
+- **The 16-sim compilation (published 2026-10-13, 8:13, 713K views)** is `16 Most Satisfying Simulations (A Venus Flytrap Eats 1,125 Balls)`.
+  It is the channel's 2nd-best compilation. The best is *12 Most Satisfying 2D Simulations* (1.03M, 2026-08-15).
+- **Format:** each clip is ~30s, one rule line at left (key words coloured), one counter at right, bright shape on black.
+  It escalates sparse to saturated (balls 189 → 885, 1,073,741,824, 10,394 kernels).
+- **Compilations did far better than its Shorts in the first month.** July: compilation median **154K** (n=2) vs Shorts median
+  5.7K. August: 102K (n=7) vs 35K. September: 118K (n=6) vs 48K. October's six compilations are young (median 19K at 1-19 days).
+- **It decays.** Individual compilations sit at 40-130K after a few weeks, and the two earliest are the biggest. Treat
+  the 1M and 714K as the top of the range, not a median.
+- **It publishes about one a week**, with a pattern: *"N Most Satisfying Simulations"* plus a bracketed hook that names one thing
+  in the video. Like rate is ~0.5% of views, lower than its Shorts (~1%).
+- **What it contradicts:** our note that compilation long form gets nothing (Bouncy Physics, 7 views). The difference is the
+  channel behind it. S2DS built to ~25K subs and ~4 Shorts a day inside 4 months, and each compilation recycles clips that already
+  worked. So a compilation looks like an *amplifier of an existing library*, not a way to start one. We have ~20 Shorts and 60 subs.
+- Caveat: public views only. Retention and the share of views from Shorts feed vs search are not visible.
 
 ## Length vs views across channels (2026-10-04)
 
@@ -642,3 +667,99 @@ question, no stake. The number (17,500-21,500) is the hook.
 - **Its station list or its layout.** Our machine is original. Only the style is borrowed.
 - **The bare number title.** We keep a stake or question form.
 - **20K live rigidbodies in real time.** In Unity that's an offline render at a fixed timestep, with most balls asleep.
+
+## @onlinevisualtimer ("Online Visual Timer"): marble-run and fuse countdown timers (data pulled 2026-11-11)
+
+Created **2026-09-10**; 1,330 subs, **1.00M views, 83 videos** in ~63 days (about 1.3 uploads/day). Subs per view is ~0.13%, the same as ours,
+so views here do not convert to subs any better than they do for us. *Observed:* every video is a countdown with a visual: a burning fuse
+through a maze, a marble run, a phone that overcharges and explodes, a themed variant (Halloween, Christmas, winter, Egypt, pirate).
+
+| Pattern | Evidence (views at pull) |
+|---|---|
+| Title is the search term: `N Minute <Thing> Timer` | 5 / 10 / 15 / 30 minute lengths, one theme per video |
+| Long beats Shorts at the top | 8 of the top 10 are long form: 30 min Bomb Timer 144K, 5 min Marble Run Timer 90K, 10 min Overcharging Phone 60K, 15 min Halloween Bomb 56K |
+| A Short still hit once | 15 Second Bomb Timer 77K (20 s, 0.51% likes); the other Shorts sit at 3-20K |
+| The marble-run timer is the repeatable line | 5 min: 90K (10-20), then 36K (neon, 11-04), 33K (Christmas, 11-03), 13K (winter), 10K (Halloween) |
+| Same template, new skin | Marble run and fuse maze each re-skinned weekly; a re-skin lands 5-35K in days, not 100K |
+| Weak ones are the generic ones | `Visual Timer` circle/hourglass/liquid spiral, 25-30 min: 271-460 views; autumn leaves: 775-1,023 |
+| Like-rate | 0.17-0.33% on long form, same as ours; 0.5-0.9% on short Shorts |
+
+**Why it matters to us (inferred, not observed):** this is *utility* demand ("5 minute timer" is something people search for and then leave
+running), not browse entertainment. The public API can't show watch time, so we can't confirm viewers sit through a 30-min timer. But the
+pattern (long durations, the 30-min video the biggest) is what a watch-hour engine would look like, and our binding constraints are watch
+hours and subs. Our fixed-timestep, seeded core makes an *exact-length* countdown trivial, which is the one thing a timer has to be.
+
+**What we'd take:** the search-term title shape; the length ladder 5 / 10 / 15 / 30 min off one scene (config only, per our architecture);
+seasonal re-skins as a config swap; marble physics as the clock (a marble run whose last marble lands at exactly 0:00).
+**What we don't take:** the 83-videos-in-9-weeks cadence (our build cost is far higher), the generic circle/hourglass timers (they flopped
+for them), or any claim about retention.
+
+**Caveats:** a 2-month-old channel is survivorship-biased and one video (144K) is ~14% of its views. Cross-channel rule applies: this is
+one channel, so it is a *lead*, not a validated genre fact. See [[multi-channel-evidence]]. To test it cheaply: one 5-min marble-run timer
+of our own is the experiment.
+
+## @chinawalk88 ("China walk everywhere 4K"): the Blender marble-loop giant, now a walking-tour channel (data pulled 2026-11-11)
+
+246K subs, 185.9M lifetime views, 264 videos, created 2020. **My first pass read only the 15 newest uploads and called it a walking-tour channel; that
+was wrong.** The catalogue is two eras. By English-title count, **165 marble/ball videos hold ~180.9M of the 185.9M views (97%)**; the Chinese-titled
+walking tours (Aug 2026 on, ~1.6K views each) are a late pivot and add almost nothing.
+
+**The marble era (2021-2025), observed:**
+
+| Video | Views | Length | Note |
+|---|---|---|---|
+| Balls on escalator 3.0 (2023-03) | **17.5M** | 2:07 Short | Blender rigid body, no narration |
+| Balls on escalator 2.0 (2022-09) | **14.9M** | 2:06 Short | |
+| 20,000 Colorful Balls Marble Run Loop V17 (2024-07) | **14.2M** | 4:32 | 0.23% likes |
+| 20,000 Colorful Balls Marble Run Loop V20 (2024-10) | **11.2M** | 4:21 | |
+| 18,200 Colorful Balls Marble Run Loop V11 (2024-04) | 9.8M | 4:24 | |
+| 20,000 Color Balls Marble Run Loop V01 (2022-11) | 7.5M | 4:20 | first loop |
+| 100,000 Color Balls on stairs (2022-03) | 5.7M | 1:46 Short | |
+
+- **Two repeatable lines.** (1) *Escalator / stairs* Shorts (2-2:15) at 2-17M each in 2022-23. (2) The **"N Colorful Balls Marble Run Loop animation Vxx"** long
+  form, 4-5.5 min, with 2-14M each in 2022-24. About 52 long and 113 short marble videos in total (~89M and ~92M views).
+- **A numbered series with the count in the title.** 17,600 / 18,200 / 20,000 balls, V01 to V30. The viewer buys the count and the "loop";
+  there's no question, story or contest. It's the same "N marbles" spectacle that lifted our `mach-001` (14,000 marbles, 3.4K views).
+- **It decayed.** 2025 uploads (V26-V29, "screening" V10-V12) are at 0.2-0.9M; 2026 uploads (V30, Planets in the Class Room / London Underground)
+  are at 0.2-0.4M. The 10M+ videos are all 2022-2024, and view counts accumulate with age, so a 2022 video has had 4 years. Still, the format
+  has clearly cooled since 2024, or the channel pivoted its attention (*inferred*).
+- **2026-04-23: the channel posted "My channel has been demonetized"** (5:50, 6K views, 18 comments). Per the user, who watched it, the stated reason was
+  that the content was *homogenous* (YouTube's repetitious / inauthentic-content rule). I can't confirm that from the API; see *Demonetisation risk* below.
+
+**Why it matters:** it's the same genre as `@ball_simulations` (see its section) and our `mach` line, but with the actual 10M+ proof. It says the
+count + loop spectacle at 4-5 min can reach millions *when it was new*, and it does so without a question or a contest. Our `mach-001` took
+3.4K, so the gap isn't the idea; it's channel size and age (they had years and 100K+ subs when V17 hit).
+
+**What we'd take:** the 4-5 min loop length, the count-in-title ("20,000 ... Balls"), the escalator/stairs ball Short (2 min, one
+mechanism, a continuous flow of balls), and a numbered series so each video lifts the previous.
+**What we don't take:** the template-clone series (demonetisation risk, and a decayed return), or the absence of any hook, since our rules
+put the question first. **Caveat:** survivorship bias, one channel. Per [[multi-channel-evidence]] it is a lead; nothing here is retention data.
+
+### Demonetisation risk: "inauthentic / repetitious content" (research pulled 2026-11-11)
+
+**The rule (YouTube Help, channel monetization policies, observed):** content must "not be mass-produced, generic, repetitive, or manipulative" and be made
+"for the enjoyment or education of viewers, rather than for the sole purpose of getting views". Listed violations: "similar or repetitive content with low educational
+value, commentary, narratives, or minimal variation across videos" and characters "put in the same situation over and over again with the same outcome
+(i.e. using a highly similar storyline template across multiple videos)". Penalties range from limited or no ads on a video to **suspension from YPP**
+(and permanent removal across accounts). July 15 2025 renamed "repetitious content" to "inauthentic content"; secondary sources say it was a wording
+clarification, not a new rule, and that clips/compilations/reactions fall under the separate *reused content* rule.
+
+**Other channels hit (all secondary sources, so treat as reports, not verified):**
+- A wave of 2D/3D animation channels in 2026: one creator posted that their 3D animation channel lost YPP for "Inauthentic Content" and the appeal was denied,
+  with an appeal video explaining how it was made; friends reported the same, and *some got a quick second human review and were re-enabled*
+  ([X post](https://x.com/EliusHQ/status/2038606313588924708)). A summary article ([Voxtly](https://voxtly.com/blog/youtubes-automated-purge), dated 2026-04-02) lists
+  ~11 gaming-parody and anime animation channels, some with monetisation off within hours of an upload; appeals often fail, replies say wait 90 days.
+  Its details are thin and it cites no YouTube statement.
+- Advice articles say the triggers are **same thumbnail layout, formulaic titles, upload flooding, and template-built videos**
+  ([TubeBuddy](https://www.tubebuddy.com/blog/youtube-ai-demonetization-how-to-spot-risk/)): "10-video test", vary thumbnails, visible creator input.
+- **No marble-, ball- or physics-simulation channel case found beyond @chinawalk88.** I searched general web and creator sources; that is an absence of
+  evidence in what I could reach, not evidence the genre is safe. Which of its signals triggered the label (the near-identical `Vxx` titles, the same loop,
+  the volume) is inference.
+
+**What this means for us (inferred):**
+- We aren't in YPP yet, so the check happens at application review, and *the pitch is a channel whose last 10 uploads differ from each other*. Ours do
+  (about 19 formats, each with its own question), which helps. The exposure is where we repeat a scene with only a config change: `esc` 001-007, `conv` 001-003, a
+  `timer` line that re-skins one scene weekly (the @onlinevisualtimer model is exactly "minimal variation").
+- **Safer than a clone series:** each video asks a different question and shows a different mechanism; vary thumbnails and title shape; put the *why* line
+  and a result on screen (our "close with the why" rule is the commentary/insight the policy asks for); limit same-format uploads to one a week.
+- A `timer` experiment is higher risk than I listed. Mark it **proposed, with this caveat**, and cap it at a few lengths of different mechanisms.

@@ -163,6 +163,12 @@ Learned building the first 3D format — prototyped as `impact`, shipped as `sur
   `esc`'s "one bounce per tick" assumption (built for a single ball against a single wall) would
   silently drop most of the hits a multi-object format needs to react to.
 
+- **Every peg field gets a funnel in front of it.** Marbles arriving at a vertical peg field (pyramid, plinko grid) hug whichever
+  side they came down on and slide past the pegs along the wall. Put guide walls (chevrons) before the field that steer the stream to the
+  centre (user, `timer-001`, 2026-11-12). **No gap in a peg field may be narrower than ~1.4 marble diameters**, peg-to-peg or
+  peg-to-wall: a gap just under one diameter is a V pocket that wedges marbles on a shallow slope (it did, the same day). Stop
+  wall-huggers with angled deflector wedges on the walls between rows, not with a tight wall clearance, and keep a stall nudge as a fail-safe.
+
 - **A generated mesh that changes shape must be saved as a fresh asset, never overwritten in place.**
   `StudioSetBuilder.SaveMesh` copies into the existing asset to keep its GUID; after a layout change the
   editor kept *drawing the previous build's mesh* while physics and obstacles used the new data, so pegs and
@@ -320,6 +326,7 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `hall` | Haunted Pumpkin — ghosts break nested jack-o'-lantern rings, each break may split the ghost, bats out before the candle dies; guess the song (`built, not yet played`, 2D, Halloween experiment) | Short |
 | `trip` | Trippy Coaster — one cart through seven shader-painted worlds (neon gate, UV tunnel, kaleidoscope, inverted sky, liquid light, fractal bloom, singularity); no riders, no scares (`built, not yet played`, 3D, hypnotic/sound-on) | Long + Short cuts |
 | `twin` | Twin Drop — two marbles released through a peg board, exactly the same or a gap of 1 cm down to one atom; SAME SLOT vs DIFFERENT tally (the butterfly effect) (`built, not yet played`, 2D, maths) | Short |
+| `fit` | Perfect Fit — a shape locks onto a spinning wall's spin and slides through a hole cut to its outline; the gap shrinks 30 mm to 0.5 mm (`built, not yet played`, 3D, oddly satisfying experiment) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 

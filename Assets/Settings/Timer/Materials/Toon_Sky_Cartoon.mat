@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Toon_Sky_Cartoon
+  m_Shader: {fileID: 4800000, guid: 682ee5216275d7547b9fe1b6969f5bdf, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _Power: 0.7
+    m_Colors:
+    - _HorizonColor: {r: 0.8117647, g: 0.91764706, b: 1, a: 1}
+    - _TopColor: {r: 0.23921569, g: 0.56078434, b: 0.9098039, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

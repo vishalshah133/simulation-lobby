@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75f4715c591a3464984420d99c842d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Timer::SimulationLobby.Simulations.Timer.TimerConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 323
+  intent: 'timer-001: a countdown that ends at 0:00 while a steady stream of marbles
+    runs down a cartoon marble run into a glass collector that is nearly full at
+    the end. Duration is the clock; the stream is paced to it.'
+  defaultsVersion: 6
+  durationSeconds: 300
+  setupHoldSeconds: 5
+  finishTailSeconds: 8
+  marbleCount: 300
+  marbleRadius: 0.2
+  marbleMass: 1
+  marbleLinearDamping: 0.1
+  marbleAngularDamping: 0.05
+  maxDepenetrationVelocity: 3
+  expectedTravelSeconds: 120
+  releaseJitterLateral: 0.25
+  releaseBurst: 1
+  questionFormat: HOW MANY OF {0} MARBLES MAKE IT IN {1}?
+  allInFormat: ALL {0} MADE IT!
+  resultFormat: '{0} OF {1} MADE IT'
+  colors:
+  - {r: 0.95, g: 0.15, b: 0.15, a: 1}
+  - {r: 1, g: 0.5, b: 0.05, a: 1}
+  - {r: 1, g: 0.9, b: 0.1, a: 1}
+  - {r: 0.5, g: 0.95, b: 0.15, a: 1}
+  - {r: 0.1, g: 0.85, b: 0.9, a: 1}
+  - {r: 0.15, g: 0.35, b: 0.95, a: 1}
+  - {r: 0.6, g: 0.2, b: 0.9, a: 1}
+  - {r: 1, g: 0.35, b: 0.7, a: 1}
+  offTrackDistance: 3
+  theme: 0

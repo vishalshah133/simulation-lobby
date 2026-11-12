@@ -30,6 +30,8 @@ format slug it would use. Mark `[built]` / `[published]` / `[dead]` as they move
 - `elim` — Season: recurring named contenders with a standings table across videos
 - `wars` — Conversion vs destruction A/B, same seed, side by side
 - `surv` — Escalating hazard gauntlet, 15 min, survivor counter throughout
+- `compilation` — "N Most Satisfying Simulations" of our proven Shorts (maths: clack, conv, brach, bell, press). **Promoted 11-06:** v28 went 10 → 825 in 9 days, so it is a cheap long-form test (no new build). Lead, n=1.
+- `mach` — Next long form: another count-spectacle colour contest, not a racer lineup. **11-06:** `mach-001` 2,788 vs `mach-002` (16 racers) 521.
 
 ### From MIKAN (2026-10-16, see `reference-channels.md` → *MIKAN*)
 
@@ -133,7 +135,7 @@ Ranked. Each one tests a single new thing, and the reuse notes are what keep it 
    a bit thicker. *How many can it break?* Tests: whether 3D glass and the shatter sound can pull the band in
    a threshold shape (v5 was 3D threshold, but without the studio look). Reuse: studio-look kit, `CollisionDetector3D`,
    procedural glass break, slow-mo director, camera rig. How it loses: the ball stops.
-4. **Bell curve drop** (maths, added 10-18). 1,000 marbles through a peg board pile into a bell curve. *Guess the
+4. **Bell curve drop** `[built]` bell-001, 2026-10-25, slug `bell` (maths, added 10-18). 1,000 marbles through a peg board pile into a bell curve. *Guess the
    shape.* Tests: whether the maths shape still lifts a peg board, the genre's most familiar look. Reuse: `rom` peg
    fields, `BodyPool2D`, `TriggerZone2D` slot counters. Brief: `math-convergence.md` #7. **10-24:** promoted to next
    maths pick, but give it a twist round (e.g. a rigged / tilted board that skews the curve), per the *10-24 read*.
@@ -169,3 +171,13 @@ Ranked. Each one tests a single new thing, and the reuse notes are what keep it 
 - Domino / chain-reaction format (satisfying, but is there a winner? needs stakes)
 - Plinko-style board with real prize values
 - Marble racing on procedurally generated tracks from a seed shown on screen
+
+## From the 2026-11-11 reference pull (see `reference-channels.md` → *@chinawalk88*, *@onlinevisualtimer*)
+
+- **[proposed] Marble Run Timer (`timer`)**: exactly 5 / 10 / 15 / 30 min, last marble lands at 0:00, one scene with config per length and per season.
+  Title is the search term (`5 Minute Marble Run Timer`). Experiment, long form; a lead from one young channel (1.0M views in 9 weeks). **Demonetisation risk:** re-skinning one scene weekly is the pattern the inauthentic-content rule names; vary the mechanism, not just the theme (`reference-channels.md` → *Demonetisation risk*).
+- **[proposed] Balls on an escalator / stairs Short (`stairs`)**: 2 min, one mechanism, a continuous flow of thousands of balls climbing and tumbling.
+  @chinawalk88's escalator Shorts reached 15-17M in 2022-23. Check it can be made our own (a count, a contest of colours) and not a clone.
+- **[proposed] "N,000 Balls" loop, 4-5 min, count in the title**: the `mach-001` line, kept as a count spectacle. Avoid a numbered near-identical series
+  (that channel posted a demonetisation notice).
+- **[dead-leaning] Mood rides with no contest** (`trip` 18 views, `coast` 199): don't build a third until a contest or count is attached. n=2, so provisional.

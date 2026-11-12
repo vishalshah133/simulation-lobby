@@ -692,6 +692,83 @@ Others flat (±15). Day-7 reads: v24 ~1,317 (recorded late), v25 due 10-30 (1,43
 - **Subs 60 → 61 (+1)** over ~1.2K new views (~0.09%), the old rate. ~0.5/day, against ~9/day needed.
 - **Run rate ~580 views/day** (+1,163 in ~2d), with mach carrying more than half of it.
 
+## 11-06 update
+
+Pull 2026-11-06: **70 subs · 32 videos · 40,855 views** (per-video sum; endpoint 40,619). ~8 days since the 10-29 pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 10-29 | Like% |
+|---|---|---|---|---|---|---|
+| 32 | coast | SCARY Halloween Roller Coaster (7:59, long-form) | ~5d | 168 | new | 0.6% |
+| 31 | hall | Ghosts ESCAPE the Haunted Pumpkin (Short) | ~6d | 1,246 | new | 0.88% |
+| 30 | brk | Can This Ball Break In To The Core? (Short) | 7d | 1,251 | new | 0.8% |
+| 29 | mach | Which Color Marble Wins? 16 Marbles, 3 Laps (7:48, long-form) | ~8d | 521 | new | 0.38% |
+| 28 | compilation | 10 Most Satisfying Simulations (8:08, long-form) | ~9d | **825** | **+815** | 0.61% |
+| 27 | bell | Do 1,000 Marbles Make a BELL Curve? (Short) | ~12d | 1,309 | +10 | 1.6% |
+| 26 | mach | 14,000 Marbles in a Giant Marble Machine (5:33) | ~12d | **2,788** | **+1,698** | 0.39% |
+| 22 | elim | 16 Marbles, 6 Races (9:51) | ~18d | 1,052 | +309 | 0.38% |
+| 15 | terr | Which Color Takes the Board? (15:15) | ~25d | 2,970 | +94 | 0.44% |
+
+Everything else flat (±15). Day-7 reads: v25 1,438, v30 1,251; v26-v29 missed (nearest reads recorded in `PROJECTS.md`).
+
+- **`mach-001` kept climbing: 1,090 → 2,788 in 8 days**, now the second-best long form (v15 is 2,970 and flat). The whole
+  16:9 drip is ~450/day (incl. new uploads), but **it did not repeat**: `mach-002` (the Grand Prix, same machine, 16 numbered racers) is
+  521 at 8d, about half of `mach-001` at the same age, and `coast` is 168 at ~5d. *Lead, n=1 each*: what pulled the push was the
+  **count spectacle** ("14,000 marbles, which colour fills first?"), not the 3D machine look. The 10-29 proposal made `mach` the template; the
+  race variant says the template is narrower than "3D, 5-10 min, colour contest".
+- **The compilation went 10 → 825 in 9 days**, the second-fastest long-form after `mach-001`. At 1d it looked dead; it was just
+  slow. *Lead, n=1*, and it fits the 10-27 S2DS note (compilations of proven Shorts work once a library exists). The old
+  "compilations get nothing" rule is **contradicted by our own data once**; don't flip it on one video, but stop treating it as dead.
+- **Shorts band holds at 10 in a row**: brk 1,251 and hall 1,246, both inside 1.2-1.4K. The Halloween experiment (`hall`) did not break out; the
+  brk song-guess hook is no multiplier either. *Validated, n=10.*
+- **Subs 61 → 70 (+9)** on +6.3K views, ~0.14%, the best window yet (~1.1/day). Cannot attribute: Studio's subs-per-video is unread.
+- **Run rate ~790/day** (+6,299 in 8 days): Shorts ~3.8K of it (three new uploads), long form ~3.6K. Excluding new uploads the back-catalogue
+  adds ~340/day, almost all `mach-001`, the compilation and `elim`.
+- **Watch hours (public-views estimate only).** ~8.7K long-form views x 3 min = ~440 h against 4,000 h, ~11%. The 87 days left need
+  ~800 views/day at that average; we are at ~450 (~1.8x off, from 1.6x), and it leans on two videos. Subs: ~10.7/day needed, ~1.1 now (~10x off).
+- **Seeds:** v29-v32 are random; the logged seeds live only in the Unity console. Confirm and record if still known.
+
+## 11-11 update
+
+Pull 2026-11-11: **71 subs · 34 videos · 42,506 views** (per-video sum; endpoint 42,434). ~5 days since the 11-06 pull.
+
+| # | Slug | Title (short) | Age | Views | Δ since 11-06 | Like% |
+|---|---|---|---|---|---|---|
+| 34 | trip | 400 KM/H Trippy Roller Coaster POV (5:28, long-form) | ~5d | **18** | new | 5.6% (1 like) |
+| 33 | twin | Two Identical Marbles, Same Drop (Short) | ~5d | **209** | new | 0.96% |
+| 32 | coast | SCARY Halloween Roller Coaster (7:59) | ~10d | 199 | +31 | 0.5% |
+| 29 | mach | 16 Marbles, 3 Laps (7:48) | ~13d | 594 | +73 | 0.34% |
+| 28 | compilation | 10 Most Satisfying Simulations (8:08) | ~14d | 920 | +95 | 0.54% |
+| 26 | mach | 14,000 Marbles in a Giant Marble Machine (5:33) | ~17d | **3,414** | **+626** | 0.32% |
+| 22 | elim | 16 Marbles, 6 Races (9:51) | ~23d | 1,291 | +239 | 0.23% |
+| 15 | terr | Which Color Takes the Board? (15:15) | ~30d | 3,023 | +53 | 0.43% |
+
+Everything else flat (v31 +4, v30 +1, v27 +2, v25 +2). Day-7 reads for v31 and v32 were missed.
+
+- **`twin` (209 at 5d) is the first Short in a while far below the 1.2-1.4K band**, and the third time a *maths-question* Short has not joined the
+  proven group (`conv`, `clack` did at 1.4-3.1K; `bell` at 1.3K). The cricket pair (60 / 171) are the only other misses. *Lead, n=1*: the title is
+  "Do They Land in the SAME slot", which doesn't name a count or a visible stake as `clack` ("how many CLACKS") does. Don't conclude from one video.
+- **`trip` (18 views at 5d) is the weakest long form yet**, and `coast` (199) is close. Both are the *no-contest* 3D mood videos (a ride through shaders, a
+  scary coaster). The long forms that worked each ask a contest or count question (`mach-001` "which colour fills first", `terr`, `elim`). *Lead, n=2*,
+  but it matches the 11-06 note that the colour/count contest, not the 3D look, pulls the views.
+- **`mach-001` is still the engine: +626 in 5 days (~125/day), now 3,414, the best video we have.** `terr` (3,023) is flat. `elim` +239 and the
+  compilation +95 are slowly climbing.
+- **Run rate fell to ~330/day** (+1,651 in 5 days), from ~790. Both new uploads were weak; ~225/day of it is the back-catalogue, nearly all long form.
+- **Subs 70 → 71 (+1)** on 1.7K views, ~0.06%, about a third of the last window. One window each; not a finding, but the +9 of last time did not repeat.
+- **Long-form totals:** 11 videos, 9,985 views. Public-views estimate at 3 min: ~500 h of 4,000 (~12.5%). 82 days to 2027-02-01 need ~850 long-form
+  views/day; we run ~260/day including new uploads (~3.3x off, from 1.8x). Subs need ~11.3/day; we run ~0.2/day over this window. The 02-01 date does not hold.
+- **Seeds:** v33 and v34 are random; the logged seeds live only in the Unity console. Confirm and record them if still known.
+
+### Reference pull 2026-11-11 (`reference-channels.md` → *@chinawalk88*, *@onlinevisualtimer*)
+
+- **@chinawalk88 is a Blender marble-loop channel with 11-17M videos** (escalator Shorts at 15-17M, "20,000 Colorful Balls Marble Run Loop" long form at 11-14M,
+  4-5 min), 97% of its 186M views from the 165 marble videos; its recent uploads are at 0.2-0.9M. *Validated as a genre ceiling, n=1 channel:* count-in-title
+  and a flowing-balls loop can reach millions, but it had years of age and a large channel, and it has cooled since 2024. It also posted a video titled
+  "My channel has been demonetized" (2026-04-23), so a near-identical numbered series has a policy risk.
+- **@onlinevisualtimer reached 1.0M views in 9 weeks with search-term countdown timers** (30 min bomb timer 144K, 5 min marble run timer 90K), at 0.13% subs
+  per view, same as ours. *Lead, n=1 young channel.* Different demand (utility), and the API can't show whether viewers watch it through.
+- **Both are the same lesson as `mach-001`:** a visible count / a long loop of balls is what carries a long-form view, not narrative. Neither says anything
+  about retention.
+
 ## Observations (provisional — one video per variant, one day-7 snapshot so far)
 
 - **Every older video went flat on the same day (10-03 → 10-04)**, including v4, which had been
