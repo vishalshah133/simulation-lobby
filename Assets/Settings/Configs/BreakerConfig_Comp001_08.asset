@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f07c95bd7d509774d8043a6c244171db, type: 3}
+  m_Name: BreakerConfig_Comp001_08
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Breaker::SimulationLobby.Simulations.Breaker.BreakerConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 90
+  intent: 'comp-001 #8 Three Rings: 3 fat rings of 10/12/14 segments, 3/4/4 touches,
+    spin 20deg/s alternating; ball 7.0 u/s +1.2 per ring; 45s clock; Hall of the
+    Mountain King, one note per touch.'
+  ringCount: 3
+  innerRadius: 1.7
+  ringSpacing: 1
+  ringThickness: 0.42
+  innerSegments: 10
+  extraSegmentsPerRing: 2
+  innerHitPoints: 3
+  outerHitPoints: 4
+  ringAngularSpeed: 20
+  alternateDirections: 1
+  spinDirectionSeeded: 1
+  ballRadius: 0.18
+  startSpeed: 7
+  speedPerRing: 1.2
+  startOffsetMax: 0.6
+  timeLimitSeconds: 45
+  finishHoldSeconds: 2.5

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8b19b0f5f8ef54f84474d94fc115e5, type: 3}
+  m_Name: MultiplyEscapeConfig_comp001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.MultiplyEscape::SimulationLobby.Simulations.MultiplyEscape.MultiplyEscapeConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 44.5
+  intent: 'comp-001 #1. One round: FILL 300 or ESCAPE. 60% of bounces clone, start gap
+    24deg, +1.5deg per escape. Calibrated from run logs (escapes ~1/4 of the geometric
+    rate at small gaps). Tune gapDegreesPerEscape only: FULL every time -> raise; EMPTY
+    with peak under ~200 -> lower. Read the [mve] summary line after each run.'
+  ballRadius: 0.14
+  ballSpeed: 5
+  cloneTurnDegrees: {x: 20, y: 70}
+  fillTarget: 300
+  cloneChance: 0.6
+  startGapDegrees: 24
+  gapDegreesPerEscape: 1.5
+  gapAngularSpeed: 25
+  gapCenterDegrees: 90
+  roundCount: 1
+  maxRoundSeconds: 38
+  preLaunchHoldSeconds: 2
+  interRoundSeconds: 4.5
+  recycleDistance: 5.3

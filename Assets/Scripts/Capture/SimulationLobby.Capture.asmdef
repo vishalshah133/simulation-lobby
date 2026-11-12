@@ -2,7 +2,9 @@
     "name": "SimulationLobby.Capture",
     "rootNamespace": "SimulationLobby.Capture",
     "references": [
-        "SimulationLobby.Core"
+        "SimulationLobby.Core",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

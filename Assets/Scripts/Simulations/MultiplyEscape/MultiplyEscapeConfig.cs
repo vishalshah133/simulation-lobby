@@ -31,6 +31,11 @@ namespace SimulationLobby.Simulations.MultiplyEscape
                  "(degrees, either side). Too small and clones ride their parent in a clump.")]
         public Vector2 cloneTurnDegrees = new Vector2(15f, 55f);
 
+        [Tooltip("Chance that a wall bounce adds a ball. 1 = every bounce (the swarm can never lose: " +
+                 "growth is +1 per bounce against at most one escape). Below 1 the exit gets a real chance: " +
+                 "growth stalls once the exit's share of the wall passes this value.")]
+        [Range(0.05f, 1f)] public float cloneChance = 1f;
+
         [Header("The race")]
         [Tooltip("The circle is FULL when this many balls are inside at once. Also the body budget.")]
         [Range(50, 1500)] public int fillTarget = 500;

@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eee88ffb64efd55448b134350ed5863f, type: 3}
+  m_Name: PiClacksConfig_comp001_01
+  m_EditorClassIdentifier: SimulationLobby.Simulations.PiClacks::SimulationLobby.Simulations.PiClacks.PiClacksConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'comp-001 segment 1, Digit Jump (16:9). One question (how many clacks?)
+    asked four times, the big block 10,000x heavier each time: 3, 314, 31415, 3141592.
+    Neon on black, fixed colours; the seed is cosmetic only.'
+  rounds:
+  - massExponent: 0
+    massLabel: 1 kg
+    bigSize: 1
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3
+    maxRunSeconds: 12
+    caption: EQUAL MASS. COUNT THE CLACKS
+    holdCaption: 'GUESS: HOW MANY CLACKS?'
+    result: '{n} CLACKS.'
+  - massExponent: 2
+    massLabel: 10,000 kg
+    bigSize: 1.7
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 7.9
+    maxRunSeconds: 12
+    caption: 10,000x HEAVIER...
+    holdCaption: 
+    result: '{n} CLACKS. 3, 314...'
+  - massExponent: 4
+    massLabel: 100,000,000 kg
+    bigSize: 2.35
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.08
+    maxRunSeconds: 12
+    caption: 10,000x HEAVIER AGAIN...
+    holdCaption: 
+    result: '{n}. STILL DIGITS OF PI.'
+  - massExponent: 6
+    massLabel: 1,000,000,000,000 kg
+    bigSize: 3
+    smallGap: 2
+    bigGap: 2
+    speed: 2
+    expectedRunSeconds: 3.53
+    maxRunSeconds: 12
+    caption: A TRILLION kg...
+    holdCaption: 
+    result: '{n}! 3.141592'
+  smallSize: 1
+  smallMassLabel: 1 kg
+  frameWidth: 18
+  firstHoldSeconds: 7
+  preLaunchHoldSeconds: 1.2
+  transitionSeconds: 1.5
+  resultHoldSeconds: 1.8
+  endCardSeconds: 5
+  title: DIGIT JUMP
+  question: HOW MANY CLACKS?
+  holdCaption: 'GUESS: HOW MANY CLACKS?'
+  counterLabel: CLACKS
+  endCard: COLLIDING BLOCKS ENCODE PI
+  endLine: PI = 3.141592

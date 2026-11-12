@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e6bafaf5b9ad749a9a60ffafd8f60f, type: 3}
+  m_Name: comp001_04
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.SegmentCardConfig
+  index: 4
+  total: 10
+  title: Needle Ellipse
+  hook: 600 BALLS LEAVE RED. HOW MANY HIT BLUE?
+  explainer: Every ball leaves one dot and, after one bounce, passes through the
+    other dot. Move the first dot and they scatter.
+  cardSeconds: 1.5
+  explainerSeconds: 6
+  accent: {r: 1, g: 0.82, b: 0.2, a: 1}

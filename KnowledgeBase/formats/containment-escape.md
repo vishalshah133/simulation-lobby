@@ -93,3 +93,15 @@ see how close it is.
   one-trick channel. Worth testing whether crossover branding actually transfers viewers.
 - Does collision-triggered audio lift retention on `race` and `surv` too? Cheap to test once
   `BounceAudioSequencer` exists.
+
+## Wide variant (comp-001)
+
+Segment 2 of `comp-001`, "Shrinking Gap" (16:9, 1920x1080). Built 2026-10-27, **not yet run in Unity**; all numbers below are estimates.
+
+- **Menu:** Simulation Lobby ▸ 2D Formats ▸ Escape (esc) ▸ Wide: Shrinking Gap (comp-001). Scene `Assets/Scenes/Comp001_02_ShrinkingGap_Wide.unity`.
+- **Files:** `Escape/EscapeWideSegment.cs` (delayed start + counter/caption feed into `SegmentCardPresenter`), `Escape/Editor/EscapeWideSceneBuilder.cs`. The 9:16 builder is untouched.
+- **Config `EscapeConfig_008`** (copy of 006): 5 rounds, gap 36 to 14 deg, spin 20 to 36 deg/s, speed 11-13, growth x1.045, `maxAttemptSeconds` 18, `interAttemptSeconds` 2. Plan had ~9s per round; that would cut rounds before the ball is "too big" and make the on-screen `/ ~N` ceiling wrong, so it is 18 (a stall guard, rounds normally end earlier). Expected ~45-55s with the ~4.5s card + explainer lead-in.
+- **Look/sound:** Frost backdrop pinned (no per-seed theme, no jitter), Ode to Joy carried across rounds (the Shorts used none, Baa Baa Black Sheep, or Fur Elise).
+- **Frame:** arena ~80% of frame height (outer ring), camera shifted right so the ring centres left of the 22% right margin. Counter plate: `BOUNCES`, `n / ~N`, `ROUND k/5`. N is computed live from the ball's size (the bounce at which it becomes too big), so it is exact per round (about 41/36/30/23/14 for 1.035-style growth, lower at x1.045).
+- **Run starts late:** `autoStart` is off and `EscapeWideSegment` calls `Begin` after the card + 3s of explainer, so round 1 is not hidden behind the card. The card keeps its own clock. Seed is random and logged (`[esc-wide] Random seed ...`).
+- **Risks:** (1) A ball aimed straight at the gap on its first approach escapes in ~1s with 0 bounces (~10% in round 1, ~4% in round 5, before the spin). `EscapeConfig` has no minimum-round field; the only hold is the 2s result beat. Re-roll the take or add a min-hold field to the config if it shows. (2) The ending image (last round squeezing out of 14 deg) only happens if the ball escapes in round 5; otherwise the closing caption sits over a trapped ball. (3) The run stops right after the last result; extend the recording tail by ~2s in the edit.

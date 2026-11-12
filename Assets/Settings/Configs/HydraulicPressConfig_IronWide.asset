@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6217444e4d7a3bd42a3b09220ee87b37, type: 3}
+  m_Name: HydraulicPressConfig_IronWide
+  m_EditorClassIdentifier: SimulationLobby.Simulations.HydraulicPress::SimulationLobby.Simulations.HydraulicPress.HydraulicPressConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: comp-001 #5 Iron Press. Wide low steel chamber, iron balls (2 t each),
+    3 rounds at 8 / 32 / 128 t (4x steps). Each crushed ball splits in two; the press
+    stops when enough balls share its weight.
+  rounds:
+  - pressTons: 8
+    pressLabel: 8 TONS
+    caption: 8 TONS. GUESS?
+    result: '{n} BALLS.'
+    maxRunSeconds: 8
+    expectedRunSeconds: 2.2
+  - pressTons: 32
+    pressLabel: 32 TONS
+    caption: '4X STRONGER: 32 TONS. GUESS?'
+    result: '{n} BALLS!'
+    maxRunSeconds: 18
+    expectedRunSeconds: 6.5
+  - pressTons: 128
+    pressLabel: 128 TONS
+    caption: '4X AGAIN: 128 TONS. GUESS?'
+    result: '{n} BALLS!!'
+    maxRunSeconds: 40
+    expectedRunSeconds: 14
+  chamberWidth: 14
+  chamberHeight: 5.5
+  startRadius: 2.5
+  startOffset: 0.6
+  ballStrengthTons: 2
+  ballWeightTons: 0
+  pressSpeed: 2.5
+  squeezeSeconds: 0.12
+  squeezeDecay: 0
+  splitJitterDegrees: 3
+  loadTolerance: 0.15
+  loadSmoothing: 0.04
+  calmSpeed: 0.5
+  minRadius: 0.008
+  maxPopsPerTick: 64
+  settleSpeed: 0.1
+  stopHoldSeconds: 0.5
+  substeps: 3
+  iterations: 4
+  relaxIterations: 16
+  contactTolerance: 0.1
+  gravity: 4
+  damping: 0.5
+  friction: 0.05
+  maxSpeed: 6
+  maxBalls: 5000
+  firstHoldSeconds: 3.5
+  holdSeconds: 0.6
+  resultHoldSeconds: 1.2
+  transitionSeconds: 1.6
+  endCardSeconds: 6
+  title: IRON PRESS
+  question: HOW MANY BALLS CAN A 128-TON PRESS CRUSH?
+  subCaption: 
+  holdCaption: GUESS?
+  counterLabel: BALLS
+  endLine: EACH BALL SPLITS IN TWO, SO THE COUNT DOUBLES EVERY SQUEEZE
+  ladderFootnote: 

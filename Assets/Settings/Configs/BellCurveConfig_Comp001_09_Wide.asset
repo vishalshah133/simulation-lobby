@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 190ac9288811bb240af161a922ce6da9, type: 3}
+  m_Name: BellCurveConfig_Comp001_09_Wide
+  m_EditorClassIdentifier: SimulationLobby.Simulations.BellCurve::SimulationLobby.Simulations.BellCurve.BellCurveConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'comp-001 #9 Rigged Board (16:9). 18 peg rows, 19 wide bins. Round 1: 500
+    marbles on a fair board. Round 2: 1,500 marbles on a board rigged left (P(right)
+    0.25). By the central limit theorem round 2 is still a bell, shifted left.'
+  rounds:
+  - marbles: 500
+    spawnPerSecond: 60
+    rightProbability: 0.5
+    pegLean: 0
+    showCurve: 1
+    ladderRow: '500 FAIR: BELL'
+    caption: 500 MARBLES. EVERY PEG A COIN FLIP...
+    holdCaption: FAIR BOARD. GUESS THE SHAPE?
+    result: A BELL CURVE.
+  - marbles: 1500
+    spawnPerSecond: 150
+    rightProbability: 0.25
+    pegLean: -0.9
+    showCurve: 1
+    ladderRow: '1,500 RIGGED: BELL'
+    caption: 'RIGGED: EVERY PEG PUSHES LEFT...'
+    holdCaption: RIGGED LEFT. STILL A BELL?
+    result: STILL A BELL, JUST SHIFTED.
+  rows: 18
+  binSpacing: 1
+  rowSpacing: 0.4
+  hopSeconds: 0.16
+  hopBump: 0.08
+  dropHeight: 1.4
+  gravity: 18
+  marbleRadius: 0.14
+  pegRadius: 0.09
+  trayDepth: 9.3
+  trayHeight: 1.8
+  peakFraction: 0.25
+  frameWidth: 20
+  firstHoldSeconds: 2.5
+  preDropHoldSeconds: 1.5
+  settleSeconds: 0.4
+  resultHoldSeconds: 3
+  transitionSeconds: 1.4
+  endCardSeconds: 4
+  title: EVERY PEG IS A COIN FLIP
+  question: WHAT SHAPE DO 1,500 MARBLES MAKE ON A BOARD THAT LEANS LEFT?
+  endQuestion: STILL A BELL
+  holdCaption: GUESS THE SHAPE?
+  counterLabel: MARBLES
+  endCard: STILL A BELL, JUST SHIFTED.
+  endLine: THE CENTRAL LIMIT THEOREM

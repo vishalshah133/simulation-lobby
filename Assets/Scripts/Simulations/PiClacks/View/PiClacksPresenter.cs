@@ -168,6 +168,11 @@ namespace SimulationLobby.Simulations.PiClacks
 
         [Range(0.4f, 0.9f)] [SerializeField] float _counterCellEm = 0.6f;
 
+        [Header("Wide variant (set by ApplyWideLook; unused in the portrait build)")]
+        [SerializeField] bool _useFixedPalette;
+        [SerializeField] Color _fixedSmallColor = Color.white;
+        [SerializeField] Color _fixedBigColor = Color.white;
+
         // ---- run-time state
         Color _smallColor;
         Color _bigColor;
@@ -222,6 +227,29 @@ namespace SimulationLobby.Simulations.PiClacks
             _rig = rig;
         }
 
+        /// <summary>
+        /// Wide (comp-001) look: a fixed block colour pair instead of the seeded one, neon wall and floor, and a
+        /// lower, heavier buzz. Called by the wide scene builder before Play; the portrait build never calls it.
+        /// </summary>
+        public void ApplyWideLook(Color smallBlock, Color bigBlock, Color wall, Color hatch, Color wallEdge,
+                                  Color floorLine, Color floorFill, int buzzBaseHz, float pitchLow, float pitchHigh,
+                                  float buzzVolumeLow, float buzzVolumeHigh)
+        {
+            _useFixedPalette = true;
+            _fixedSmallColor = smallBlock;
+            _fixedBigColor = bigBlock;
+            _wallColor = wall;
+            _hatchColor = hatch;
+            _wallEdgeColor = wallEdge;
+            _floorLineColor = floorLine;
+            _floorFillColor = floorFill;
+            _buzzBaseHz = buzzBaseHz;
+            _pitchLow = pitchLow;
+            _pitchHigh = pitchHigh;
+            _buzzVolumeLow = buzzVolumeLow;
+            _buzzVolumeHigh = buzzVolumeHigh;
+        }
+
         void Start()
         {
             var runner = GetComponent<SimulationRunner>();
@@ -229,6 +257,11 @@ namespace SimulationLobby.Simulations.PiClacks
             _cosmetic = new System.Random(seed ^ 0x5bd1e995);
             _clickRandom = new System.Random(seed ^ 0x2545f491);
             PickPalette();
+            if (_useFixedPalette)
+            {
+                _smallColor = _fixedSmallColor;
+                _bigColor = _fixedBigColor;
+            }
 
             if (_rig != null && _rig.glowSprite != null && _rig.squareSprite != null)
             {

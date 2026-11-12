@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 933f9419282c03c4cb28e3831acf8cad, type: 3}
+  m_Name: PerfectFitConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.PerfectFit::SimulationLobby.Simulations.PerfectFit.PerfectFitConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'fit-001 Perfect Fit. One question (will it fit?) asked seven times: a
+    shape flies at a spinning wall with a hole cut exactly to its outline, locks
+    onto the spin just before it arrives, and slides through. The gap shrinks from
+    30 mm to 0.5 mm and the spin climbs from 40 to 210 deg/s. The seed only picks
+    each round''s spin direction, start offset and tumble.'
+  rounds:
+  - kind: 0
+    shapeName: TRIANGLE
+    gapMillimetres: 30
+    spinDegreesPerSecond: 40
+    result: FITS.
+  - kind: 1
+    shapeName: CROSS
+    gapMillimetres: 15
+    spinDegreesPerSecond: 60
+    result: STILL FITS.
+  - kind: 2
+    shapeName: STAR
+    gapMillimetres: 8
+    spinDegreesPerSecond: 85
+    result: NOT A TOUCH.
+  - kind: 3
+    shapeName: GEAR
+    gapMillimetres: 4
+    spinDegreesPerSecond: 110
+    result: CLEAN.
+  - kind: 4
+    shapeName: FLOWER
+    gapMillimetres: 2
+    spinDegreesPerSecond: 140
+    result: STILL CLEAN.
+  - kind: 5
+    shapeName: NINJA STAR
+    gapMillimetres: 1
+    spinDegreesPerSecond: 170
+    result: ONE MILLIMETRE.
+  - kind: 6
+    shapeName: SPIKE STAR
+    gapMillimetres: 0.5
+    spinDegreesPerSecond: 210
+    result: HALF A MILLIMETRE.
+  shapeRadius: 0.55
+  shapeDepth: 0.5
+  wallRadius: 1.25
+  wallThickness: 0.3
+  startDistance: 4.2
+  exitDistance: 1
+  startOffsetMinDegrees: 50
+  startOffsetMaxDegrees: 150
+  tiltMaxDegrees: 28
+  wobbleDegrees: 4
+  alignLeadFraction: 0.05
+  firstHoldSeconds: 1.8
+  holdSeconds: 1.7
+  flightSeconds: 5.2
+  resultSeconds: 1.5
+  slideSeconds: 0.9
+  endCardSeconds: 4.5
+  slideDistance: 3.4
+  widePosition: {x: 0, y: 0.1, z: -10.3}
+  wideTarget: {x: 0, y: 0.55, z: 0}
+  closePosition: {x: 0.28, y: 0.3, z: -5.2}
+  closeTarget: {x: 0, y: 0.1, z: 0.2}
+  fieldOfView: 28
+  title: PERFECT FIT
+  endCard: '{n} SHAPES. ZERO TOUCHES.'
+  endLine: 'SAME SHAPE, SAME SPIN: THE GAP NEVER CLOSES.'

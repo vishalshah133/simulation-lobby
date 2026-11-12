@@ -1,0 +1,26 @@
+{
+    "name": "SimulationLobby.Simulations.PerfectFit.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.PerfectFit.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "SimulationLobby.Simulations.PerfectFit",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

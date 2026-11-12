@@ -82,3 +82,14 @@ needs its own motion model and its own HUD becomes its own format (as `clack` di
 - Does our audience (escalation-shaped so far) take a calmer, prediction-shaped Short? This is the experiment.
 - Is "math" a channel-identity risk for a *simulation lobby*? Our view: no, if it's framed as a physical
   sim with a question (balls and walls), not a lesson.
+
+## Wide variant (comp-001)
+
+Segment 4 of the ten-sim compilation, **Needle Ellipse** (16:9, 1920x1080). Menu: `Simulation Lobby ▸ 2D Formats ▸ Math Convergence (conv) ▸ Wide: Needle Ellipse (comp-001)` -> `Assets/Scenes/Comp001_04_NeedleEllipse_Wide.unity`, config `Assets/Settings/Configs/EllipseFocusConfig_Comp001_04.asset` (delete it to reset to the builder defaults), card `Assets/Settings/SegmentCards/comp001_04.asset`.
+
+- **Geometry:** eccentricity 0.95, semi-major 8.5 (width = 85% of frame, 17 x 5.3 units), foci at +-8.075, speed 8, 600 balls r=0.07, rainbow hue = launch angle, trails 1.5s.
+- **Rounds:** (1) WATCH BLUE, red on focus, 8s, ALL 600. (2) NOW MOVE RED A LITTLE, red 1.2 off along the axis, 10s, ~57 of 600 hit (offline check of the kernel math; the sim logs an error if a verdict disagrees). (3) PUT IT BACK, 6s, ALL 600 AGAIN. About 46s total including the 7.5s card + explainer lead-in (estimated from config, not measured).
+- **Layout:** hook in the top bar, result caption in the bottom strip, counter `HIT BLUE n / 600` moved to the **bottom-left** (the 85%-wide ellipse occupies the right margin; the thin ellipse leaves the lower-left corner empty). No world-space "MAGIC POINT" label (it would fall off-frame beside the tip); the ghost ring still marks the focus.
+- **Ending image:** `CausticAccumulator` paints the last round's chords into a texture and fades it in over the final result hold, so the end card shows the full web of paths on black after the bodies vanish. Cosmetic (depends on render fps, not on the seed).
+- **Not built: second-pass re-converge.** The verdict is first pass only (launch to expected meet + window), so the counter does not show balls re-meeting at red at 2E. Doing so needs a change to `ConvergenceSimulation` (verdict window / second target), deliberately out of scope here.
+- New code is additive: `Editor/ConvergenceWideSceneBuilder.cs`, `View/ConvergenceWideBinder.cs`, `View/CausticAccumulator.cs`. The existing presenter runs with no portrait HUD (`hud = null`).

@@ -5,6 +5,7 @@
         "SimulationLobby.Core",
         "SimulationLobby.Shared",
         "SimulationLobby.Presentation",
+        "UnityEngine.UI",
         "Unity.TextMeshPro"
     ],
     "includePlatforms": [],

@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b71ac0b4ed55648a8e4137b0e43621, type: 3}
+  m_Name: BrachistochroneConfig_Wide_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Brachistochrone::SimulationLobby.Simulations.Brachistochrone.BrachistochroneConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: comp-001 #7 Racetrack (wide). Six rounds, one question; the cycloid wins
+    every round, including with a bump dented into it. Run lengths are estimated,
+    not measured.
+  rounds:
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    finishX: 10
+    finishY: 3
+    caption: STRAIGHT vs CURVE
+    holdCaption: STRAIGHT vs CURVE. WHO WINS?
+    result: THE CURVE WINS!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 3
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    finishX: 10
+    finishY: 3
+    caption: NOW A STEEP DROP
+    holdCaption: NOW A STEEP DROP. WHO WINS?
+    result: CURVE AGAIN!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 3
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    finishX: 10
+    finishY: 3
+    caption: NOW A CIRCLE
+    holdCaption: NOW A CIRCLE. WHO WINS?
+    result: CURVE, BY A HAIR!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 3.3
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    finishX: 10.5
+    finishY: 1.8
+    caption: FINISH MOVES UP
+    holdCaption: FINISH MOVES UP. WHO WINS?
+    result: STILL THE CURVE!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: CURVE GOES UNDER IT!
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 4
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 6
+      label: BUMPY CURVE
+      shape: 0.7
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    - kind: 3
+      label: PARABOLA
+      shape: 0
+    finishX: 10
+    finishY: 2.5
+    caption: 'SABOTAGE: A BUMP ON THE CURVE'
+    holdCaption: A BUMP ON THE CURVE! WHO WINS?
+    result: STILL THE FASTEST!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 3.5
+  - tracks:
+    - kind: 0
+      label: STRAIGHT
+      shape: 0
+    - kind: 1
+      label: CURVE
+      shape: 0
+    - kind: 4
+      label: STEEP
+      shape: 0.12
+    - kind: 2
+      label: CIRCLE
+      shape: 0
+    - kind: 3
+      label: PARABOLA
+      shape: 0
+    - kind: 5
+      label: DEEP
+      shape: 1
+    - kind: 7
+      label: SINE
+      shape: 0
+    - kind: 8
+      label: WAVE
+      shape: 0
+    finishX: 10
+    finishY: 3
+    caption: ALL 8 SHAPES
+    holdCaption: ALL 8 SHAPES. WHO WINS?
+    result: CURVE. ALWAYS!
+    showLengths: 0
+    maxRunSeconds: 14
+    caption2: 
+    result2: 
+    resultSeconds: 0
+    expectedRunSeconds: 3.1
+  gravity: 8
+  frameWidth: 12.6
+  pathSamples: 800
+  firstHoldSeconds: 7.5
+  preLaunchHoldSeconds: 1.5
+  transitionSeconds: 0.6
+  resultHoldSeconds: 1.25
+  endCardSeconds: 3.5
+  slowMoRadius: 0.7
+  slowMoGap: 0.11
+  slowMoRate: 0.3
+  title: RACETRACK
+  question: WHICH SLIDE WINS?
+  holdCaption: WHO WINS? GUESS!
+  endCard: BRACHISTOCHRONE CURVE
+  endCardSizePercent: 80
+  endTitle: GREEK FOR "SHORTEST TIME"
+  endLabel: BRACHISTOCHRONE
+  endLine: BRACHISTOS = SHORTEST,  CHRONOS = TIME
+  endLine2: THE FASTEST SLIDE ISN'T THE SHORTEST

@@ -672,7 +672,7 @@ namespace SimulationLobby.Simulations.Brachistochrone
         void CheckWinner(int track)
         {
             BrachTrack t = Config.rounds[RoundIndex].tracks[track];
-            if (t.kind != CurveKind.Cycloid)
+            if (t.kind != CurveKind.Cycloid && t.kind != CurveKind.BumpedCycloid)
             {
                 Debug.LogError($"[brach] round {RoundIndex + 1}: winner is {t.kind}, expected the cycloid");
             }

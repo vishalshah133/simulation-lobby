@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 190ac9288811bb240af161a922ce6da9, type: 3}
+  m_Name: BellCurveConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.BellCurve::SimulationLobby.Simulations.BellCurve.BellCurveConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 120
+  intent: 'bell-001 Bell Curve Drop. One question (what shape will the marbles make?)
+    asked three times: 100 marbles on a fair board (a rough mound), 1,000 on a fair
+    board (a bell), 1,000 on a rigged board (still a bell, just shifted). Every peg
+    is a seeded coin flip, so the seed decides every pile.'
+  rounds:
+  - marbles: 100
+    spawnPerSecond: 14
+    rightProbability: 0.5
+    pegLean: 0
+    showCurve: 0
+    ladderRow: '100: ROUGH'
+    caption: 100 MARBLES. EVERY PEG A COIN FLIP...
+    holdCaption: 
+    result: A ROUGH MOUND...
+  - marbles: 1000
+    spawnPerSecond: 55
+    rightProbability: 0.5
+    pegLean: 0
+    showCurve: 1
+    ladderRow: '1,000: BELL'
+    caption: NOW 1,000 MARBLES...
+    holdCaption: GUESS AGAIN?
+    result: A SMOOTH BELL CURVE!
+  - marbles: 1000
+    spawnPerSecond: 60
+    rightProbability: 0.65
+    pegLean: 0.8
+    showCurve: 1
+    ladderRow: 'RIGGED: BELL'
+    caption: 'RIGGED: EVERY PEG LEANS RIGHT...'
+    holdCaption: STILL A BELL?
+    result: STILL A BELL. JUST SHIFTED.
+  rows: 10
+  binSpacing: 0.92
+  rowSpacing: 0.52
+  hopSeconds: 0.2
+  hopBump: 0.12
+  dropHeight: 1.4
+  gravity: 18
+  marbleRadius: 0.14
+  pegRadius: 0.09
+  trayDepth: 7.6
+  trayHeight: 2
+  peakFraction: 0.34
+  frameWidth: 11
+  firstHoldSeconds: 1.8
+  preDropHoldSeconds: 1.2
+  settleSeconds: 0.4
+  resultHoldSeconds: 2.4
+  transitionSeconds: 1.4
+  endCardSeconds: 5
+  title: EVERY PEG IS A COIN FLIP
+  question: WHAT SHAPE WILL THEY MAKE?
+  endQuestion: BELL CURVE
+  holdCaption: GUESS THE SHAPE?
+  counterLabel: MARBLES
+  endCard: RANDOM LEFT/RIGHT STEPS ADD UP TO A BELL CURVE
+  endLine: THE CENTRAL LIMIT THEOREM

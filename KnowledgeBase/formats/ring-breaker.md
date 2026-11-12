@@ -44,3 +44,20 @@ more hits.
   Tune from real scan numbers, not the model.
 - **2026-10-04: spin rings with a kinematic Rigidbody2D.** Moving static colliders by transform
   made a 200-seed scan take 38 minutes.
+
+## Wide variant (comp-001 #8 "Three Rings")
+
+16:9 (1920x1080) segment for `comp-001`. Menu: **Simulation Lobby ▸ 2D Formats ▸ Ring Breaker (brk) ▸ Wide: Three Rings (comp-001)**
+-> `Assets/Scenes/Comp001_08_ThreeRings_Wide.unity`, config `Assets/Settings/Configs/BreakerConfig_Comp001_08.asset`,
+card `Assets/Settings/SegmentCards/comp001_08.asset`. Sim code untouched; new files `BreakerWideHud.cs` (runtime) and
+`Editor/BreakerWideSceneBuilder.cs`; the Breaker asmdef gained `UnityEngine.UI` + `Unity.TextMeshPro` references.
+
+- **Variation:** 3 fat rings (r 1.7/2.7/3.7, thickness 0.42, 10/12/14 segments), hit points 3/4/4, ball 7.0 u/s +1.2 per ring,
+  spin 20 deg/s, **45 s clock**, cyan ball on navy, gold rings, *In the Hall of the Mountain King* (one note per touch).
+- **Real loss state:** clock at 0 with a ring up -> sim freezes ball and rings, caption `TIME UP! RING n OF 3 IS STILL STANDING`.
+- **HUD:** hook top-left, `RINGS BROKEN n/3` in the counter slot, big `TIME LEFT m:ss` plate with a draining bar under it
+  (red under 10 s), caption bottom. The run starts after the 1.5 s title card so the clock does not burn under it.
+- **Outcome UNVERIFIED.** Tuned from a rough billiard model (median ~65 s for 3/4/4, discounted ~1.4x because the model ran
+  slower than the real brk-001), not from Unity. Run several takes. Tune in the config: `innerHitPoints`/`outerHitPoints`,
+  `startSpeed`/`speedPerRing`, `innerSegments`/`extraSegmentsPerRing` (rebuild after segment changes), `timeLimitSeconds`.
+  Too many wins -> raise hit points or lower speed; too many losses -> the reverse.

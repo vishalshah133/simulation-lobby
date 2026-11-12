@@ -15,7 +15,7 @@ namespace SimulationLobby.Simulations.PiClacks.EditorTools
     /// Menu: <c>Simulation Lobby ▸ 2D Formats ▸ Pi Clacks (clack) ▸ Pi Blocks (clack-001)</c>. Re-running replaces
     /// the scene and keeps an existing config asset (hand tuning survives).
     /// </summary>
-    static class PiClacksSceneBuilder
+    static partial class PiClacksSceneBuilder
     {
         const string ScenePath = "Assets/Scenes/PiClacks_Blocks_2D.unity";
         const string ConfigPath = "Assets/Settings/Configs/PiClacksConfig_001.asset";

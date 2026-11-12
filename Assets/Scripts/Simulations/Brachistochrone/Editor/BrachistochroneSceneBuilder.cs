@@ -191,7 +191,7 @@ namespace SimulationLobby.Simulations.Brachistochrone.EditorTools
         // ---------------------------------------------------------------- generated sprite
 
         /// <summary>A 6 x 4 checkered flag, 1.5 x 1 world units, point-filtered so the squares stay crisp.</summary>
-        static Sprite EnsureCheckerSprite()
+        internal static Sprite EnsureCheckerSprite()
         {
             const string fileName = "BrachChecker_48x32.png";
             string path = $"{ArtFolder}/{fileName}";

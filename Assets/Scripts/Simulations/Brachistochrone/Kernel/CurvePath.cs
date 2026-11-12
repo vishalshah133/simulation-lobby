@@ -132,6 +132,44 @@ namespace SimulationLobby.Simulations.Brachistochrone.Kernel
 
                     break;
 
+                case CurveKind.BumpedCycloid:
+                {
+                    // Same cycloid, with a gaussian dent (height = shape world units) around the middle of its descent.
+                    thetaB = SolveCycloidTheta(bx / by);
+                    radius = by / (1.0 - Math.Cos(thetaB));
+                    double h = Math.Max(0.0, shape);
+                    for (int i = 0; i < n; i++)
+                    {
+                        double u = (double)i / (n - 1);
+                        double th = thetaB * u;
+                        double d = (u - 0.5) / 0.07;
+                        x[i] = radius * (th - Math.Sin(th));
+                        y[i] = Math.Max(0.05, radius * (1.0 - Math.Cos(th)) - h * Math.Exp(-d * d));
+                    }
+
+                    break;
+                }
+
+                case CurveKind.Sine:
+                    for (int i = 0; i < n; i++)
+                    {
+                        double u = (double)i / (n - 1);
+                        x[i] = bx * u;
+                        y[i] = by * Math.Sin(0.5 * Math.PI * u);
+                    }
+
+                    break;
+
+                case CurveKind.Wave:
+                    for (int i = 0; i < n; i++)
+                    {
+                        double u = (double)i / (n - 1);
+                        x[i] = bx * u;
+                        y[i] = by * u + 0.25 * by * Math.Sin(4.0 * Math.PI * u) * Math.Min(1.0, 6.0 * u) * (1.0 - u);
+                    }
+
+                    break;
+
                 case CurveKind.SteepDrop:
                     BuildSteepDrop(x, y, bx, by, shape);
                     break;

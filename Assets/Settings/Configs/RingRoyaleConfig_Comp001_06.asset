@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0cc1cb4465b5c4ea72234bd8392df9, type: 3}
+  m_Name: RingRoyaleConfig_Comp001_06
+  m_EditorClassIdentifier: SimulationLobby.Simulations.RingRoyale::SimulationLobby.Simulations.RingRoyale.RingRoyaleConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 106.9
+  intent: 'comp-001 #6 ''Six Colours'' (16:9). 6 hues 60 deg apart x 3 marbles; x2
+    arc 24 deg opposite a 10 deg EXIT; ring 60 deg/s; sudden death at 15 s, +4 deg/s.
+    Collision-free model: game ~35-42 s (+2.5 s hold, ~0.9 s seal, 2.5 s result)
+    = ~45 s clip. Needs a seed scan to confirm.'
+  colours:
+  - {r: 1, g: 0.120000005, b: 0.120000005, a: 1}
+  - {r: 1, g: 0.96833336, b: 0.050000012, a: 1}
+  - {r: 0.14999998, g: 1, b: 0.22083324, a: 1}
+  - {r: 0.100000024, g: 0.92499995, b: 1, a: 1}
+  - {r: 0.25, g: 0.3499999, b: 1, a: 1}
+  - {r: 1, g: 0.14999998, b: 0.92916673, a: 1}
+  colourNames:
+  - RED
+  - YELLOW
+  - GREEN
+  - CYAN
+  - BLUE
+  - PINK
+  marblesPerColour: 3
+  ballRadius: 0.26
+  ballSpeed: 5
+  cloneTurnDegrees: {x: 15, y: 55}
+  spawnRadiusFraction: 0.75
+  spawnSpacing: 0.9
+  ringRadius: 4.6
+  exitStartDegrees: 10
+  exitCenterDegrees: 90
+  x2ArcDegrees: 24
+  x2CenterDegrees: 270
+  ringAngularSpeed: 60
+  suddenDeathAtSeconds: 15
+  suddenDeathDegreesPerSecond: 4
+  maxExitDegrees: 300
+  bodyCap: 300
+  maxGameSeconds: 100
+  preLaunchHoldSeconds: 2.5
+  sealSeconds: 0.9
+  resultHoldSeconds: 2.5
+  recycleDistance: 9

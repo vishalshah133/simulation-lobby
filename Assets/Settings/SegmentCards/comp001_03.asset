@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e6bafaf5b9ad749a9a60ffafd8f60f, type: 3}
+  m_Name: comp001_03
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.SegmentCardConfig
+  index: 9
+  total: 10
+  title: Gate Funnel
+  hook: 1 BALL. HOW MANY SURVIVE THE GATES?
+  explainer: One marble drops through five rows of gates. x3 triples it, +3 adds,
+    half halves it, x0 wipes it out. How many reach the bottom?
+  cardSeconds: 1.5
+  explainerSeconds: 6
+  accent: {r: 1, g: 0.82, b: 0.2, a: 1}

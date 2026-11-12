@@ -47,3 +47,22 @@ chords, so expect more wall hits and shorter games in Unity.
 
 - Does the share bar read at 480px with four colours, and does a 1-marble colour stay findable?
 - Does sudden death feel earned, or like a cheat? (Caption it, and show the gap opening.)
+
+## Wide variant (comp-001)
+
+Segment 6 "Six Colours" (16:9, 1920x1080). Menu: `Simulation Lobby ▸ 2D Formats ▸ Color Rumble (royale) ▸ Wide: Six Colours (comp-001)`
+(priority 196). Scene `Assets/Scenes/Comp001_06_SixColours_Wide.unity`, config `Assets/Settings/Configs/RingRoyaleConfig_Comp001_06.asset`,
+card `Assets/Settings/SegmentCards/comp001_06.asset`. Code: `RingRoyaleWideSceneBuilder` (Editor) + `RingRoyaleWidePresenter`
+(reads state in `LateUpdate`; the 9:16 builder and `RingRoyalePresenter` are untouched, the latter still does audio/tint/confetti).
+
+- **Config:** 6 colours x 3 (18 marbles), hues 60 degrees apart (red, yellow, green, cyan, blue, pink) on near-black, ball radius 0.26,
+  ring 60 deg/s, EXIT 10 deg, x2 arc 24 deg, sudden death at 15 s widening 4 deg/s, 2.5 s setup hold, 2.5 s result hold.
+- **Legibility:** every marble carries its colour's initial (R Y G C B P) as a world-space TMP glyph, so colour is not the only cue.
+- **Frame:** ring height-limited (ortho from `WideFrameLayout`, camera shifted right so the ring clears the right margin). Counter
+  ("N LEFT") tops the right margin; a vertical stacked share column (count per colour, min 10% height, OUT dims) fills the rest.
+- **Zoom:** once two colours remain the camera eases to 0.72x ortho over 9 s, drifting toward those marbles; it eases back out when
+  the winner is sealed in so the ending image is the whole ring in the winner's colour.
+- **Length:** collision-free model (30 seeds, scratchpad `model.py`): game p10/median/p90 = 35 / 39 / 42 s at x2 24 deg, sudden
+  death 15 s; plus ~6 s of hold/seal/result = ~45 s clip. ESTIMATED, not measured; ball-ball collisions shorten it. Needs a seed scan
+  (config values, not seeds) to confirm.
+- **Open:** do the six hues + letters read at 480px? Does a 1-marble colour stay findable in the column?

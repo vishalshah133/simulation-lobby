@@ -32,3 +32,15 @@ and the growth rate (~4× for 2× force, if the harness confirms it) is the twis
 
 - Does the ~4× ratio hold across seeds, or is the pile too irregular for a clean law?
 - Does a 2,000-grain pile read at 480px, or does it turn to noise?
+
+## Wide variant (comp-001)
+
+Segment 5 of `comp-001`, **Iron Press**: 16:9, built by `Simulation Lobby ▸ 2D Formats ▸ Hydraulic Press (press) ▸ Wide: Iron Press (comp-001)`
+(`HydraulicPressIronWideBuilder`, scene `Assets/Scenes/Comp001_05_IronPress_Wide.unity`, config `HydraulicPressConfig_IronWide`).
+
+- Config only plus a cosmetic path: chamber 14 x 5.5, `startRadius` 2.5, `ballStrengthTons` 2, three rounds 8 / 32 / 128 t, holds 3.5 / 0.6 / 1.2.
+  The presenter gained an additive `EnableIronWide(SegmentCardPresenter)` (molten palette, dark steel, deeper thuds, HUD to the segment card).
+- Kernel-only harness (4 seeds, dt 1/60): 8 t = 4-6 balls in 1.7-2.3 s; 32 t = 101-117 balls in 5.3-7.9 s; 128 t = 1,467-1,504 balls in 11.6-16.3 s.
+  Counts scale as tons squared (x16 per 4x force), so `maxBalls` 5000 is never reached; `startRadius` is the knob that sets the pile size.
+- Estimated video length ~42 s (3.5 s lead-in, medians, 6 s end card). Not yet watched in Unity.
+- Never claim a ratio: the ladder is 5 / ~110 / ~1,500, which is not a clean 4x.

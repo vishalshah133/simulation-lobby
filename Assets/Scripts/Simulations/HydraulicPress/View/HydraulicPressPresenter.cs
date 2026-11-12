@@ -145,6 +145,12 @@ namespace SimulationLobby.Simulations.HydraulicPress
         [Tooltip("The counter is padded with invisible digits to this many cells so the line doesn't shift.")]
         [Range(1, 6)] [SerializeField] int _counterCells = 4;
 
+        [Header("Wide variant (comp-001). Off for the 9:16 Short.")]
+        [Tooltip("Set by EnableIronWide. When bound, the hook/counter/result caption go to the SegmentCardPresenter instead of the CaptionHud.")]
+        [SerializeField] SegmentCardPresenter _card;
+        [SerializeField] bool _molten;
+        [SerializeField] bool _deepAudio;
+
         // ---- run-time state
         System.Random _cosmetic;
         bool _seeded;
@@ -213,6 +219,39 @@ namespace SimulationLobby.Simulations.HydraulicPress
             _rig = rig;
         }
 
+        /// <summary>
+        /// Wide (16:9) "Iron Press" look, additive: HUD goes to the segment card canvas, balls take a molten palette
+        /// (white-hot first generation cooling to deep red), the chamber goes dark steel, the thuds drop an octave.
+        /// Cosmetic only; the run is untouched. Called by the scene builder.
+        /// </summary>
+        public void EnableIronWide(SegmentCardPresenter card)
+        {
+            _card = card;
+            _molten = true;
+            _deepAudio = true;
+            _popOctavesPerGeneration = 0.14f;
+            _brightnessVariation = 0.1f;
+            _backColor = new Color(0.05f, 0.055f, 0.07f, 0.95f);
+            _wallColor = new Color(0.14f, 0.15f, 0.18f, 1f);
+            _edgeColor = new Color(0.5f, 0.54f, 0.6f, 0.9f);
+            _floorColor = new Color(0.1f, 0.105f, 0.13f, 1f);
+            _plateColor = new Color(0.2f, 0.215f, 0.25f, 1f);
+            _housingColor = new Color(0.22f, 0.24f, 0.28f, 1f);
+            _rodColor = new Color(0.7f, 0.74f, 0.8f, 1f);
+        }
+
+        static Color32 MoltenColor(int generation)
+        {
+            // White-hot, yellow, orange, deep red-orange as the balls shrink.
+            Color[] stops =
+            {
+                new Color(1f, 0.97f, 0.85f), new Color(1f, 0.82f, 0.25f), new Color(1f, 0.48f, 0.08f), new Color(0.85f, 0.2f, 0.05f)
+            };
+            float t = Mathf.Clamp01(generation / 11f) * (stops.Length - 1);
+            int i = Mathf.Min(Mathf.FloorToInt(t), stops.Length - 2);
+            return Color.Lerp(stops[i], stops[i + 1], t - i);
+        }
+
         void Start()
         {
             BuildBalls();
@@ -273,7 +312,7 @@ namespace SimulationLobby.Simulations.HydraulicPress
             for (int g = 0; g < _palette.Length; g++)
             {
                 float hue = Mathf.Repeat(_hueOffset + g * _hueStep, 1f);
-                _palette[g] = Color.HSVToRGB(hue, _ballSaturation, 1f);
+                _palette[g] = _molten ? MoltenColor(g) : (Color32)Color.HSVToRGB(hue, _ballSaturation, 1f);
             }
 
             _seeded = true;
@@ -364,8 +403,10 @@ namespace SimulationLobby.Simulations.HydraulicPress
             _pop = HydraulicPressAudio.CreatePop(7);
             _clink = ProceduralToneBank.CreateGlassClink(1f, 1.4f, 3, "PressClink");
             _whoosh = ProceduralToneBank.CreateWhoosh(1.1f, 2, "PressWhoosh");
-            _landThud = ProceduralToneBank.CreateImpactThud(0.9f, 0.28f, 5, "PressLand");
-            _stopThud = ProceduralToneBank.CreateImpactThud(0.6f, 0.5f, 6, "PressStop");
+            _landThud = _deepAudio ? ProceduralToneBank.CreateImpactThud(0.55f, 0.4f, 5, "PressLandDeep")
+                                   : ProceduralToneBank.CreateImpactThud(0.9f, 0.28f, 5, "PressLand");
+            _stopThud = _deepAudio ? ProceduralToneBank.CreateImpactThud(0.38f, 0.75f, 6, "PressStopDeep")
+                                   : ProceduralToneBank.CreateImpactThud(0.6f, 0.5f, 6, "PressStop");
 
             _voices = new AudioSource[_popVoices];
             for (int i = 0; i < _voices.Length; i++)
@@ -736,6 +777,12 @@ namespace SimulationLobby.Simulations.HydraulicPress
 
         void UpdateHud(HydraulicPressConfig config, PressPhase phase)
         {
+            if (_card != null)
+            {
+                UpdateCardHud(config, phase);
+                return;
+            }
+
             if (_hud == null)
             {
                 return;
@@ -757,7 +804,34 @@ namespace SimulationLobby.Simulations.HydraulicPress
             }
         }
 
-        string BuildFooter(HydraulicPressConfig config, PressPhase phase)
+        /// <summary>Wide path: hook top-left, "BALLS n" in the right margin, the round caption / result along the bottom.</summary>
+        void UpdateCardHud(HydraulicPressConfig config, PressPhase phase)
+        {
+            if (!_hudInitialised)
+            {
+                _hudInitialised = true;
+                _card.SetHook(config.question);
+            }
+
+            string footer = BuildFooter(config, phase, false);
+            if (footer != _footerShown)
+            {
+                _footerShown = footer;
+                _card.SetResultCaption(footer);
+            }
+
+            _card.SetCounter(WideCounter(config, _simulation.BallCount));
+        }
+
+        /// <summary>"BALLS" over the number, digits in fixed cells so the number doesn't jitter sideways.</summary>
+        string WideCounter(HydraulicPressConfig config, int count)
+        {
+            string digits = count.ToString(CultureInfo.InvariantCulture);
+            string cell = _counterCellEm.ToString("0.###", CultureInfo.InvariantCulture);
+            return "<size=55%>" + config.counterLabel + "</size>\n<mspace=" + cell + "em>" + digits + "</mspace>";
+        }
+
+        string BuildFooter(HydraulicPressConfig config, PressPhase phase, bool withCounter = true)
         {
             PressRound round = _simulation.CurrentRound;
             int balls = _simulation.BallCount;
@@ -782,12 +856,12 @@ namespace SimulationLobby.Simulations.HydraulicPress
 
                     break;
                 case PressPhase.EndCard:
-                    return Tint("<size=80%>" + (config.endLine ?? string.Empty) + "</size>", _resultTint);
+                    return Tint(withCounter ? "<size=80%>" + (config.endLine ?? string.Empty) + "</size>" : config.endLine ?? string.Empty, _resultTint);
                 default:
                     return string.Empty;
             }
 
-            return line + "\n" + CounterLine(config, balls);
+            return withCounter ? line + "\n" + CounterLine(config, balls) : line;
         }
 
         static string Caption(PressRound round, HydraulicPressConfig config)

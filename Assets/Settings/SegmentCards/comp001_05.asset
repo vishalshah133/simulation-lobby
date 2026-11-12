@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e6bafaf5b9ad749a9a60ffafd8f60f, type: 3}
+  m_Name: comp001_05
+  m_EditorClassIdentifier: SimulationLobby.Presentation::SimulationLobby.Presentation.SegmentCardConfig
+  index: 5
+  total: 10
+  title: Iron Press
+  hook: HOW MANY BALLS CAN A 128-TON PRESS CRUSH?
+  explainer: Each ball holds 2 tons. A crushed ball splits in two. The press stops
+    once enough balls share its weight.
+  cardSeconds: 1.5
+  explainerSeconds: 4
+  accent: {r: 1, g: 0.82, b: 0.2, a: 1}

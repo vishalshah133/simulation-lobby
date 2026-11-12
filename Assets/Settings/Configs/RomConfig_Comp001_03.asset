@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60948b803aac58742a4746498d78493c, type: 3}
+  m_Name: RomConfig_Comp001_03
+  m_EditorClassIdentifier: SimulationLobby.Simulations.ReleaseOrMultiply::SimulationLobby.Simulations.ReleaseOrMultiply.RomConfig
+  fixedTimestep: 0.016666668
+  maxDurationSeconds: 150
+  intent: 'comp-001 #3 Gate Funnel (wide): 6 lanes x 5 rows (x n, +n, half, x0),
+    ONE starting marble, 300-body cap, slow gravity for ~45 s total. Never run in
+    Unity; length is an estimate.'
+  startMarbles: 1
+  dropIntervalSeconds: 1
+  dropSpread: 0.35
+  rows:
+  - gates:
+    - kind: 0
+      value: 2
+    - kind: 0
+      value: 2
+    - kind: 0
+      value: 3
+    - kind: 1
+      value: 2
+    - kind: 0
+      value: 2
+    - kind: 0
+      value: 3
+  - gates:
+    - kind: 0
+      value: 3
+    - kind: 0
+      value: 2
+    - kind: 1
+      value: 3
+    - kind: 0
+      value: 2
+    - kind: 2
+      value: 2
+    - kind: 0
+      value: 4
+  - gates:
+    - kind: 0
+      value: 3
+    - kind: 0
+      value: 2
+    - kind: 1
+      value: 5
+    - kind: 2
+      value: 2
+    - kind: 0
+      value: 5
+    - kind: 3
+      value: 0
+  - gates:
+    - kind: 0
+      value: 4
+    - kind: 0
+      value: 2
+    - kind: 2
+      value: 2
+    - kind: 0
+      value: 10
+    - kind: 1
+      value: 10
+    - kind: 3
+      value: 0
+  - gates:
+    - kind: 0
+      value: 100
+    - kind: 0
+      value: 20
+    - kind: 0
+      value: 5
+    - kind: 2
+      value: 2
+    - kind: 3
+      value: 0
+    - kind: 3
+      value: 0
+  shuffleGatesPerRun: 1
+  countCap: 1000000000000
+  maxBodies: 300
+  maxClonesPerGate: 24
+  marbleRadius: 0.2
+  marbleBounciness: 0.45
+  gravityScale: 0.07
+  linearDamping: 0.15
+  maxFallSpeed: 6.5
+  stuckSeconds: 1.2
+  laneWidth: 3
+  rowPitch: 1.9
+  gateThickness: 1
+  firstGateY: 3.6
+  spawnY: 5
+  pegLinesPerRow: 1
+  pegRadius: 0.12
+  pegSpacing: 1.5
+  finishHoldSeconds: 6

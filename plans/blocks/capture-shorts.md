@@ -33,8 +33,9 @@ Renders a chosen seed to a 1080x1920 @ 60fps video file suitable for YouTube Sho
 
 ## Gotchas
 
-- Unity Recorder is not in `Packages/manifest.json` yet — add `com.unity.recorder` before this block
-  can be built, or implement frame capture manually.
+- Unity Recorder 5.1.7 (`com.unity.recorder`) IS in `Packages/manifest.json`. For 16:9 long form set the
+  Game view and Recorder output to 1920x1080; the comp-001 checklist is `Simulation Lobby ▸ Tools ▸
+  Compilation (comp-001) ▸ Print Recording Checklist`.
 - Real-time capture drops frames under load; use Recorder's offline mode or step the simulation
   manually per captured frame.
 - Check framing in a real 9:16 frame, not a maximized Game view — it lies about safe areas.

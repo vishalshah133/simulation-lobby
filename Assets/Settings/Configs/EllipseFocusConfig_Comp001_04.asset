@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54decbcf9066b834f87e3e671684b14e, type: 3}
+  m_Name: EllipseFocusConfig_Comp001_04
+  m_EditorClassIdentifier: SimulationLobby.Simulations.Convergence::SimulationLobby.Simulations.Convergence.EllipseFocusConfig
+  fixedTimestep: 0.008333334
+  maxDurationSeconds: 45.899998
+  intent: 'comp-001 segment 4, Needle Ellipse (wide 16:9). One question (600 balls
+    from red: how many hit blue?) in a very thin ellipse (e=0.95). Round 1 red on
+    the focus: all hit. Round 2 red nudged along the axis: most miss. Round 3 red
+    back: all hit again. Verdict is first pass only. Seed is cosmetic only.'
+  ballCount: 600
+  ballRadius: 0.07
+  showBodiesDuringHold: 0
+  showStartPoint: 1
+  hueSpan: 1
+  meetRadius: 0.25
+  meetFraction: 0.95
+  verdictWindowSeconds: 0.06
+  firstHoldSeconds: 7.5
+  preLaunchHoldSeconds: 0.8
+  resultHoldSeconds: 1.8
+  transitionSeconds: 1.2
+  endCardSeconds: 5
+  holdCaption: GUESS?
+  counterLabel: HIT BLUE
+  title: NEEDLE ELLIPSE
+  endTitle: 
+  question: 600 BALLS LEAVE RED. HOW MANY HIT BLUE?
+  endCard: A BOUNCE OFF AN ELLIPSE SENDS FOCUS TO FOCUS.
+  idealSpotLabel: 
+  maxAngleOffsetDegrees: 1
+  rounds:
+  - info:
+      caption: WATCH BLUE
+      result: ALL {n}. AT THE SAME INSTANT.
+      expected: 0
+      runSeconds: 8
+      trailSeconds: 1.5
+      ballCount: 600
+    halfWidth: 8.5
+    halfHeight: 2.6541245
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 8
+  - info:
+      caption: NOW MOVE RED A LITTLE...
+      result: ONLY {n} HIT.
+      expected: 1
+      runSeconds: 10
+      trailSeconds: 1.5
+      ballCount: 600
+    halfWidth: 8.5
+    halfHeight: 2.6541245
+    startOffset: {x: -1.2, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 8
+  - info:
+      caption: PUT IT BACK...
+      result: ALL {n} AGAIN.
+      expected: 0
+      runSeconds: 6
+      trailSeconds: 1.5
+      ballCount: 600
+    halfWidth: 8.5
+    halfHeight: 2.6541245
+    startOffset: {x: 0, y: 0}
+    targetOffset: {x: 0, y: 0}
+    speed: 8

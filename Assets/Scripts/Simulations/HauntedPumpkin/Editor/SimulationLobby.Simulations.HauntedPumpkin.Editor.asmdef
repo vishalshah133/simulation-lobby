@@ -1,0 +1,24 @@
+{
+    "name": "SimulationLobby.Simulations.HauntedPumpkin.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.HauntedPumpkin.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "SimulationLobby.Simulations.HauntedPumpkin",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

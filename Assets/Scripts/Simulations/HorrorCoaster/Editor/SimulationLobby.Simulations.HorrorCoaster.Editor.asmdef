@@ -1,0 +1,27 @@
+{
+    "name": "SimulationLobby.Simulations.HorrorCoaster.Editor",
+    "rootNamespace": "SimulationLobby.Simulations.HorrorCoaster.EditorTools",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "SimulationLobby.Presentation.Editor",
+        "SimulationLobby.Simulations.HorrorCoaster",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

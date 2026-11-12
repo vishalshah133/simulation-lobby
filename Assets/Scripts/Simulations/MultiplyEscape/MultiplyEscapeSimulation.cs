@@ -335,6 +335,12 @@ namespace SimulationLobby.Simulations.MultiplyEscape
 
         void Clone(SwarmBall parent, Vector2 position)
         {
+            // Only drawn below 1, so configs at 1 keep the exact sequence they always had.
+            if (_config.cloneChance < 1f && _random.NextFloat() >= _config.cloneChance)
+            {
+                return;
+            }
+
             if (_inside.Count + 1 > _config.fillTarget || _pool.FreeCount == 0)
             {
                 // Still drawn, so the sequence doesn't depend on whether the pool had room.
@@ -408,6 +414,9 @@ namespace SimulationLobby.Simulations.MultiplyEscape
             }
 
             int round = _outcomes.Count;
+            Debug.Log($"[mve] round {round} {outcome}: {_roundTick * _config.fixedTimestep:0.0}s, peak {PeakThisRound}, " +
+                      $"born {_nextSerial}, escaped {EscapedThisRound}, exit {_boundary.gapDegrees:0}deg " +
+                      $"(clone {_config.cloneChance:0.00}, +{_config.gapDegreesPerEscape:0.0}/escape)", this);
             _recorder.LogEvent($"round_{round}_{outcome.ToString().ToLowerInvariant()}", _inside.Count);
             _recorder.SetMetric($"round_{round}_peak", PeakThisRound);
             _recorder.SetMetric($"round_{round}_escaped", EscapedThisRound);

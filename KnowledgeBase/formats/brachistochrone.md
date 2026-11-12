@@ -40,3 +40,23 @@ has to climb back up. The payoff is seeing the longer path win, not having it ex
 1. **Fastest path** (*brach-001*): which ball wins? Five rounds, the cycloid always.
 2. **Tautochrone**: balls released from different heights on one cycloid all reach the bottom at once.
 3. **Galileo vs Bernoulli**: circle arc vs cycloid only, the finish moved round by round, and the gap never closes.
+
+## Wide variant (comp-001)
+
+Segment 7 of `comp-001`, "Racetrack". Menu: `Simulation Lobby ▸ 2D Formats ▸ Brachistochrone (brach) ▸ Wide: Racetrack (comp-001)`
+-> `Assets/Scenes/Comp001_07_Racetrack_Wide.unity`, config `BrachistochroneConfig_Wide_001` (built from
+`BrachistochroneWidePreset`; delete the asset to regenerate), card `Assets/Settings/SegmentCards/comp001_07.asset`.
+
+- **Same sim, new view.** `BrachistochroneSimulation` is reused untouched; `BrachistochroneWidePresenter` replaces the Short's
+  presenter. Light blueprint-paper backdrop (cream + faint blue grid), saturated ink tracks, one fixed colour per slot. The only
+  light frame in the compilation. The card HUD is re-skinned to ink-on-paper by the builder (by name; Presentation is untouched).
+- **Frame.** A at the origin, B at about (10, 3) so the cycloid dips below it; static camera sized with `WideFrameLayout`;
+  a slow zoom and side-follow toward B only while photo-finish slow motion is on.
+- **Six rounds:** straight; +steep; +circle (photo finish); finish moves up (curve dips 2 units under B); a bump dented
+  into the curve (new `BumpedCycloid`, height 0.7, still wins by about 0.04s over the circle); all 8 shapes (new `Sine`, `Wave`).
+  Kernel took three new `CurveKind`s; the original five rounds are unchanged.
+- **Pacing.** 7.5s first hold (card + explainer), then per round 0.6s transition, 1.5s guess hold, about 3-4s run, 1.25s result
+  (caption hold kept above 1.2s by cutting run time first: gravity 8, one caption per result, no `result2`). Series estimate
+  about 49s. **Estimated from the kernel, not measured in Unity.**
+- **Audio.** Each ball ticks while running; tick pitch and rate rise with its speed. Whoosh at launch, chimes by finish place.
+- **Ending.** Others fade, the curve thickens and glows and its label becomes `BRACHISTOCHRONE`; captions give the Greek roots.

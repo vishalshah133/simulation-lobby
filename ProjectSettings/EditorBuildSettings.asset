@@ -6,6 +6,39 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Comp001_Master.unity
+    guid: e6ac34e412cafaa44977445b4f4c6814
+  - enabled: 1
+    path: Assets/Scenes/Comp001_10_FillOrEscape_Wide.unity
+    guid: 0f1c8c590073c7648bf0219788b7b548
+  - enabled: 1
+    path: Assets/Scenes/Comp001_08_ThreeRings_Wide.unity
+    guid: d0a3b1d3013478b4f993b009f796b984
+  - enabled: 1
+    path: Assets/Scenes/Comp001_09_RiggedBoard_Wide.unity
+    guid: e76058441f81eec42bb4adaf18c9b4c2
+  - enabled: 1
+    path: Assets/Scenes/Comp001_04_NeedleEllipse_Wide.unity
+    guid: 530dffeea7734dc4eab009cdba00ddf2
+  - enabled: 1
+    path: Assets/Scenes/Comp001_05_IronPress_Wide.unity
+    guid: 1bdb14fb8edf5b240b08e45de4bafb20
+  - enabled: 1
+    path: Assets/Scenes/Comp001_02_ShrinkingGap_Wide.unity
+    guid: a54307d20686b614fb4a595062ab4f58
+  - enabled: 1
+    path: Assets/Scenes/Comp001_07_Racetrack_Wide.unity
+    guid: 261ff4cc0adb64648b544c15310e8db3
+  - enabled: 1
+    path: Assets/Scenes/Comp001_01_DigitJump_Wide.unity
+    guid: 492e24bf9f723b247a0d03c7fe254041
+  - enabled: 1
+    path: Assets/Scenes/Comp001_03_GateFunnel_Wide.unity
+    guid: e95282bad2638974ca1df5028a1809c4
+  - enabled: 1
+    path: Assets/Scenes/Comp001_06_SixColours_Wide.unity
+    guid: 9b6971bb03aa2dd4bb6cf6aab452a192
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:

@@ -1,0 +1,20 @@
+{
+    "name": "SimulationLobby.Simulations.PerfectFit",
+    "rootNamespace": "SimulationLobby.Simulations.PerfectFit",
+    "references": [
+        "SimulationLobby.Core",
+        "SimulationLobby.Shared",
+        "SimulationLobby.Presentation",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

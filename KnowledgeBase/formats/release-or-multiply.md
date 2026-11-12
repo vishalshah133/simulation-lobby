@@ -57,3 +57,13 @@ explanation line needed beyond the title.
 
 - Does the escalating series (carry-over numbers) actually build return viewership? Test over 5 videos.
 - Best final-gate odds for a satisfying-but-tense finish — 70/30?
+
+## Wide variant (comp-001)
+
+Segment 3 of the ten-sim compilation, **Gate Funnel** (16:9, 1920x1080). Menu: `Simulation Lobby ▸ 2D Formats ▸ Release or Multiply (rom) ▸ Wide: Gate Funnel (comp-001)`; scene `Assets/Scenes/Comp001_03_GateFunnel_Wide.unity`. Additive: `RomWideSceneBuilder`, `RomWidePresenter`, `RomWideStarter`, `RomWideSettings` (the 9:16 builder, presenter and `RomConfig_001` are untouched).
+
+- **Run:** `RomConfig_Comp001_03`: 6 lanes x 5 rows of real gate types (x n, +n, half, x0), shuffled per run, **one starting marble**, last row x100/x20/x5/half/x0/x0. Wipes and halves are kept out of the top two rows so the lone marble is not simply deleted. Slow gravity (0.07) and heavy damping stretch the fall; the sparse single peg line per row keeps the gates the readable part.
+- **Frame:** hook top-left, `MARBLES n` counter in the right margin, one result caption held >= 1.5 s in the bottom strip (most dramatic gate since the last change), explainer panel via `SegmentCardPresenter`. Gate labels are world-space TextMeshPro decals on each gate band (dark text on bright bars).
+- **Ending:** every banked marble adds a gold dot to a mound in a bucket under the funnel (cap 170 dots), then the final count fades in huge over it.
+- **Start beat:** `RomWideStarter` holds the run for `startDelaySeconds` (1.8 s, the segment card) so the single drop is seen; the card timeline uses the starter's clock, not the runner's.
+- **Untuned:** never run in Unity. Length is an **estimate (~30-45 s)**, not measured: fall time through the pegs is the unknown. Dials: `gravityScale`, `linearDamping`, `finishHoldSeconds` (config), `startDelaySeconds`, `captionHoldSeconds`, pile and final-number sizes (`RomWide_Comp001_03`).

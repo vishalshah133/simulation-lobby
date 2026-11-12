@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa959d36f871e854a86adcff833186e0, type: 3}
+  m_Name: CoreConfig_001
+  m_EditorClassIdentifier: SimulationLobby.Simulations.ReachCore::SimulationLobby.Simulations.ReachCore.CoreConfig
+  fixedTimestep: 0.01
+  maxDurationSeconds: 150
+  intent: 'core-001: 5 rings of 20-12 segments, 1 touch outside to 4 inside, spinning
+    18deg/s alternating; ball 6.8 u/s +0.4 per ring; 100s clock; the arena wall closes
+    in on each ring clear. Ode to Joy, one note per touch. Portrait 9:16.'
+  ringCount: 4
+  outerRingInnerRadius: 4.4
+  ringSpacing: 1
+  ringThickness: 0.22
+  outerSegments: 20
+  segmentsLostPerRing: 2
+  coreRadius: 0.45
+  outerHitPoints: 1
+  innerHitPoints: 6
+  segmentCooldownSeconds: 0.8
+  incidenceBandDegrees: {x: 25, y: 65}
+  stallSeconds: 2.5
+  ringAngularSpeed: 18
+  alternateDirections: 1
+  spinDirectionSeeded: 1
+  ballRadius: 0.16
+  startSpeed: 3.6
+  speedPerRing: 0.2
+  timeLimitSeconds: 100
+  finishHoldSeconds: 1.2

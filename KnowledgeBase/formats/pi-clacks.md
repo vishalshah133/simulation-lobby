@@ -49,3 +49,19 @@ at each contact: exact for k = 0..6 (3 … 3,141,592), 1.2 s of CPU for k = 6 in
   round until the harness shows the rightmost contact inside the visible width.
 - **Contact gaps get microscopic** (k = 6: big block 2·10⁻⁶ from the small one). That's fine in doubles. Drawn, the
   blocks just look like they touch, which is the classic picture.
+
+## Wide variant (comp-001)
+
+Segment 1 of `comp-001`, **Digit Jump** (16:9, 1920x1080). Menu: `Simulation Lobby ▸ 2D Formats ▸ Pi Clacks (clack) ▸ Wide: Digit Jump (comp-001)`.
+Scene `Assets/Scenes/Comp001_01_DigitJump_Wide.unity`, config `Assets/Settings/Configs/PiClacksConfig_comp001_01.asset`,
+card `Assets/Settings/SegmentCards/comp001_01.asset`. Code: `Editor/PiClacksWideSceneBuilder.cs` (partial of the portrait
+builder), `View/PiClacksWideHud.cs`, plus `PiClacksPresenter.ApplyWideLook` (fixed palette, heavier buzz).
+
+- **Rounds skip**: exponents 0, 2, 4, 6 (mass ratio 1 / 10^4 / 10^8 / 10^12), counts 3 / 314 / 31415 / 3141592, labels
+  1 kg / 10,000 kg / 100,000,000 kg / 1,000,000,000,000 kg. Gaps and speed unchanged, so run lengths are the old
+  harness numbers (3.0 / 7.9 / 3.1 / 3.5 s). Series estimate about 45 s (not measured in Unity).
+- **Look**: black backdrop, fixed magenta small block and cyan big block, violet wall, aqua floor line. Not seed-picked.
+- **HUD**: hook top-left, `CLACKS n` in the right margin, digit ladder under it (new digits tinted gold, ends
+  `PI = 3.141592`), result caption bottom, `WAIT...` whenever a run is silent for 1.6 s (the k = 2 tail).
+- **Hold before round 1 is 7 s** so the title card (1.5 s) and the explainer (5 s) play over a static scene.
+- **Open**: the long mass labels (`1,000,000,000,000 kg`) auto-size small on the block; check at 480 px wide.
