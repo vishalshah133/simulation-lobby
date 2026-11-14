@@ -169,6 +169,10 @@ Learned building the first 3D format — prototyped as `impact`, shipped as `sur
   peg-to-wall: a gap just under one diameter is a V pocket that wedges marbles on a shallow slope (it did, the same day). Stop
   wall-huggers with angled deflector wedges on the walls between rows, not with a tight wall clearance, and keep a stall nudge as a fail-safe.
 
+- **Never keep the collider of a scaled `Cylinder` primitive.** Its collider is a `CapsuleCollider`, and a 1400 x 0.1 x 1400 floor
+  becomes a 700 m *sphere* around the whole scene: every body starts inside it and is ejected (`push-001`, 131 of 150 coins fell
+  through the shelf). Destroy it and add a `BoxCollider` (or use a `Cube`) for any flat cylinder that must collide.
+
 - **A generated mesh that changes shape must be saved as a fresh asset, never overwritten in place.**
   `StudioSetBuilder.SaveMesh` copies into the existing asset to keep its GUID; after a layout change the
   editor kept *drawing the previous build's mesh* while physics and obstacles used the new data, so pegs and
@@ -274,6 +278,14 @@ without being asked twice. The user pastes them straight into YouTube Studio.
 - **Standalone.** Write as if this is the only video that exists. Never reference other videos, earlier
   versions or internal names ("same question", "part 2 of", slugs like `conv-002`, "v2").
 - **Verify lengths with a script** (`python -c "print(len(...))"`) before handing over. Don't estimate.
+- **Analyse the recorded footage before writing the kit.** Recordings land in `Recordings/` (`Movie_NNN.mp4`). `ffmpeg` is not on
+  PATH, but Python's `imageio_ffmpeg` bundles it:
+  `python -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())"` (no `ffprobe`; `ffmpeg -i` prints duration, resolution,
+  fps, streams). Check the duration against the length target, make a contact sheet
+  (`-vf "fps=1/4.6,scale=270:480,tile=4x4" -frames:v 1`) and read the last frame, and `-af volumedetect` for audio. Read the real
+  result (final counter, outcome) from the frames so the kit and thumbnail match what is on screen. Pull the thumbnail/cover frame
+  with `-ss <t> -frames:v 1`. Report anything the footage breaks from the plan (counter not starting at 0, missing outro, text over
+  the arena, too short) instead of papering over it. Put scratch frames in the scratchpad, not `Recordings/`.
 
 **Shorts**
 1. **Title**, max 100 chars, hashtags included. A question naming what's on screen, a hook word in CAPS at
@@ -286,6 +298,18 @@ without being asked twice. The user pastes them straight into YouTube Studio.
    - Then 5-8 hashtags; the first 3 show above the title, so put the most relevant first.
 3. **Tags** (the Studio Tags field), comma-separated, under 500 chars. Lead with the concept's search
    terms and misspellings, then genre terms (`physics simulation`, `satisfying`), and end with `simulation lobby`.
+4. **Outro**: stitch the branded end card `Recordings/Simulation_Lobby_Shorts_Outro.mp4` (5 s, 1080x1920, logo + subscribe +
+   handle, has audio) onto the end of the recording with a **0.6 s crossfade**. Never fake one with a freeze-frame and text.
+   Look for existing outro files in `Recordings/` before making anything. Write the result as the renamed upload file, keep
+   `Movie_NNN.mp4` untouched. ffmpeg (`$F` = the `imageio_ffmpeg` exe; `offset` = recording duration - 0.6):
+   `$F -i Movie_NNN.mp4 -i Simulation_Lobby_Shorts_Outro.mp4 -filter_complex "[0:v]fps=30,format=yuv420p,settb=AVTB[v0];[1:v]fps=30,scale=1080:1920,format=yuv420p,settb=AVTB[v1];[v0][v1]xfade=transition=fade:duration=0.6:offset=<offset>[v];[0:a]aresample=48000[a0];[1:a]aresample=48000[a1];[a0][a1]acrossfade=d=0.6[a]" -map "[v]" -map "[a]" -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart <name>.mp4`
+   (the outro lists audio before video, so always `-map` explicitly). Check one frame mid-fade. The recording's result card
+   must be on screen for at least 2 s before the fade starts.
+5. **Renamed files** (SEO): never upload `Movie_002.mp4`. Rename to the main search phrase, lowercase, hyphenated, no
+   slugs or dates, ending `-physics-simulation-shorts` (match `Recordings/`, e.g.
+   `halloween-haunted-pumpkin-ghost-escape-physics-simulation-shorts.mp4`; thumbnail `<same-stem>-thumbnail.jpg`).
+6. **Thumbnail** (CTR): the cover frame. Say which timestamp to pick (the tensest frame before the answer, the question
+   text readable at 480 px). A custom 1280x720 thumbnail is optional; when made, same rules as long form.
 
 **Long form**
 1. **Title**, max 100 chars, keeping the hook in the first ~60 (that's what shows in browse). **No hashtags** in the
@@ -297,8 +321,19 @@ without being asked twice. The user pastes them straight into YouTube Studio.
    - A comment prompt.
    - 3-5 hashtags at the end.
 3. **Tags**, comma-separated, under 500 chars. Same rules as for Shorts.
+4. **Outro**: stitch `Recordings/Long_Form_Outro.mp4` (or `Long_Form_Outro_4k.mp4` for a 4K render) onto the end with a
+   crossfade, same `xfade` + `acrossfade` recipe as Shorts (check its size/fps with `ffmpeg -i` and scale to match). It must
+   leave 10-20 s for YouTube end-screen elements (video + subscribe). Never fake one with a freeze-frame and text.
+5. **Renamed files** (SEO): never upload `Movie_002.mp4`. Rename the video and thumbnail to the main search phrase,
+   lowercase, hyphenated, no slugs or dates, ending `-physics-simulation` (match `Recordings/`, e.g.
+   `5-minute-marble-run-timer-300-marbles-countdown-physics-simulation.mp4`; thumbnail `5-minute-marble-run-timer-300-marbles-thumbnail.jpg`).
+6. **Thumbnail** (CTR): 1280x720 16:9, under 2 MB, JPG/PNG. One subject, 2-3 high-contrast colours, at most 3-4 words of huge
+   text (never repeating the title), readable at ~120 px wide, no clutter at the edges (the timestamp covers the bottom
+   right). Show the tension or the question's key object, not the answer. Give a concrete layout spec (text, colours,
+   which frame to grab). Shorts have no custom thumbnail upload on mobile: pick a strong frame instead and say which.
 
-Also give a **pinned comment** suggestion. Remind the user to record the logged seed in the video's plan.
+**Every video, Shorts and long form, gets the full kit:** title, description, tags, pinned comment, outro, renamed
+file names and thumbnail. Also give a **pinned comment** suggestion. Remind the user to record the logged seed in the video's plan.
 
 ## Content formats (shorthand used in commits and docs)
 
@@ -327,6 +362,8 @@ Also give a **pinned comment** suggestion. Remind the user to record the logged 
 | `trip` | Trippy Coaster — one cart through seven shader-painted worlds (neon gate, UV tunnel, kaleidoscope, inverted sky, liquid light, fractal bloom, singularity); no riders, no scares (`built, not yet played`, 3D, hypnotic/sound-on) | Long + Short cuts |
 | `twin` | Twin Drop — two marbles released through a peg board, exactly the same or a gap of 1 cm down to one atom; SAME SLOT vs DIFFERENT tally (the butterfly effect) (`built, not yet played`, 2D, maths) | Short |
 | `fit` | Perfect Fit — a shape locks onto a spinning wall's spin and slides through a hole cut to its outline; the gap shrinks 30 mm to 0.5 mm (`built, not yet played`, 3D, oddly satisfying experiment) | Short |
+| `timer` | Marble Run Timer — exact countdown, 300-marble stream into a bucket; "how many make it in 5 minutes?" (`built`, 3D, utility long form) | Long |
+| `push` | Coin Pusher — arcade coin pusher; put 100 coins in, how many come out? (IN vs OUT) (`building`, 3D, real-world experiment) | Short |
 
 Details and per-format hooks live in `KnowledgeBase/formats/`.
 
